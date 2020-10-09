@@ -32,4 +32,7 @@ WEnd
 ProgressOff()
 
 ;~ Dism /Unmount-Image /MountDir:"C:\WinPE_amd64\mount" /commit
+;~ Dism /Unmount-Image /MountDir:"C:\WinPE_amd64\mount" /discard
 ;~ Dism /Mount-Image /ImageFile:"C:\WinPE_amd64\media\sources\boot.wim" /index:1 /MountDir:"C:\WinPE_amd64\mount"
+;~ https://www.autoitscript.com/forum/topic/123970-dism-console-progress-using-stdoutread/page/2/#comments
+;~ https://www.autoitscript.com/forum/topic/127075-wimgapi-udf/#comments
