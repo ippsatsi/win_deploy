@@ -49,3 +49,4 @@ ProgressOff()
 ;~ Dism /Mount-Image /ImageFile:"C:\WinPE_amd64\media\sources\boot.wim" /index:1 /MountDir:"C:\WinPE_amd64\mount"
 ;~ https://www.autoitscript.com/forum/topic/123970-dism-console-progress-using-stdoutread/page/2/#comments
 ;~ https://www.autoitscript.com/forum/topic/127075-wimgapi-udf/#comments
+;~ dism /Apply-Image /ImageFile:N:\Images\my-windows-partition.wim /Index:1 /ApplyDir:W:\
