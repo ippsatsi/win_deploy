@@ -1,10 +1,13 @@
-#RequireAdmin
+;#RequireAdmin
 #include <ButtonConstants.au3>
 #include <ComboConstants.au3>
 #include <GUIConstantsEx.au3>
 #include <GUIListBox.au3>
 #include <StaticConstants.au3>
 #include <WindowsConstants.au3>
+#include <ColorConstants.au3>
+#include <funciones.au3>
+
 #Region ### START Koda GUI section ### Form=c:\users\luis\documents\form2.kxf
 $Form1_1 = GUICreate("Form1", 598, 274, 220, 202)
 $btActivar = GUICtrlCreateButton("Activar", 338, 215, 89, 25)
@@ -15,12 +18,12 @@ $Group1 = GUICtrlCreateGroup("Group1", 16, 8, 561, 249)
 $lblArranque = GUICtrlCreateLabel("Tipo Arranque: ", 42, 28, 156, 17)
 $Label1 = GUICtrlCreateLabel("Activar particion de sistema", 42, 56, 156, 17)
 
-    GUICtrlCreateGroup("Arranque:", 42, 95, 220,50)
-    Local $ckUEFI = GUICtrlCreateRadio("", 62, 115, 17, 17)
-	GUICtrlCreateLabel("UEFI", 80, 117, 25, 17)
-    GUICtrlCreateRadio("", 132, 115, 17, 17)
-	GUICtrlCreateLabel("CSM/MBR", 150, 117, 55, 17)
-    GUICtrlCreateGroup("", -99, -99, 1, 1) ;close group
+GUICtrlCreateGroup("Arranque:", 42, 95, 220,50)
+Local $ckUEFI = GUICtrlCreateRadio("", 62, 115, 17, 17)
+GUICtrlCreateLabel("UEFI", 80, 117, 25, 17)
+Local $ckCsm = GUICtrlCreateRadio("", 132, 115, 17, 17)
+GUICtrlCreateLabel("CSM/MBR", 150, 117, 55, 17)
+GUICtrlCreateGroup("", -99, -99, 1, 1) ;close group
 
 GUICtrlCreateGroup("", -99, -99, 1, 1)
 GUISetState(@SW_SHOW)
@@ -29,8 +32,10 @@ GUISetState(@SW_SHOW)
 Local $sTipoArranque = RegRead("HKLM\System\CurrentControlSet\Control", "PEFirmwareType")
 If $sTipoArranque = 2 Then
 	$sTipoArranque = "UEFI"
+	GUICtrlSetState($ckUEFI, $GUI_CHECKED)
 Else
 	$sTipoArranque = "CSM"
+	GUICtrlSetState($ckCsm, $GUI_CHECKED)
 EndIf
 
 GUICtrlSetData($lblArranque, "Tipo Arranque: " & $sTipoArranque)
@@ -56,6 +61,7 @@ While 1
 
 			Local $readConsole = StdoutRead($psBCDboot)
 			If StringInStr($readConsole, "Archivos de arranque creados correctamente") Then
+				$b = _CirculoResultado(30, 30, "verde")
 				MsgBox($MB_SYSTEMMODAL, "", "Activacion" & @CRLF & "OK ")
 			EndIf
 

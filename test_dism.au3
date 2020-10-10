@@ -15,14 +15,13 @@ Local $hTimer = TimerInit()
 
 ProgressOn("Image Load", "Deploying Image", "0 percent")
 While ProcessExists($DISMp)
-    $line = StdoutRead($DISMp, 5)
+    $line = StdoutRead($DISMp, False)
 	;ConsoleWrite($line)
-
     If StringInStr($line, ".0%") Then
         $line1 = StringSplit($line, ".")
-		;_ArrayDisplay( StringSplit( $line, @LF), "asDisksxxx")
-        $value = StringRight($line1[$line1[0] - 1], 2)
-        $value = StringStripWS($value, 7)
+        $value = StringRight($line1[$line1[0] - 1], 2) ; agarramos el ultimo % leido
+
+        ;$value = StringStripWS($value, 7)
     EndIf
     If $value == "00" Then $value = 100
     If @error Then ExitLoop
