@@ -43,18 +43,23 @@ While 1
 			Exit
 		Case $btActivar
 			MsgBox($MB_SYSTEMMODAL, "", "Default button clicked:" & @CRLF & "Radio ")
-			$Title = "Bogus"
-			$psDismApply = Run(@ComSpec & " /c title " & $Title & "|" & 'Dism.exe /Apply-Image /ImageFile:D:\util\install.wim /Index:1 /ApplyDir:W:\', "", "", 2 + 4)
+;~ 			$Title = "Bogus"
+;~ 			$psDismApply = Run(@ComSpec & " /c title " & $Title & "|" & 'Dism.exe /Apply-Image /ImageFile:D:\util\install.wim /Index:1 /ApplyDir:W:\', "", "", 2 + 4)
 
-			While ProcessExists($psDismApply)
-				$outConsole = StdoutRead($psDismApply,5)
-				ConsoleWrite($outConsole)
-			WEnd
+;~ 			While ProcessExists($psDismApply)
+;~ 				$outConsole = StdoutRead($psDismApply,5)
+;~ 				ConsoleWrite($outConsole)
+;~ 			WEnd
 ;~ 			dism /Apply-Image /ImageFile:N:\Images\my-windows-partition.wim /Index:1 /ApplyDir:W:\
-;~ 			$psBCDboot = Run(@ComSpec & " /c " & 'W:\Windows\System32\bcdboot W:\Windows /l es-mx /s S:', "", @SW_HIDE, $STDOUT_CHILD)
-;~ 			ProcessWaitClose($psBCDboot)
-;~ 			Local $readConsole = StdoutRead($psBCDboot)
-;~ 			ConsoleWrite($readConsole)
+			$psBCDboot = Run(@ComSpec & " /c " & 'W:\Windows\System32\bcdboot W:\Windows /l es-mx /s S:', "", @SW_HIDE, $STDOUT_CHILD)
+			ProcessWaitClose($psBCDboot)
+
+			Local $readConsole = StdoutRead($psBCDboot)
+			If StringInStr($readConsole, "Archivos de arranque creados correctamente") Then
+				MsgBox($MB_SYSTEMMODAL, "", "Activacion" & @CRLF & "OK ")
+			EndIf
+
+			ConsoleWrite($readConsole)
 
 	EndSwitch
 WEnd
