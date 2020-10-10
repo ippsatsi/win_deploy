@@ -1,4 +1,4 @@
-;#RequireAdmin
+#RequireAdmin
 #include <ButtonConstants.au3>
 #include <ComboConstants.au3>
 #include <GUIConstantsEx.au3>
@@ -8,8 +8,10 @@
 #include <ColorConstants.au3>
 #include <funciones.au3>
 
+Opt("GUIResizeMode", $GUI_DOCKTOP  + $GUI_DOCKSIZE)
+
 #Region ### START Koda GUI section ### Form=c:\users\luis\documents\form2.kxf
-$Form1_1 = GUICreate("Form1", 598, 274, 220, 202)
+$Form1_1 = GUICreate("Form1", 598, 374,-1,-1,$WS_SIZEBOX)
 $btActivar = GUICtrlCreateButton("Activar", 338, 215, 89, 25)
 $Button2 = GUICtrlCreateButton("Button1", 456, 215, 89, 25)
 $Group1 = GUICtrlCreateGroup("Group1", 16, 8, 561, 249)
@@ -26,6 +28,7 @@ GUICtrlCreateLabel("CSM/MBR", 150, 117, 55, 17)
 GUICtrlCreateGroup("", -99, -99, 1, 1) ;close group
 
 GUICtrlCreateGroup("", -99, -99, 1, 1)
+GUICtrlCreateLabel("xx", 4, 190, 200, 18, -1, $WS_EX_STATICEDGE)
 GUISetState(@SW_SHOW)
 #EndRegion ### END Koda GUI section ###
 
@@ -46,6 +49,8 @@ While 1
 	Switch $nMsg
 		Case $GUI_EVENT_CLOSE
 			Exit
+		Case $Button2
+			WinMove($Form1_1,"",Default, Default,Default, 500)
 		Case $btActivar
 			MsgBox($MB_SYSTEMMODAL, "", "Default button clicked:" & @CRLF & "Radio ")
 ;~ 			$Title = "Bogus"
