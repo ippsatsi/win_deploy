@@ -5,13 +5,18 @@
 #include <GUIListBox.au3>
 #include <StaticConstants.au3>
 #include <WindowsConstants.au3>
+#include <ProgressConstants.au3>
 #include <ColorConstants.au3>
 #include <funciones.au3>
 
 Opt("GUIResizeMode", $GUI_DOCKTOP  + $GUI_DOCKSIZE)
 
+Local $intGuiAncho = 598
+Local $intGuiAltoMin = 344
+Local $intGuiAltoMax = 500
+
 #Region ### START Koda GUI section ### Form=c:\users\luis\documents\form2.kxf
-$Form1_1 = GUICreate("Form1", 598, 374,-1,-1,$WS_SIZEBOX)
+$Form1_1 = GUICreate("Form1", $intGuiAncho, $intGuiAltoMin,-1,-1,$WS_SIZEBOX)
 $btActivar = GUICtrlCreateButton("Activar", 338, 215, 89, 25)
 $Button2 = GUICtrlCreateButton("Button1", 456, 215, 89, 25)
 $Group1 = GUICtrlCreateGroup("Group1", 16, 8, 561, 249)
@@ -28,7 +33,12 @@ GUICtrlCreateLabel("CSM/MBR", 150, 117, 55, 17)
 GUICtrlCreateGroup("", -99, -99, 1, 1) ;close group
 
 GUICtrlCreateGroup("", -99, -99, 1, 1)
-GUICtrlCreateLabel("xx", 4, 190, 200, 18, -1, $WS_EX_STATICEDGE)
+Local $idProgressbar1 = GUICtrlCreateProgress(16, 270, 430, 25)
+$btDetalles = GUICtrlCreateButton("<< Detalles", 456, 270, 89, 25)
+Local $boolDetalles = False
+Local $txtContenidoDetalles = ''
+$BoxDetalles = GUICtrlCreateLabel("", 16, 320, 561, 118, -1, $WS_EX_STATICEDGE)
+
 GUISetState(@SW_SHOW)
 #EndRegion ### END Koda GUI section ###
 
@@ -49,8 +59,16 @@ While 1
 	Switch $nMsg
 		Case $GUI_EVENT_CLOSE
 			Exit
-		Case $Button2
-			WinMove($Form1_1,"",Default, Default,Default, 500)
+		Case $btDetalles
+			If $boolDetalles = False Then
+				WinMove($Form1_1,"",Default, Default,Default, $intGuiAltoMax)
+				$boolDetalles = True
+			Else
+				WinMove($Form1_1,"",Default, Default,Default, $intGuiAltoMin)
+				$boolDetalles = False
+			EndIf
+
+
 		Case $btActivar
 			MsgBox($MB_SYSTEMMODAL, "", "Default button clicked:" & @CRLF & "Radio ")
 ;~ 			$Title = "Bogus"
