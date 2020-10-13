@@ -8,6 +8,7 @@
 #include <ProgressConstants.au3>
 #include <ColorConstants.au3>
 #include <funciones.au3>
+#include <EditConstants.au3>
 
 Opt("GUIResizeMode", $GUI_DOCKTOP  + $GUI_DOCKSIZE)
 
@@ -37,11 +38,12 @@ Local $idProgressbar1 = GUICtrlCreateProgress(16, 270, 430, 25)
 $btDetalles = GUICtrlCreateButton("<< Detalles", 456, 270, 89, 25)
 Local $boolDetalles = False
 Local $txtContenidoDetalles = ''
-$BoxDetalles = GUICtrlCreateLabel("", 16, 320, 561, 118, -1, $WS_EX_STATICEDGE)
+$BoxDetalles = GUICtrlCreateEdit("", 16, 320, 561, 118, $ES_MULTILINE + $ES_AUTOVSCROLL + $WS_VSCROLL, $WS_EX_STATICEDGE)
 
 GUISetState(@SW_SHOW)
 #EndRegion ### END Koda GUI section ###
-
+Local $txtCommandLine = ''
+Local $txtBootOption = ''
 Local $sTipoArranque = RegRead("HKLM\System\CurrentControlSet\Control", "PEFirmwareType")
 If $sTipoArranque = 2 Then
 	$sTipoArranque = "UEFI"
@@ -79,15 +81,29 @@ While 1
 ;~ 				ConsoleWrite($outConsole)
 ;~ 			WEnd
 ;~ 			dism /Apply-Image /ImageFile:N:\Images\my-windows-partition.wim /Index:1 /ApplyDir:W:\
-			$psBCDboot = Run(@ComSpec & " /c " & 'W:\Windows\System32\bcdboot W:\Windows /l es-mx /s S:', "", @SW_HIDE, $STDOUT_CHILD)
+			If	GUICtrlRead($ckUEFI) = $GUI_CHECKED Then
+				$txtBootOption = "UEFI"
+			Else
+				$txtBootOption = "BIOS"
+			EndIf
+
+			$txtCommandLine = 'W:\Windows\System32\bcdboot W:\Windows /l es-mx /s S: /f ' & $txtBootOption
+			$psBCDboot = Run(@ComSpec & " /c " & $txtCommandLine, "", @SW_HIDE, $STDOUT_CHILD)
 			ProcessWaitClose($psBCDboot)
 
 			Local $readConsole = StdoutRead($psBCDboot)
+			GUICtrlSetData($BoxDetalles, "Activando Particion De Sistema...." & @CRLF)
+			GUICtrlSetData($BoxDetalles, "==============================" & @CRLF, 1)
+			GUICtrlSetData($BoxDetalles, $txtCommandLine & @CRLF, 1)
 			If StringInStr($readConsole, "Archivos de arranque creados correctamente") Then
 				$b = _CirculoResultado(30, 30, "verde")
 				MsgBox($MB_SYSTEMMODAL, "", "Activacion" & @CRLF & "OK ")
+			Else
+				$b = _CirculoResultado(30, 30, "rojo")
+				GUICtrlSetData($BoxDetalles, "Error:" & @CRLF, 1)
+				MsgBox($MB_SYSTEMMODAL, "", "Error en la activacion de la particion de sistema" & @CRLF & "OK ")
 			EndIf
-
+			GUICtrlSetData($BoxDetalles, $readConsole & @CRLF, 1)
 			ConsoleWrite($readConsole)
 
 	EndSwitch
