@@ -106,7 +106,7 @@ While 1
 			EndIf
 			; Activar particion sistema
 			$resultado = _EjecutarTarea($ContenedorCtrl,$arrayComandos, $itemActivacion, $intOperaciones,$txtBootOption)
-			;$resultado = True
+			$resultado = True
 
 			If Not $resultado Then
 				ContinueLoop
@@ -118,7 +118,13 @@ While 1
 			;Crear carpeta Winre
 			_MensajesEstado($ContenedorCtrl[1],$ContenedorCtrl[2], $arrayComandos[$intOperaciones][0])
 			$rutaWinre = "R:\Recovery\WindowsRE"
-			If	FileExists($rutaWinre) Or (Not FileExists($rutaWinre) And DirCreate($rutaWinre)) Then
+			$unidadRecovery = "R:\"
+			If FileExists($unidadRecovery) Then
+				ConsoleWrite("Existe R:")
+				ContinueLoop
+			EndIf
+
+			If	FileExists($unidadRecovery) Or FileExists($rutaWinre) Or (Not FileExists($rutaWinre) And DirCreate($rutaWinre)) Then
 				_MensajesEstado($ContenedorCtrl[1],$ContenedorCtrl[2],$arrayComandos[$intOperaciones][2])
 				$resultado = True
 			ElseIf Not FileExists($rutaWinre) Then
