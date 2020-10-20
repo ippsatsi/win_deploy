@@ -22,24 +22,24 @@ Local $intGuiAltoMin = 343
 Local $intGuiAltoMax = 500
 
 #Region ### START Koda GUI section ### Form=c:\users\luis\documents\form2.kxf
-Global $Form1_1 = GUICreate("Form1", $intGuiAncho, $intGuiAltoMin,-1,-1)
+Global $Form1_1 = GUICreate("Activador de Restauración", $intGuiAncho, $intGuiAltoMin,-1,-1)
 $btActivar = GUICtrlCreateButton("Activar", 338, 215, 89, 25)
 $Button2 = GUICtrlCreateButton("Button1", 456, 215, 89, 25)
-$Group1 = GUICtrlCreateGroup("Group1", 16, 8, 561, 249)
+$Group1 = GUICtrlCreateGroup("Activación", 16, 8, 561, 249)
 ;$List1 = GUICtrlCreateList("", 192, 56, 201, 19)
 ;$Combo1 = GUICtrlCreateCombo("Combo1", 88, 104, 177, 25, BitOR($CBS_DROPDOWN,$CBS_AUTOHSCROLL))
-$lblArranque = GUICtrlCreateLabel("Tipo Arranque: ", 42, 28, 156, 17)
-Global $itemActivacion = GUICtrlCreateLabel("Activar particion de sistema", 42, 56, 156, 17)
+$lblArranque = GUICtrlCreateLabel("Tipo Arranque Actual: ", 42, 28, 156, 17)
+Global $itemActivacion = GUICtrlCreateLabel("Activar particion de sistema", 52, 56, 156, 17)
 
-GUICtrlCreateGroup("Arranque:", 52, 75, 220,50)
-Local $ckUEFI = GUICtrlCreateRadio("", 72, 95, 17, 17)
-GUICtrlCreateLabel("UEFI", 90, 97, 25, 17)
-Local $ckCsm = GUICtrlCreateRadio("", 142, 95, 17, 17)
-GUICtrlCreateLabel("CSM/MBR", 160, 97, 55, 17)
+GUICtrlCreateGroup("Arranque en disco:", 62, 75, 220,50)
+Local $ckUEFI = GUICtrlCreateRadio("", 82, 95, 17, 17)
+GUICtrlCreateLabel("UEFI", 100, 97, 25, 17)
+Local $ckCsm = GUICtrlCreateRadio("", 152, 95, 17, 17)
+GUICtrlCreateLabel("CSM/MBR", 170, 97, 55, 17)
 GUICtrlCreateGroup("", -99, -99, 1, 1) ;close group
 
-Global $itemCopyWinre = GUICtrlCreateLabel("Copiado WinRe", 42, 137, 156, 17)
-Global $itemRegWinre = GUICtrlCreateLabel("Registro WinRe", 42, 157, 156, 17)
+Global $itemCopyWinre = GUICtrlCreateLabel("Copiado WinRE", 52, 137, 156, 17)
+Global $itemRegWinre = GUICtrlCreateLabel("Registro WinRE", 52, 157, 156, 17)
 GUICtrlCreateGroup("", -99, -99, 1, 1)
 Local $lblEstado = GUICtrlCreateLabel("Listo", 16, 262, 375, 17)
 Local $idProgressbar1 = GUICtrlCreateProgress(16, 282, 430, 25)
@@ -60,7 +60,7 @@ Else
 	$sTipoArranque = "CSM"
 	GUICtrlSetState($ckCsm, $GUI_CHECKED)
 EndIf
-GUICtrlSetData($lblArranque, "Tipo Arranque: " & $sTipoArranque)
+GUICtrlSetData($lblArranque, "Arranque Actual de BIOS: " & $sTipoArranque)
 GUISetState(@SW_SHOW)
 $intOperaciones = 0
 Local $ContenedorCtrl[3]
@@ -98,7 +98,7 @@ While 1
 ;~ 			dism /Apply-Image /ImageFile:N:\Images\my-windows-partition.wim /Index:1 /ApplyDir:W:\
 			$intOperaciones = 0
 			GUICtrlSetData($BoxDetalles, '')
-			GUICtrlSetData($xlblEstado, "Iniciando activación de particiones...")
+			GUICtrlSetData($lblEstado, "Iniciando activación de particiones...")
 			GUICtrlSetData($idProgressbar1, 0)
 			If	GUICtrlRead($ckUEFI) = $GUI_CHECKED Then
 				$txtBootOption = "UEFI"
@@ -137,7 +137,7 @@ While 1
 				EndIf
 			Else ;si no existe particion Recovery
 				$rutaWinre = $RutaCopiadoOrigen
-				MensajesEstado($ContenedorCtrl[1],$ContenedorCtrl[2], "Se usara la particion Windows para la imagen Recovery")
+				_MensajesEstado($ContenedorCtrl[1],$ContenedorCtrl[2], "Se usara la particion Windows para la imagen Recovery")
 			EndIf
 
 			GUICtrlSetData($idProgressbar1, 40)
@@ -174,7 +174,7 @@ While 1
 					ContinueLoop
 				EndIf
 			Else
-				MensajesEstado($ContenedorCtrl[1],$ContenedorCtrl[2], "El archivo WinRE.wim ya esta en el destino, se obvia la copia")
+				_MensajesEstado($ContenedorCtrl[1],$ContenedorCtrl[2], "El archivo WinRE.wim ya esta en el destino, se obvia la copia")
 			EndIf
 
 
