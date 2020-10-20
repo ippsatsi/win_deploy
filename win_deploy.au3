@@ -17,15 +17,15 @@
 
 Opt("GUIResizeMode", $GUI_DOCKTOP  + $GUI_DOCKSIZE)
 
-Local $intGuiAncho = 598
+Local $intGuiAncho = 398
 Local $intGuiAltoMin = 343
 Local $intGuiAltoMax = 500
 
 #Region ### START Koda GUI section ### Form=c:\users\luis\documents\form2.kxf
 Global $Form1_1 = GUICreate("Activador de Restauración", $intGuiAncho, $intGuiAltoMin,-1,-1)
-$btActivar = GUICtrlCreateButton("Activar", 338, 215, 89, 25)
-$Button2 = GUICtrlCreateButton("Button1", 456, 215, 89, 25)
-$Group1 = GUICtrlCreateGroup("Activación", 16, 8, 561, 249)
+$btActivar = GUICtrlCreateButton("Activar", $intGuiAncho - 268, 215, 89, 25)
+$Button2 = GUICtrlCreateButton("Button1", $intGuiAncho - 142, 215, 89, 25)
+$Group1 = GUICtrlCreateGroup("Activación", 16, 8, $intGuiAncho - 37, 249)
 ;$List1 = GUICtrlCreateList("", 192, 56, 201, 19)
 ;$Combo1 = GUICtrlCreateCombo("Combo1", 88, 104, 177, 25, BitOR($CBS_DROPDOWN,$CBS_AUTOHSCROLL))
 $lblArranque = GUICtrlCreateLabel("Tipo Arranque Actual: ", 42, 28, 156, 17)
@@ -42,11 +42,11 @@ Global $itemCopyWinre = GUICtrlCreateLabel("Copiado WinRE", 52, 137, 156, 17)
 Global $itemRegWinre = GUICtrlCreateLabel("Registro WinRE", 52, 157, 156, 17)
 GUICtrlCreateGroup("", -99, -99, 1, 1)
 Local $lblEstado = GUICtrlCreateLabel("Listo", 16, 262, 375, 17)
-Local $idProgressbar1 = GUICtrlCreateProgress(16, 282, 430, 25)
-$btDetalles = GUICtrlCreateButton("<< Detalles", 456, 282, 89, 25)
+Local $idProgressbar1 = GUICtrlCreateProgress(16, 282, $intGuiAncho - 168, 25)
+$btDetalles = GUICtrlCreateButton("<< Detalles", $intGuiAncho - 142, 282, 89, 25)
 Local $boolDetalles = False
 Local $txtContenidoDetalles = ''
-$BoxDetalles = GUICtrlCreateEdit("", 16, 325, 561, 128, $ES_MULTILINE + $ES_AUTOVSCROLL + $WS_VSCROLL + $ES_READONLY, $WS_EX_STATICEDGE)
+$BoxDetalles = GUICtrlCreateEdit("", 16, 325, $intGuiAncho - 37, 128, $ES_MULTILINE + $ES_AUTOVSCROLL + $WS_VSCROLL + $ES_READONLY, $WS_EX_STATICEDGE)
 WinMove($Form1_1,"",Default, Default,Default, $intGuiAltoMin)
 
 #EndRegion ### END Koda GUI section ###
