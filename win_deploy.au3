@@ -98,6 +98,7 @@ While 1
 ;~ 			dism /Apply-Image /ImageFile:N:\Images\my-windows-partition.wim /Index:1 /ApplyDir:W:\
 			$intOperaciones = 0
 			GUICtrlSetData($BoxDetalles, '')
+			GUICtrlSetData($xlblEstado, "Iniciando activación de particiones...")
 			GUICtrlSetData($idProgressbar1, 0)
 			If	GUICtrlRead($ckUEFI) = $GUI_CHECKED Then
 				$txtBootOption = "UEFI"
@@ -117,24 +118,28 @@ While 1
 
 			;Crear carpeta Winre
 			_MensajesEstado($ContenedorCtrl[1],$ContenedorCtrl[2], $arrayComandos[$intOperaciones][0])
+			; esta sera la ruta si existe particion Recovery
+			; $rutaWinre definie donde se alamacenara la imagen Recovery
 			$rutaWinre = "R:\Recovery\WindowsRE"
 			$unidadRecovery = "R:\"
+			$RutaCopiadoOrigen = "W:\Windows\System32\Recovery"
+			;Si existe R: (particion Recovery)
 			If FileExists($unidadRecovery) Then
-				ConsoleWrite("Existe R:")
-				ContinueLoop
+				If	FileExists($unidadRecovery) Or FileExists($rutaWinre) Or (Not FileExists($rutaWinre) And DirCreate($rutaWinre)) Then
+					_MensajesEstado($ContenedorCtrl[1],$ContenedorCtrl[2],$arrayComandos[$intOperaciones][2])
+					$resultado = True
+				ElseIf Not FileExists($rutaWinre) Then
+					_MensajesEstado($ContenedorCtrl[1],$ContenedorCtrl[2],"Error: " & $arrayComandos[$intOperaciones][3])
+					ContinueLoop
+				EndIf
+				If Not $resultado Then
+					ContinueLoop
+				EndIf
+			Else ;si no existe particion Recovery
+				$rutaWinre = $RutaCopiadoOrigen
+				MensajesEstado($ContenedorCtrl[1],$ContenedorCtrl[2], "Se usara la particion Windows para la imagen Recovery")
 			EndIf
 
-			If	FileExists($unidadRecovery) Or FileExists($rutaWinre) Or (Not FileExists($rutaWinre) And DirCreate($rutaWinre)) Then
-				_MensajesEstado($ContenedorCtrl[1],$ContenedorCtrl[2],$arrayComandos[$intOperaciones][2])
-				$resultado = True
-			ElseIf Not FileExists($rutaWinre) Then
-				_MensajesEstado($ContenedorCtrl[1],$ContenedorCtrl[2],"Error: " & $arrayComandos[$intOperaciones][3])
-				ContinueLoop
-			EndIf
-
-			If Not $resultado Then
-				ContinueLoop
-			EndIf
 			GUICtrlSetData($idProgressbar1, 40)
 			$resultado = False
 			$intOperaciones = $intOperaciones + 1
@@ -143,41 +148,41 @@ While 1
 			$LetrasUnidad = "C:|D:|E:|F:|G:|H:|I:|J:|K:|L:|M:|N:|O:|P:|Q:|R:|S:|T:|U:|V:|W:|X:|Y:|Z:"
 			$arrayLetras = StringSplit($LetrasUnidad, '|', 1)
 
-
-			$archivo_wim = "install.wim"
-			$rutaFinalWinre = "\usb\IMA\"
-			For $Letra in $arrayLetras
-				$RutaArchivo = $Letra & $rutaFinalWinre & $archivo_wim
-				If FileExists($RutaArchivo) Then
-
-				EndIf
-			Next
-
-			$RutaCopiadoOrigen = "W:\Windows\System32\Recovery\"
-			If FileExists($RutaCopiadoOrigen & "winre.wim") Then
+			;Verificamos donde esta winre.wim antes de copiarlo
+			; si existe en la imagen ya desplegada
+			If FileExists($RutaCopiadoOrigen & "\winre.wim") Then
 				$parametro = $RutaCopiadoOrigen
-			Else
-				$archivo_wim = "install.wim"
+			Else ; sino esta en la imagen despleada la buscamos en algun usb ya sea en la raiz o en usb\IMA
+				$archivo_wim = "winre.wim"
 				$rutaFinalWinre = "\usb\IMA\"
 				For $Letra in $arrayLetras
 					$RutaArchivo = $Letra & $rutaFinalWinre & $archivo_wim
+					$rutaWinreRaiz = $Letra & '\' & $archivo_wim
 					If FileExists($RutaArchivo) Then
 						$parametro = $Letra & $rutaFinalWinre
+					ElseIf FileExists($rutaWinreRaiz) Then
+						$parametro = $Letra & '\'
 					EndIf
 				Next
 
 			EndIf
-
-			$resultado = _EjecutarTarea($ContenedorCtrl,$arrayComandos, $itemCopyWinre, $intOperaciones, $parametro)
-
-			If Not $resultado Then
-				ContinueLoop
+			;solo copiamos si hay particion R:
+			If $rutaWinre <> $parametro Then
+				;ejecutamos el copiado #2
+				$resultado = _EjecutarTarea($ContenedorCtrl,$arrayComandos, $itemCopyWinre, $intOperaciones, $parametro)
+				If Not $resultado Then
+					ContinueLoop
+				EndIf
+			Else
+				MensajesEstado($ContenedorCtrl[1],$ContenedorCtrl[2], "El archivo WinRE.wim ya esta en el destino, se obvia la copia")
 			EndIf
+
+
 			$resultado = False
 			$intOperaciones = $intOperaciones + 1
 			GUICtrlSetData($idProgressbar1, 70)
-			;Registrar Winre
-			$resultado = _EjecutarTarea($ContenedorCtrl,$arrayComandos, $itemRegWinre, $intOperaciones)
+			;Registrar Winre #3 y pasamos la ruta de la imagen a registrar
+			$resultado = _EjecutarTarea($ContenedorCtrl,$arrayComandos, $itemRegWinre, $intOperaciones, $rutaWinre)
 
 			If Not $resultado Then
 				ContinueLoop

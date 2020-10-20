@@ -14,19 +14,19 @@ $arrayComandos[1][3] = 'Creacion carpeta recovery' ; texto alternativo de tarea
 $arrayComandos[1][4] = 'autoit' ; texto alternativo de tarea
 ;
 $arrayComandos[2][0] = "Copiando Winre.Wim..." ; Tarea a mostrar
-$arrayComandos[2][1] = 'copy /y ??param??winre.wim R:\Recovery\WindowsRE\winre.wim' ; commando a ejecutar
+$arrayComandos[2][1] = 'copy /y ??param??\winre.wim R:\Recovery\WindowsRE\winre.wim' ; commando a ejecutar
 $arrayComandos[2][2] = '1 archivo(s) copiado(s)' ; salida a comparar si es exitoso
 $arrayComandos[2][3] = 'Copiado Winre.wim' ; texto alternativo de tarea
 $arrayComandos[2][4] = 'cmd' ; texto alternativo de tarea
 ;
 $arrayComandos[3][0] = "Registrando Winre.Wim..." ; Tarea a mostrar
-$arrayComandos[3][1] = 'W:\Windows\System32\reagentc /setreimage /path R:\Recovery\WindowsRE /target W:\Windows' ; commando a ejecutar
+$arrayComandos[3][1] = 'W:\Windows\System32\reagentc /setreimage /path ??param?? /target W:\Windows' ; commando a ejecutar
 $arrayComandos[3][2] = 'n efectuada correctamente' ; salida a comparar si es exitoso
 $arrayComandos[3][3] = 'Registro Winre.wim' ; texto alternativo de tarea
 $arrayComandos[3][4] = 'cmd' ; texto alternativo de tarea
 ;
 $arrayComandos[4][0] = "Registrando Winre.Wim..." ; Tarea a mostrar
-$arrayComandos[4][1] = 'W:\Windows\System32\reagentc /setreimage /path R:\Recovery\WindowsRE /target W:\Windows' ; commando a ejecutar
+$arrayComandos[4][1] = 'W:\Windows\System32\reagentc /setreimage /path ??param?? /target W:\Windows' ; commando a ejecutar
 $arrayComandos[4][2] = 'La operación se completó correctamente' ; salida a comparar si es exitoso
 $arrayComandos[4][3] = 'Registro Winre.wim' ; texto alternativo de tarea
 $arrayComandos[4][4] = 'cmd' ; texto alternativo de tarea
