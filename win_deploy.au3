@@ -17,7 +17,7 @@
 
 Opt("GUIResizeMode", $GUI_DOCKTOP  + $GUI_DOCKSIZE)
 
-Local $intGuiAncho = 398
+Local $intGuiAncho = 598
 Local $intGuiAltoMin = 343
 Local $intGuiAltoMax = 500
 
@@ -119,13 +119,13 @@ While 1
 			;Crear carpeta Winre
 			_MensajesEstado($ContenedorCtrl[1],$ContenedorCtrl[2], $arrayComandos[$intOperaciones][0])
 			; esta sera la ruta si existe particion Recovery
-			; $rutaWinre definie donde se alamacenara la imagen Recovery
+			; $rutaWinre define donde se alamacenara la imagen Recovery
 			$rutaWinre = "R:\Recovery\WindowsRE"
 			$unidadRecovery = "R:\"
 			$RutaCopiadoOrigen = "W:\Windows\System32\Recovery"
 			;Si existe R: (particion Recovery)
 			If FileExists($unidadRecovery) Then
-				If	FileExists($unidadRecovery) Or FileExists($rutaWinre) Or (Not FileExists($rutaWinre) And DirCreate($rutaWinre)) Then
+				If	FileExists($rutaWinre) Or (Not FileExists($rutaWinre) And DirCreate($rutaWinre)) Then
 					_MensajesEstado($ContenedorCtrl[1],$ContenedorCtrl[2],$arrayComandos[$intOperaciones][2])
 					$resultado = True
 				ElseIf Not FileExists($rutaWinre) Then
@@ -135,9 +135,10 @@ While 1
 				If Not $resultado Then
 					ContinueLoop
 				EndIf
-			Else ;si no existe particion Recovery
+			Else ;si no existe particion Recovery no ejecutaremos la primera tarea de copiado, sino la siguiente q es para copiado sin R:
 				$rutaWinre = $RutaCopiadoOrigen
 				_MensajesEstado($ContenedorCtrl[1],$ContenedorCtrl[2], "Se usara la particion Windows para la imagen Recovery")
+				$intOperaciones = $intOperaciones + 1
 			EndIf
 
 			GUICtrlSetData($idProgressbar1, 40)
@@ -150,23 +151,29 @@ While 1
 
 			;Verificamos donde esta winre.wim antes de copiarlo
 			; si existe en la imagen ya desplegada
+			$parametro = ''
 			If FileExists($RutaCopiadoOrigen & "\winre.wim") Then
 				$parametro = $RutaCopiadoOrigen
+				;Aca deberiamos ir a registrar directamente, codifcar despues
 			Else ; sino esta en la imagen despleada la buscamos en algun usb ya sea en la raiz o en usb\IMA
-				$archivo_wim = "winre.wim"
-				$rutaFinalWinre = "\usb\IMA\"
+				$archivo_wim = "\winre.wim"
+				$rutaFinalWinre = "\usb\IMA"
 				For $Letra in $arrayLetras
 					$RutaArchivo = $Letra & $rutaFinalWinre & $archivo_wim
-					$rutaWinreRaiz = $Letra & '\' & $archivo_wim
+					$rutaWinreRaiz = $Letra & $archivo_wim
 					If FileExists($RutaArchivo) Then
 						$parametro = $Letra & $rutaFinalWinre
 					ElseIf FileExists($rutaWinreRaiz) Then
-						$parametro = $Letra & '\'
+						$parametro = $Letra
 					EndIf
 				Next
 
 			EndIf
-			;solo copiamos si hay particion R:
+			If $parametro = '' Then
+				_MensajesEstado($ContenedorCtrl[1],$ContenedorCtrl[2],"Error: No se ubica el archivo WinRE.wim")
+				ContinueLoop
+			EndIf
+			;solo copiamos si la ruta destino $rutaWinre es diferente de la ruta origen $parametro, si son iguales indica q el archivo ya existe
 			If $rutaWinre <> $parametro Then
 				;ejecutamos el copiado #2
 				$resultado = _EjecutarTarea($ContenedorCtrl,$arrayComandos, $itemCopyWinre, $intOperaciones, $parametro)
@@ -177,9 +184,8 @@ While 1
 				_MensajesEstado($ContenedorCtrl[1],$ContenedorCtrl[2], "El archivo WinRE.wim ya esta en el destino, se obvia la copia")
 			EndIf
 
-
 			$resultado = False
-			$intOperaciones = $intOperaciones + 1
+			$intOperaciones = $intOperaciones + $arrayComandos[$intOperaciones][4]
 			GUICtrlSetData($idProgressbar1, 70)
 			;Registrar Winre #3 y pasamos la ruta de la imagen a registrar
 			$resultado = _EjecutarTarea($ContenedorCtrl,$arrayComandos, $itemRegWinre, $intOperaciones, $rutaWinre)

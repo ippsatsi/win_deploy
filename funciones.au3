@@ -31,13 +31,18 @@ Func _EjecutarTarea ($xContenedorCtrl, $arrayComandos,$ctrlItem, $numTarea, $par
 	EndIf
 ;,
 	;Local $txtCommandLine = 'W:\Windows\System32\bcdboot W:\Windows /l es-mx /s S: /f ' & $txtBootOption
+	;en la caja de detalles insertamos un Enter para q se vea mas limpio
+	GUICtrlSetData($xContenedorCtrl[1], @CRLF, 1)
+	; mostramos mensaje de inicio de tares
+	_MensajesEstado($xContenedorCtrl[1],$xContenedorCtrl[2], $arrayComando[0])
+	GUICtrlSetData($xContenedorCtrl[1], _StringRepeat("=", StringLen($arrayComando[0])) & @CRLF, 1)
+	;insertamos la linea de comandos a ejecutar
+	GUICtrlSetData($xContenedorCtrl[1], $txtCommandLine & @CRLF, 1)
+
 	Local $psTarea = Run(@ComSpec & " /c " & $txtCommandLine, "", @SW_HIDE, $STDOUT_CHILD)
 	ProcessWaitClose($psTarea)
-
 	Local $readConsole = StdoutRead($psTarea)
-	_MensajesEstado($xContenedorCtrl[1],$xContenedorCtrl[2], @CRLF & $arrayComando[0])
-	GUICtrlSetData($xContenedorCtrl[1], _StringRepeat("=", StringLen($arrayComando[0])) & @CRLF, 1)
-	GUICtrlSetData($xContenedorCtrl[1], $txtCommandLine & @CRLF, 1)
+	; obtenemos la posicion del control, para colocarle a su costado la luz roja o verde segun el resultado
 	$arrayPos = ControlGetPos($xContenedorCtrl[0], "", $ctrlItem )
 	$posX = $arrayPos[0]
 	$posY = $arrayPos[1]
