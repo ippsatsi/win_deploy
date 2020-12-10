@@ -119,13 +119,33 @@ Func ListarDiscos($Diskpart_pid)
 EndFunc
 
 Func ExtraerFilasTabla($sSalida)
-	Local $arFilas
+	Local $arFilas, $i, $arSize
 	$arFilas = StringSplit($sSalida, @LF, $STR_NOCOUNT)
 	_ArrayDelete($arFilas, 0)
 	_ArrayDelete($arFilas, 0)
 	_ArrayDelete($arFilas, 0)
-	_ArrayDisplay( $arFilas, "Lista Filas")
+	;_ArrayDisplay( $arFilas, "Lista Filas")
+	Dim $arDisks[UBound($arFilas)][6]
 
+	For $i = 0 to UBound($arFilas) - 1
+		$sDato = StringMid($arFilas[$i], 9,1);# de disco
+		$arDisks[$i][0] = $sDato
+		$sDato = StringMid($arFilas[$i], 14,9)
+		$arDisks[$i][1] = $sDato
+		$sDato = StringMid($arFilas[$i], 28,8)
+		$arSize = StringSplit(StringStripWS($sDato,7)," ",2)
+		;_ArrayDisplay( $arSize, "Lista Filas")
+		$arDisks[$i][2] = $arSize[0]
+		$arDisks[$i][3] = $arSize[1]
+		;$arDisks[$i][2] = $sDato
+		$sDato = StringMid($arFilas[$i], 38,7)
+		$arSize = StringSplit(StringStripWS($sDato,7)," ",2)
+		$arDisks[$i][4] = $arSize[0]
+		$arDisks[$i][5] = $arSize[1]
+		;$arDisks[$i][3] = $sDato
+
+	Next
+	_ArrayDisplay( $arDisks, "Lista Filas")
 	Return $arFilas
 EndFunc
 
