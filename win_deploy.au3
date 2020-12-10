@@ -10,10 +10,12 @@
 #include <WindowsConstants.au3>
 #include <ProgressConstants.au3>
 #include <String.au3>
+#include <EditConstants.au3>
+#include <Array.au3>
 #include <ColorConstants.au3>
+
 #include <comandos_array.au3>
 #include <funciones.au3>
-#include <EditConstants.au3>
 
 Opt("GUIResizeMode", $GUI_DOCKTOP  + $GUI_DOCKSIZE)
 
@@ -22,9 +24,14 @@ Local $intGuiAltoMin = 343
 Local $intGuiAltoMax = 500
 
 #Region ### START Koda GUI section ### Form=c:\users\luis\documents\form2.kxf
+;Primera ventana
+Global $Form1_0 = GUICreate("Activador de Restauración", $intGuiAncho, $intGuiAltoMin,-1,-1)
+Local $idListDiscos = GUICtrlCreateListView("# Disco|Tamaño|Tipo  ", 10, 20, 200, 150) ;,$LVS_SORTDESCENDING)
+$btNext = GUICtrlCreateButton("Siguiente", $intGuiAncho - 142, 282, 89, 25)
+;seguna ventana
 Global $Form1_1 = GUICreate("Activador de Restauración", $intGuiAncho, $intGuiAltoMin,-1,-1)
-$btActivar = GUICtrlCreateButton("Activar", $intGuiAncho - 268, 215, 89, 25)
-$Button2 = GUICtrlCreateButton("Button1", $intGuiAncho - 142, 215, 89, 25)
+$btAnterior = GUICtrlCreateButton("anterior", $intGuiAncho - 268, 215, 89, 25)
+$btActivar = GUICtrlCreateButton("Activar", $intGuiAncho - 142, 215, 89, 25)
 $Group1 = GUICtrlCreateGroup("Activación", 16, 8, $intGuiAncho - 37, 249)
 ;$List1 = GUICtrlCreateList("", 192, 56, 201, 19)
 ;$Combo1 = GUICtrlCreateCombo("Combo1", 88, 104, 177, 25, BitOR($CBS_DROPDOWN,$CBS_AUTOHSCROLL))
@@ -48,6 +55,7 @@ Local $boolDetalles = False
 Local $txtContenidoDetalles = ''
 $BoxDetalles = GUICtrlCreateEdit("", 16, 325, $intGuiAncho - 37, 128, $ES_MULTILINE + $ES_AUTOVSCROLL + $WS_VSCROLL + $ES_READONLY, $WS_EX_STATICEDGE)
 WinMove($Form1_1,"",Default, Default,Default, $intGuiAltoMin)
+WinMove($Form1_0,"",Default, Default,Default, $intGuiAltoMin)
 
 #EndRegion ### END Koda GUI section ###
 Local $txtCommandLine = ''
@@ -61,20 +69,30 @@ Else
 	GUICtrlSetState($ckCsm, $GUI_CHECKED)
 EndIf
 GUICtrlSetData($lblArranque, "Arranque Actual de BIOS: " & $sTipoArranque)
-GUISetState(@SW_SHOW)
+GUISetState(@SW_SHOW, $Form1_0)
+GUISetState(@SW_HIDE, $Form1_1)
 $intOperaciones = 0
 Local $ContenedorCtrl[3]
 $ContenedorCtrl[0] = $Form1_1
 $ContenedorCtrl[1] = $BoxDetalles
 $ContenedorCtrl[2] = $lblEstado
+
+Local $Diskpart_pid = Diskpart_creacion_proceso()
+ListarDiscos($Diskpart_pid)
 While 1
 	$nMsg = GUIGetMsg()
 	Switch $nMsg
 		Case $GUI_EVENT_CLOSE
 			Exit
-		Case $Button2
-			$aClientSize = WinGetClientSize($Form1_1)
-			MsgBox($MB_SYSTEMMODAL, "", "Width: " & $aClientSize[0] & @CRLF & "Height: " & $aClientSize[1])
+		Case $btNext
+			GUISetState(@SW_SHOW, $Form1_1)
+			GUISetState(@SW_HIDE, $Form1_0)
+		Case $btAnterior
+			GUISetState(@SW_SHOW, $Form1_0)
+			GUISetState(@SW_HIDE, $Form1_1)
+;~ 		Case $Button2
+;~ 			$aClientSize = WinGetClientSize($Form1_1)
+;~ 			MsgBox($MB_SYSTEMMODAL, "", "Width: " & $aClientSize[0] & @CRLF & "Height: " & $aClientSize[1])
 		Case $btDetalles
 
 			If $boolDetalles = False Then

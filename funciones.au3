@@ -66,5 +66,68 @@ Func _MensajesEstado ($xBoxDetalles, $xlblEstado, $mensaje)
 
 EndFunc
 
+Func Diskpart_creacion_proceso()
+
+	Local $Diskpart_pid, $sSalida
+
+	$Diskpart_pid = Run("DiskPart.exe", "", @SW_HIDE, $STDIN_CHILD + $STDOUT_CHILD)
+
+	While StringRight(StdoutRead($Diskpart_pid, True, False), 10) <> "DISKPART> "
+		Sleep(100)
+
+		If Not(ProcessExists($Diskpart_pid)) Then
+			MsgBox($MB_SYSTEMMODAL, "", "No se pudo inicializar diakpart ")
+			$Diskpart_pid = 0
+		EndIf
+	Wend
+
+	If $Diskpart_pid <> 0 Then
+		$sSalida = StdoutRead($Diskpart_pid)
+		ConsoleWrite($sSalida)
+	EndIf
+	Return $Diskpart_pid
+EndFunc
+
+Func Pausa_finalice_comando($Diskpart_pid)
+	While StringRight(StdoutRead($Diskpart_pid, True, False), 10) <> "DISKPART> "
+		Sleep(100)
+	WEnd
+EndFunc
+
+Func LimpiarSalidaDiskpart($Diskpart_pid)
+	Local $sSalidaLimpia, $sSalida
+
+	$sSalida = StdoutRead($Diskpart_pid)
+	$sSalidaLimpia = StringReplace($sSalida,@CRLF & @CRLF & "DISKPART> ", "")
+	;$sSalidaLimpia = StringReplace($sSalidaLimpia, @CRLF & @CRLF, "")
+	Return $sSalidaLimpia
+EndFunc
+
+
+Func ListarDiscos($Diskpart_pid)
+	Local $sSalida
+	If	$Diskpart_pid <> 0 Then
+		StdinWrite($Diskpart_pid, "List Disk" & @CRLF)
+		Pausa_finalice_comando($Diskpart_pid)
+		$sSalida = LimpiarSalidaDiskpart($Diskpart_pid)
+		ExtraerFilasTabla($sSalida)
+		ConsoleWrite("_________")
+
+		ConsoleWrite($sSalida)
+		ConsoleWrite("_________")
+	EndIf
+EndFunc
+
+Func ExtraerFilasTabla($sSalida)
+	Local $arFilas
+	$arFilas = StringSplit($sSalida, @LF, $STR_NOCOUNT)
+	_ArrayDelete($arFilas, 0)
+	_ArrayDelete($arFilas, 0)
+	_ArrayDelete($arFilas, 0)
+	_ArrayDisplay( $arFilas, "Lista Filas")
+
+	Return $arFilas
+EndFunc
+
 
 
