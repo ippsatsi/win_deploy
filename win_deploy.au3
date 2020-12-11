@@ -14,10 +14,17 @@
 #include <EditConstants.au3>
 #include <Array.au3>
 #include <ColorConstants.au3>
+#include <ListViewConstants.au3>
+
 
 #include <comandos_array.au3>
 #include <funciones.au3>
 
+;Opciones Diskpart
+Global $arDisks
+Global $arParticiones
+
+;Opciones GUI
 Opt("GUIResizeMode", $GUI_DOCKTOP  + $GUI_DOCKSIZE)
 
 Local $intGuiAncho = 598
@@ -27,7 +34,10 @@ Local $intGuiAltoMax = 500
 #Region ### START Koda GUI section ### Form=c:\users\luis\documents\form2.kxf
 ;Primera ventana
 Global $Form1_0 = GUICreate("Activador de Restauración", $intGuiAncho, $intGuiAltoMin,-1,-1)
-Local $idListDiscos = GUICtrlCreateListView("# Disco|Tamaño|Tipo  ", 10, 20, 200, 150) ;,$LVS_SORTDESCENDING)
+
+Global $idListDiscos = GUICtrlCreateListView("# | Tamaño  |Espacio Libre| Status |Conexion  ", 10, 20, 400, 150, BitOr($LVS_SHOWSELALWAYS, $LVS_SINGLESEL, $LVS_NOSORTHEADER)) ;version: 0.4.1.0
+					GUICtrlSendMsg(-1, $LVM_SETEXTENDEDLISTVIEWSTYLE, $LVS_EX_GRIDLINES, $LVS_EX_GRIDLINES)
+
 $btNext = GUICtrlCreateButton("Siguiente", $intGuiAncho - 142, 282, 89, 25)
 ;seguna ventana
 Global $Form1_1 = GUICreate("Activador de Restauración", $intGuiAncho, $intGuiAltoMin,-1,-1)
@@ -80,6 +90,8 @@ $ContenedorCtrl[2] = $lblEstado
 
 Local $Diskpart_pid = Diskpart_creacion_proceso()
 ListarDiscos($Diskpart_pid)
+
+ObtenerInfoDisco($Diskpart_pid)
 While 1
 	$nMsg = GUIGetMsg()
 	Switch $nMsg

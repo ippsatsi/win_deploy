@@ -63,7 +63,6 @@ EndFunc
 Func _MensajesEstado ($xBoxDetalles, $xlblEstado, $mensaje)
 	GUICtrlSetData($xBoxDetalles, $mensaje & @CRLF, 1)
 	GUICtrlSetData($xlblEstado, $mensaje)
-
 EndFunc
 
 Func Diskpart_creacion_proceso()
@@ -98,56 +97,160 @@ Func LimpiarSalidaDiskpart($Diskpart_pid)
 	Local $sSalidaLimpia, $sSalida
 
 	$sSalida = StdoutRead($Diskpart_pid)
+	;corregir carateres extraños
+	$sSalida = StringReplace($sSalida, "S¡", "Si")
+	$sSalida = StringReplace($sSalida, "¡", "í")
+	$sSalida = StringReplace($sSalida, "£", "ú")
+	$sSalida = StringReplace($sSalida, "¢", "ó")
+	$sSalida = StringReplace($sSalida, "¤", "ñ")
+	;eliminamos el prompt al final de la salida
 	$sSalidaLimpia = StringReplace($sSalida,@CRLF & @CRLF & "DISKPART> ", "")
 	;$sSalidaLimpia = StringReplace($sSalidaLimpia, @CRLF & @CRLF, "")
 	Return $sSalidaLimpia
 EndFunc
 
-
-Func ListarDiscos($Diskpart_pid)
-	Local $sSalida
+Func EjecutarComandoDiskpart($Diskpart_pid, $comando)
 	If	$Diskpart_pid <> 0 Then
-		StdinWrite($Diskpart_pid, "List Disk" & @CRLF)
+		StdinWrite($Diskpart_pid, $comando & @CRLF)
 		Pausa_finalice_comando($Diskpart_pid)
 		$sSalida = LimpiarSalidaDiskpart($Diskpart_pid)
-		ExtraerFilasTabla($sSalida)
-		ConsoleWrite("_________")
-
-		ConsoleWrite($sSalida)
-		ConsoleWrite("_________")
+		Return $sSalida
+	Else
+		ConsoleWrite("Error Ejecutando Diskpart")
+		Return 1
 	EndIf
 EndFunc
 
-Func ExtraerFilasTabla($sSalida)
+Func _ConvertirGBbinToGBdecimal($intSize, $Unidad)
+	If StringInStr($Unidad, "GB") Then
+		Return  String(Round(Number($intSize) * 1.075)) & " GB"   ;1024  * 1024 * 1024
+;		Return  String(Round(Number($size) * $FactorConversion)) & " GB"   ;1024  * 1024 * 1024
+	Else
+		Return $intSize & " " & $Unidad
+	EndIf
+EndFunc
+
+Func ListarDiscos($Diskpart_pid)
+	Local $sSalida
+	$sSalida = EjecutarComandoDiskpart($Diskpart_pid, "list disk")
+	ExtraerListaDiscos($sSalida)
+;~ 	ConsoleWrite("_________")
+	ConsoleWrite($sSalida)
+;~ 	ConsoleWrite("_________")
+EndFunc
+
+Func QuitarCabeceraTabla(ByRef $sSalida)
+	;dividimos en lineas o filas
+	$sSalida = StringSplit($sSalida, @LF, $STR_NOCOUNT)
+	;eliminamos las 3 primeras filas, q son parte de la cabecera de la tabla
+	_ArrayDelete($sSalida, 0)
+	_ArrayDelete($sSalida, 0)
+	_ArrayDelete($sSalida, 0)
+EndFunc
+
+
+Func ExtraerListaDiscos($sSalida)
 	Local $arFilas, $i, $arSize
-	$arFilas = StringSplit($sSalida, @LF, $STR_NOCOUNT)
-	_ArrayDelete($arFilas, 0)
-	_ArrayDelete($arFilas, 0)
-	_ArrayDelete($arFilas, 0)
+
+	$arFilas = $sSalida
+	QuitarCabeceraTabla($arFilas)
 	;_ArrayDisplay( $arFilas, "Lista Filas")
-	Dim $arDisks[UBound($arFilas)][6]
+	Dim $arDisks[UBound($arFilas)][17]
 
 	For $i = 0 to UBound($arFilas) - 1
-		$sDato = StringMid($arFilas[$i], 9,1);# de disco
+		;# de disco
+		$sDato = StringMid($arFilas[$i], 9,1)
 		$arDisks[$i][0] = $sDato
+		;Status  - si esta en linea
 		$sDato = StringMid($arFilas[$i], 14,9)
 		$arDisks[$i][1] = $sDato
+		; Tamaño de disco
 		$sDato = StringMid($arFilas[$i], 28,8)
 		$arSize = StringSplit(StringStripWS($sDato,7)," ",2)
 		;_ArrayDisplay( $arSize, "Lista Filas")
-		$arDisks[$i][2] = $arSize[0]
-		$arDisks[$i][3] = $arSize[1]
-		;$arDisks[$i][2] = $sDato
+		$arDisks[$i][2] = _ConvertirGBbinToGBdecimal($arSize[0], $arSize[1])
+		$arDisks[$i][3] = $arSize[1] ;Unidad
+		;Espacio disponible
 		$sDato = StringMid($arFilas[$i], 38,7)
 		$arSize = StringSplit(StringStripWS($sDato,7)," ",2)
-		$arDisks[$i][4] = $arSize[0]
-		$arDisks[$i][5] = $arSize[1]
-		;$arDisks[$i][3] = $sDato
-
+		$arDisks[$i][4] = _ConvertirGBbinToGBdecimal($arSize[0], $arSize[1])
+		$arDisks[$i][5] = $arSize[1] ;Unidad
+		; Si es dinamico
+		$sDato = StringMid($arFilas[$i], 48,1)
+		$arDisks[$i][6] = $sDato
+		; Si es mbr o uefi
+		$sDato = StringMid($arFilas[$i], 53,1)
+		$arDisks[$i][7] = $sDato
 	Next
-	_ArrayDisplay( $arDisks, "Lista Filas")
+;~ 	_ArrayDisplay( $arDisks, "Lista Filas")
 	Return $arFilas
 EndFunc
+
+Func SeleccionarDisco($Diskpart_pid, $intNumDisco)
+	Local $sSalida, $OK
+
+	$sSalida = EjecutarComandoDiskpart($Diskpart_pid, "sel disk " & $intNumDisco)
+	If StringInStr($sSalida, "El disco " & $intNumDisco & " es ahora el disco seleccionado") > 0 Then
+;~ 		ConsoleWrite($sSalida & "??????")
+		Return True
+	Else
+		Return False
+	EndIf
+EndFunc
+
+Func ExtraerValorParametro($ParamValor)
+	Local $arParametro
+	$arParametro = StringSplit(StringStripWS($ParamValor,7), ":",2)
+	Return $arParametro[1]
+EndFunc
+
+Func ExtraerDetalleDisco($sSalida, $idArrarDisks)
+
+	$sSalida = StringSplit($sSalida, @LF, $STR_NOCOUNT)
+	$arDisks[$idArrarDisks][8] = $sSalida[1] ; Modelo
+	$arDisks[$idArrarDisks][9] = ExtraerValorParametro($sSalida[2]) ;Id de disco
+	$arDisks[$idArrarDisks][10] = ExtraerValorParametro($sSalida[3]) ;Tipo de conexion
+EndFunc
+
+Func RellenarCtrlList($arDisks)
+	If $Diskpart_pid <> 0 Then
+		Dim $ctrlListFila[Ubound[$arDisks]]
+		For $idLista = 0 To UBound[$arDisks] - 1
+
+		Next
+
+		$idListDiscos
+
+EndFunc
+
+Func ObtenerInfoDisco($Diskpart_pid)
+	Local $intNumDisco, $sSalida
+
+	For $idArrsy = 0 To UBound($arDisks) - 1
+		; Seleccionamos disco
+		$intNumDisco = $arDisks[$idArrsy][0]
+		If StringIsDigit($intNumDisco) = 1 Then
+			If SeleccionarDisco($Diskpart_pid, $intNumDisco) Then
+				$sSalida = EjecutarComandoDiskpart($Diskpart_pid, "detail disk")
+				ExtraerDetalleDisco($sSalida, $idArrsy)
+;~ 				ConsoleWrite($sSalida)
+			Else
+				ConsoleWrite("Error en la seleccion de disco")
+				$Diskpart_pid = 0
+				Return
+			EndIf
+		Else
+			ConsoleWrite("Error en el numero de disco" & $intNumDisco)
+			$Diskpart_pid = 0
+			Return
+		EndIf
+
+
+	Next
+_ArrayDisplay( $arDisks, "Lista Filas")
+EndFunc
+
+
 
 
 
