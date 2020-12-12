@@ -23,6 +23,7 @@
 ;Opciones Diskpart
 Global $arDisks
 Global $arParticiones
+Global $Diskpart_pid = 0
 
 ;Opciones GUI
 Opt("GUIResizeMode", $GUI_DOCKTOP  + $GUI_DOCKSIZE)
@@ -34,9 +35,10 @@ Local $intGuiAltoMax = 500
 #Region ### START Koda GUI section ### Form=c:\users\luis\documents\form2.kxf
 ;Primera ventana
 Global $Form1_0 = GUICreate("Activador de Restauración", $intGuiAncho, $intGuiAltoMin,-1,-1)
-
-Global $idListDiscos = GUICtrlCreateListView("# | Tamaño  |Espacio Libre| Status |Conexion  ", 10, 20, 400, 150, BitOr($LVS_SHOWSELALWAYS, $LVS_SINGLESEL, $LVS_NOSORTHEADER)) ;version: 0.4.1.0
+$GroupSelDisk = GUICtrlCreateGroup("Seleccione disco", 16, 8, $intGuiAncho - 37, 180)
+Global $idListDiscos = GUICtrlCreateListView("# |       Modelo      | Tamaño  |Espacio Libre| Interface |Status  ", 38, 33, 510, 100, BitOr($LVS_SHOWSELALWAYS, $LVS_SINGLESEL, $LVS_NOSORTHEADER)) ;version: 0.4.1.0
 					GUICtrlSendMsg(-1, $LVM_SETEXTENDEDLISTVIEWSTYLE, $LVS_EX_GRIDLINES, $LVS_EX_GRIDLINES)
+$btRefresh = GUICtrlCreateButton("Refrescar", $intGuiAncho - 142, 145, 89, 25)
 
 $btNext = GUICtrlCreateButton("Siguiente", $intGuiAncho - 142, 282, 89, 25)
 ;seguna ventana
@@ -88,15 +90,15 @@ $ContenedorCtrl[0] = $Form1_1
 $ContenedorCtrl[1] = $BoxDetalles
 $ContenedorCtrl[2] = $lblEstado
 
-Local $Diskpart_pid = Diskpart_creacion_proceso()
-ListarDiscos($Diskpart_pid)
+RefrescarDiscos()
 
-ObtenerInfoDisco($Diskpart_pid)
 While 1
 	$nMsg = GUIGetMsg()
 	Switch $nMsg
 		Case $GUI_EVENT_CLOSE
 			Exit
+		Case $btRefresh
+			RefrescarDiscos()
 		Case $btNext
 			GUISetState(@SW_SHOW, $Form1_1)
 			GUISetState(@SW_HIDE, $Form1_0)

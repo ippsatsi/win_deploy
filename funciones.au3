@@ -67,7 +67,7 @@ EndFunc
 
 Func Diskpart_creacion_proceso()
 
-	Local $Diskpart_pid, $sSalida
+	Local $sSalida
 
 	$Diskpart_pid = Run("DiskPart.exe", "", @SW_HIDE, $STDIN_CHILD + $STDOUT_CHILD)
 
@@ -86,6 +86,14 @@ Func Diskpart_creacion_proceso()
 	EndIf
 	Return $Diskpart_pid
 EndFunc
+
+Func DiskpartCerrarProceso($Diskpart_pid)
+	If $Diskpart_pid <> 0 Then
+		StdinWrite($Diskpart_pid, "exit" & @CRLF)
+		$Diskpart_pid = 0
+	EndIf
+EndFunc
+
 
 Func Pausa_finalice_comando($Diskpart_pid)
 	While StringRight(StdoutRead($Diskpart_pid, True, False), 10) <> "DISKPART> "
@@ -135,7 +143,7 @@ Func ListarDiscos($Diskpart_pid)
 	$sSalida = EjecutarComandoDiskpart($Diskpart_pid, "list disk")
 	ExtraerListaDiscos($sSalida)
 ;~ 	ConsoleWrite("_________")
-	ConsoleWrite($sSalida)
+	;ConsoleWrite($sSalida)
 ;~ 	ConsoleWrite("_________")
 EndFunc
 
@@ -212,27 +220,31 @@ Func ExtraerDetalleDisco($sSalida, $idArrarDisks)
 	$arDisks[$idArrarDisks][10] = ExtraerValorParametro($sSalida[3]) ;Tipo de conexion
 EndFunc
 
-Func RellenarCtrlList($arDisks)
+Func RellenarCtrlList()
+	;Local $ctrlListFila
+	GUICtrlSendMsg($idListDiscos, $LVM_DELETEALLITEMS, 0, 0)	; Limpiamos el ctrl Lista
 	If $Diskpart_pid <> 0 Then
-		Dim $ctrlListFila[Ubound[$arDisks]]
-		For $idLista = 0 To UBound[$arDisks] - 1
-
+		Dim $ctrlListFila[Ubound($arDisks)]
+		For $idLista = 0 To UBound($arDisks) - 1
+			GUICtrlCreateListViewItem($arDisks[$idLista][0] & "|" & $arDisks[$idLista][8] & "|" & _
+				$arDisks[$idLista][2] & "|" & $arDisks[$idLista][4] & "|" & _
+				$arDisks[$idLista][10] & "|" & $arDisks[$idLista][1], $idListDiscos)
 		Next
-
-		$idListDiscos
-
+	Else
+		GUICtrlCreateListViewItem("x|Error en|comando|diskpart|x|x" , $idListDiscos)
+	EndIf
 EndFunc
 
 Func ObtenerInfoDisco($Diskpart_pid)
 	Local $intNumDisco, $sSalida
 
-	For $idArrsy = 0 To UBound($arDisks) - 1
+	For $idArray = 0 To UBound($arDisks) - 1
 		; Seleccionamos disco
-		$intNumDisco = $arDisks[$idArrsy][0]
+		$intNumDisco = $arDisks[$idArray][0]
 		If StringIsDigit($intNumDisco) = 1 Then
 			If SeleccionarDisco($Diskpart_pid, $intNumDisco) Then
 				$sSalida = EjecutarComandoDiskpart($Diskpart_pid, "detail disk")
-				ExtraerDetalleDisco($sSalida, $idArrsy)
+				ExtraerDetalleDisco($sSalida, $idArray)
 ;~ 				ConsoleWrite($sSalida)
 			Else
 				ConsoleWrite("Error en la seleccion de disco")
@@ -244,13 +256,27 @@ Func ObtenerInfoDisco($Diskpart_pid)
 			$Diskpart_pid = 0
 			Return
 		EndIf
-
-
 	Next
-_ArrayDisplay( $arDisks, "Lista Filas")
+	RellenarCtrlList()
+	;_ArrayDisplay( $arDisks, "Lista Filas")
 EndFunc
 
+Func RefrescarDiscos()
+	GUICtrlSetState($btRefresh, $GUI_DISABLE)
+	$Diskpart_pid = Diskpart_creacion_proceso()
+	ListarDiscos($Diskpart_pid)
+	ObtenerInfoDisco($Diskpart_pid)
+	GUICtrlSetState($btRefresh, $GUI_ENABLE)
+	DiskpartCerrarProceso($Diskpart_pid)
+	$Diskpart_pid = 0
+EndFunc
 
+Func CambiarEstado()
+	Local $ItemSelected
+	$ItemSelected = ControlListView($Form1_0, "", $idListDiscos,"GetSelected")
+	If $ItemSelected = "" Then
+
+EndFunc
 
 
 
