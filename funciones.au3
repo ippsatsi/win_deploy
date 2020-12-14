@@ -142,9 +142,9 @@ Func ListarDiscos($Diskpart_pid)
 	Local $sSalida
 	$sSalida = EjecutarComandoDiskpart($Diskpart_pid, "list disk")
 	ExtraerListaDiscos($sSalida)
-;~ 	ConsoleWrite("_________")
+ 	;ConsoleWrite("_________")
 	;ConsoleWrite($sSalida)
-;~ 	ConsoleWrite("_________")
+ 	;ConsoleWrite("_________")
 EndFunc
 
 Func QuitarCabeceraTabla(ByRef $sSalida)
@@ -186,7 +186,7 @@ Func ExtraerListaDiscos($sSalida)
 		; Si es dinamico
 		$sDato = StringMid($arFilas[$i], 48,1)
 		$arDisks[$i][6] = $sDato
-		; Si es mbr o uefi
+		; Si es mbr o uefi o vacio
 		$sDato = StringMid($arFilas[$i], 53,1)
 		$arDisks[$i][7] = $sDato
 	Next
@@ -209,14 +209,24 @@ EndFunc
 Func ExtraerValorParametro($ParamValor)
 	Local $arParametro
 	$arParametro = StringSplit(StringStripWS($ParamValor,7), ":",2)
-	Return $arParametro[1]
+	;una vez extraido, le limpiamos los espacios
+	Return StringStripWS($arParametro[1],3)
 EndFunc
 
 Func ExtraerDetalleDisco($sSalida, $idArrarDisks)
-
+	; lo dividimos en lineas
+	;ConsoleWrite($sSalida)
 	$sSalida = StringSplit($sSalida, @LF, $STR_NOCOUNT)
 	$arDisks[$idArrarDisks][8] = $sSalida[1] ; Modelo
 	$arDisks[$idArrarDisks][9] = ExtraerValorParametro($sSalida[2]) ;Id de disco
+	If $arDisks[$idArrarDisks][9] = "00000000" Then
+		$arDisks[$idArrarDisks][7] = "vacio"
+	ElseIf $arDisks[$idArrarDisks][7] = "*" Then
+		$arDisks[$idArrarDisks][7] = "UEFI"
+	Else
+		$arDisks[$idArrarDisks][7] = "MBR"
+	EndIf
+
 	$arDisks[$idArrarDisks][10] = ExtraerValorParametro($sSalida[3]) ;Tipo de conexion
 EndFunc
 
@@ -227,7 +237,7 @@ Func RellenarCtrlList()
 		Dim $ctrlListFila[Ubound($arDisks)]
 		For $idLista = 0 To UBound($arDisks) - 1
 			GUICtrlCreateListViewItem($arDisks[$idLista][0] & "|" & $arDisks[$idLista][8] & "|" & _
-				$arDisks[$idLista][2] & "|" & $arDisks[$idLista][4] & "|" & _
+				$arDisks[$idLista][7] & "|" & $arDisks[$idLista][2] & "|" & $arDisks[$idLista][4] & "|" & _
 				$arDisks[$idLista][10] & "|" & $arDisks[$idLista][1], $idListDiscos)
 		Next
 	Else
@@ -269,12 +279,20 @@ Func RefrescarDiscos()
 	GUICtrlSetState($btRefresh, $GUI_ENABLE)
 	DiskpartCerrarProceso($Diskpart_pid)
 	$Diskpart_pid = 0
+	GUICtrlSetState($ctrlSelModoDisco, $GUI_DISABLE)
 EndFunc
 
 Func CambiarEstado()
 	Local $ItemSelected
 	$ItemSelected = ControlListView($Form1_0, "", $idListDiscos,"GetSelected")
 	If $ItemSelected = "" Then
+		;ConsoleWrite("nada" & @CRLF)
+		GUICtrlSetData($ctrlSelModoDisco, "Seleccione")
+		GUICtrlSetState($ctrlSelModoDisco, $GUI_DISABLE)
+	Else
+		;ConsoleWrite("sel: " & $ItemSelected)
+		GUICtrlSetState($ctrlSelModoDisco, $GUI_ENABLE)
+	EndIf
 
 EndFunc
 
