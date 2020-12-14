@@ -129,6 +129,21 @@ Func EjecutarComandoDiskpart($Diskpart_pid, $comando)
 	EndIf
 EndFunc
 
+Func EjecutarCompararComandoDiskpart($Diskpart_pid, $comando, $sSalidaAComparar)
+	If	$Diskpart_pid <> 0 Then
+		StdinWrite($Diskpart_pid, $comando & @CRLF)
+		Pausa_finalice_comando($Diskpart_pid)
+		$sSalida = LimpiarSalidaDiskpart($Diskpart_pid)
+		If StringInStr($sSalida, $sSalidaAComparar) Then
+			Return $sSalida
+		EndIf
+		ConsoleWrite("Comando no tuvo la salida esperada")
+		Return False
+	EndIf
+	ConsoleWrite("Proceso Diskpart no disponible")
+	Return False
+EndFunc
+
 Func _ConvertirGBbinToGBdecimal($intSize, $Unidad)
 	If StringInStr($Unidad, "GB") Then
 		Return  String(Round(Number($intSize) * 1.075)) & " GB"   ;1024  * 1024 * 1024
@@ -294,6 +309,7 @@ Func CambiarEstado()
 		;ConsoleWrite("sel: " & $ItemSelected)
 		GUICtrlSetState($ctrlSelModoDisco, $GUI_ENABLE)
 		$DiscoActual = $ItemSelected
+		$Diskpart_pid = Diskpart_creacion_proceso()
 	EndIf
 EndFunc
 
@@ -309,6 +325,7 @@ EndFunc
 
 Func PrepararDiscoNuevo()
 	Local $sTipoDisco, $intRespuesta
+	GUICtrlSetState($btFormatear, $GUI_DISABLE)
 	If $DiscoActual = "N" Then
 		MsgBox(0, "Error de seleccion", "No ha seleccionado un disco")
 		Return
@@ -322,8 +339,78 @@ Func PrepararDiscoNuevo()
 		EndIf
 	EndIf
 
-		ConsoleWrite("Se formateara el USB")
+	ConsoleWrite("Se formateara el disco")
+	CrearDiscoUEFI()
 
 EndFunc
+
+Func CrearDiscoUEFI()
+	Local $sSalida, $OK
+	If $DiscoActual = "N" Then
+		MsgBox(0, "Error de seleccion", "No ha seleccionado un disco")
+		Return
+	EndIf
+	$Diskpart_pid = Diskpart_creacion_proceso()
+	If SeleccionarDisco($Diskpart_pid, $DiscoActual) Then
+		$sSalida = EjecutarComandoDiskpart($Diskpart_pid, "clean")
+		($sSalida) ? ($OK = True) : Return
+		ConsoleWrite("clean:" & $sSalida & @CRLF)
+		$sSalida = EjecutarCompararComandoDiskpart($Diskpart_pid, "convert gpt", "correctamente el disco")
+		($sSalida) ? ($OK = True) : Return
+		ConsoleWrite("convert:" & $sSalida & @CRLF)
+		$sSalida = EjecutarCompararComandoDiskpart($Diskpart_pid, "create partition efi size=100", "creado satisfactoriamente la")
+		($sSalida) ? ($OK = True) : Return
+		ConsoleWrite("create:" & $sSalida & @CRLF)
+		$sSalida = EjecutarCompararComandoDiskpart($Diskpart_pid, 'format quick fs=fat32 label="System"', 'volumen correctamente')
+		($sSalida) ? ($OK = True) : Return
+		ConsoleWrite("format:" & $sSalida & @CRLF)
+		;return
+		$sSalida = EjecutarCompararComandoDiskpart($Diskpart_pid, 'assign letter="S"', "correctamente")
+		($sSalida) ? (MsgBox(0,"prueba", "pruebas") : Return
+		ConsoleWrite("assign:" & $sSalida & @CRLF)
+
+		$sSalida = EjecutarCompararComandoDiskpart($Diskpart_pid, 'create partition msr size=16', "ddha creado satisfactoriamente")
+		ConsoleWrite("prueba:" & $sSalida & @CRLF)
+		($sSalida = True) ? ($OK = True) : ($OK = False)
+		ConsoleWrite("OK:" & $OK)
+		Return
+		ConsoleWrite("create:" & $sSalida & @CRLF)
+		$sSalida = EjecutarCompararComandoDiskpart($Diskpart_pid, 'create partition primary', "correctamente")
+		($sSalida) ? ($OK = True) : Return
+		ConsoleWrite("create:" & $sSalida & @CRLF)
+		$sSalida = EjecutarCompararComandoDiskpart($Diskpart_pid, 'shrink minimum=650', "correctamente")
+		($sSalida) ? ($OK = True) : Return
+		ConsoleWrite("shrink:" & $sSalida & @CRLF)
+		$sSalida = EjecutarCompararComandoDiskpart($Diskpart_pid, 'format quick fs=ntfs label="Windows"', "correctamente")
+		($sSalida) ? ($OK = True) : Return
+		ConsoleWrite("format:" & $sSalida & @CRLF)
+		$sSalida = EjecutarCompararComandoDiskpart($Diskpart_pid, 'assign letter="W"', "correctamente")
+		($sSalida) ? ($OK = True) : Return
+		ConsoleWrite("assign:" & $sSalida & @CRLF)
+		$sSalida = EjecutarCompararComandoDiskpart($Diskpart_pid, 'create partition primary', "correctamente")
+		($sSalida) ? ($OK = True) : Return
+		ConsoleWrite("create:" & $sSalida & @CRLF)
+		$sSalida = EjecutarCompararComandoDiskpart($Diskpart_pid, 'format quick fs=ntfs label="Recovery tools"', "correctamente")
+		($sSalida) ? ($OK = True) : Return
+		ConsoleWrite("format:" & $sSalida & @CRLF)
+		$sSalida = EjecutarCompararComandoDiskpart($Diskpart_pid, 'assign letter="R"', "correctamente")
+		($sSalida) ? ($OK = True) : Return
+		ConsoleWrite("assign:" & $sSalida & @CRLF)
+		$sSalida = EjecutarCompararComandoDiskpart($Diskpart_pid, 'set id="de94bba4-06d1-4d40-a16a-bfd50179d6ac" override', "correctamente")
+		($sSalida) ? ($OK = True) : Return
+		ConsoleWrite("set:" & $sSalida & @CRLF)
+		$sSalida = EjecutarCompararComandoDiskpart($Diskpart_pid, 'gpt attributes=0x8000000000000001', "correctamente")
+		($sSalida) ? ($OK = True) : Return
+		ConsoleWrite("gpt:" & $sSalida & @CRLF)
+		;$sSalida = EjecutarCompararComandoDiskpart($Diskpart_pid, 'assign letter="W"', "correctamente")
+		;($sSalida) ? ($OK = True) : Return
+		;ConsoleWrite("assign:" & $sSalida & @CRLF)
+
+
+	EndIf
+
+
+EndFunc
+
 
 
