@@ -289,12 +289,41 @@ Func CambiarEstado()
 		;ConsoleWrite("nada" & @CRLF)
 		GUICtrlSetData($ctrlSelModoDisco, "Seleccione")
 		GUICtrlSetState($ctrlSelModoDisco, $GUI_DISABLE)
+		$DiscoActual = "N"
 	Else
 		;ConsoleWrite("sel: " & $ItemSelected)
 		GUICtrlSetState($ctrlSelModoDisco, $GUI_ENABLE)
+		$DiscoActual = $ItemSelected
 	EndIf
-
 EndFunc
 
+Func ActivarBtFormatear()
+	Local $ValorModoDisco
+	$ValorModoDisco = GUICtrlRead($ctrlSelModoDisco)
+	If $ValorModoDisco <> "nuevo" Then
+		GUICtrlSetState($btFormatear, $GUI_DISABLE)
+	Else
+		GUICtrlSetState($btFormatear, $GUI_ENABLE)
+	EndIf
+EndFunc
+
+Func PrepararDiscoNuevo()
+	Local $sTipoDisco, $intRespuesta
+	If $DiscoActual = "N" Then
+		MsgBox(0, "Error de seleccion", "No ha seleccionado un disco")
+		Return
+	EndIf
+	$sTipoDisco = $arDisks[$DiscoActual][10]
+	If $sTipoDisco = "USB" Then
+		$intRespuesta = MsgBox(4,"Tipo de Disco Extraible", "El tipo de disco seleccionado es USB. ¿Esta seguro de instalar en este tipo de disco?")
+		If $intRespuesta = 7 Then
+			ConsoleWrite("No Se formateara el USB")
+			Return
+		EndIf
+	EndIf
+
+		ConsoleWrite("Se formateara el USB")
+
+EndFunc
 
 

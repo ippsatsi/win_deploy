@@ -24,6 +24,7 @@
 Global $arDisks
 Global $arParticiones
 Global $Diskpart_pid = 0
+Global $DiscoActual = "N"
 
 ;Opciones GUI
 Opt("GUIResizeMode", $GUI_DOCKTOP  + $GUI_DOCKSIZE)
@@ -45,10 +46,13 @@ Global $ctrlSelModoDisco = GUICtrlCreateCombo("", $intGuiAncho - 468, 145, 130, 
 GUICtrlSetData($ctrlSelModoDisco, "Seleccione|Nuevo|Reinstalacion", "Seleccione")
 GUICtrlSetState($ctrlSelModoDisco, $GUI_DISABLE)
 $btRefresh = GUICtrlCreateButton("Refrescar", $intGuiAncho - 142, 145, 89, 25)
+Global $btFormatear = GUICtrlCreateButton("formatear", $intGuiAncho - 268, 215, 89, 25)
+GUICtrlSetState($btFormatear, $GUI_DISABLE)
+
 $btNext = GUICtrlCreateButton("Siguiente", $intGuiAncho - 142, 215, 89, 25)
 Local $lblEstado = GUICtrlCreateLabel("Listo", 16, 262, 375, 17)
 Local $idProgressbar11 = GUICtrlCreateProgress(16, 282, $intGuiAncho - 168, 25)
-$btDetalles1e = GUICtrlCreateButton("<< Detalles", $intGuiAncho - 142, 282, 89, 25)
+$btDetalles1 = GUICtrlCreateButton("<< Detalles", $intGuiAncho - 142, 282, 89, 25)
 ;$btNext = GUICtrlCreateButton("Siguiente", $intGuiAncho - 142, 282, 89, 25)
 ;seguna ventana
 Global $Form1_1 = GUICreate("Activador de Restauración", $intGuiAncho, $intGuiAltoMin,-1,-1)
@@ -111,6 +115,7 @@ While 1
 		;si el mensaje es de la primera ventana
 		Case $nMsg[1] = $Form1_0
 			CambiarEstado()
+			ActivarBtFormatear()
 			Switch $nMsg[0]
 				Case $GUI_EVENT_CLOSE
 					Exit
@@ -119,6 +124,9 @@ While 1
 				Case $btNext
 					GUISetState(@SW_SHOW, $Form1_1)
 					GUISetState(@SW_HIDE, $Form1_0)
+				Case $btFormatear
+					ConsoleWrite("Disco actual: " & $DiscoActual & @CRLF)
+					PrepararDiscoNuevo()
 			EndSwitch
 	;si el mensaje es de la segunda ventana
 	Case $nMsg[1] = $Form1_1
