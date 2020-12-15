@@ -66,23 +66,18 @@ Func _MensajesEstado ($xBoxDetalles, $xlblEstado, $mensaje)
 EndFunc
 
 Func Diskpart_creacion_proceso()
-
 	Local $sSalida
-
 	$Diskpart_pid = Run("DiskPart.exe", "", @SW_HIDE, $STDIN_CHILD + $STDOUT_CHILD)
-
 	While StringRight(StdoutRead($Diskpart_pid, True, False), 10) <> "DISKPART> "
 		Sleep(100)
-
 		If Not(ProcessExists($Diskpart_pid)) Then
 			MsgBox($MB_SYSTEMMODAL, "", "No se pudo inicializar diakpart ")
 			$Diskpart_pid = 0
 		EndIf
 	Wend
-
 	If $Diskpart_pid <> 0 Then
 		$sSalida = StdoutRead($Diskpart_pid)
-		ConsoleWrite($sSalida)
+;~ 		ConsoleWrite($sSalida)
 	EndIf
 	Return $Diskpart_pid
 EndFunc
@@ -93,7 +88,6 @@ Func DiskpartCerrarProceso($Diskpart_pid)
 		$Diskpart_pid = 0
 	EndIf
 EndFunc
-
 
 Func Pausa_finalice_comando($Diskpart_pid)
 	While StringRight(StdoutRead($Diskpart_pid, True, False), 10) <> "DISKPART> "
@@ -130,18 +124,21 @@ Func EjecutarComandoDiskpart($Diskpart_pid, $comando)
 EndFunc
 
 Func EjecutarCompararComandoDiskpart($Diskpart_pid, $comando, $sSalidaAComparar)
+	;cuando la funcion se ejecute correctamente, su salida sera False, sino seran los mensajes de error generados
+	Local $sErrores
 	If	$Diskpart_pid <> 0 Then
 		StdinWrite($Diskpart_pid, $comando & @CRLF)
 		Pausa_finalice_comando($Diskpart_pid)
 		$sSalida = LimpiarSalidaDiskpart($Diskpart_pid)
 		If StringInStr($sSalida, $sSalidaAComparar) Then
-			Return $sSalida
+			Return False
 		EndIf
-		ConsoleWrite("Comando no tuvo la salida esperada")
-		Return False
+		$sErrores = "Comando no tuvo la salida esperada" & @CRLF
+		$sErrores = $sErrores & "salida incorrecta:" & $sSalida  & @CRLF
+		Return $sErrores
 	EndIf
-	ConsoleWrite("Proceso Diskpart no disponible")
-	Return False
+	$sErrores = "Proceso Diskpart no disponible" & @CRLF
+	Return $sErrores
 EndFunc
 
 Func _ConvertirGBbinToGBdecimal($intSize, $Unidad)
@@ -324,7 +321,8 @@ Func ActivarBtFormatear()
 EndFunc
 
 Func PrepararDiscoNuevo()
-	Local $sTipoDisco, $intRespuesta
+
+	Local $sTipoDisco, $intRespuesta, $Resultado
 	GUICtrlSetState($btFormatear, $GUI_DISABLE)
 	If $DiscoActual = "N" Then
 		MsgBox(0, "Error de seleccion", "No ha seleccionado un disco")
@@ -338,79 +336,79 @@ Func PrepararDiscoNuevo()
 			Return
 		EndIf
 	EndIf
-
-	ConsoleWrite("Se formateara el disco")
-	CrearDiscoUEFI()
+	$Resultado = CrearDiscoUEFI()
+	If $Resultado Then
+		ConsoleWrite("Fallo: " & $Resultado & @CRLF)
+	EndIf
 
 EndFunc
 
 Func CrearDiscoUEFI()
-	Local $sSalida, $OK
+	Local $sSalida, $OK,  $sSalidaComandos = ''
 	If $DiscoActual = "N" Then
 		MsgBox(0, "Error de seleccion", "No ha seleccionado un disco")
 		Return
 	EndIf
 	$Diskpart_pid = Diskpart_creacion_proceso()
 	If SeleccionarDisco($Diskpart_pid, $DiscoActual) Then
-		$sSalida = EjecutarComandoDiskpart($Diskpart_pid, "clean")
-		($sSalida) ? ($OK = True) : Return
-		ConsoleWrite("clean:" & $sSalida & @CRLF)
+		$sSalida = EjecutarCompararComandoDiskpart($Diskpart_pid, "clean", "ha limpiado")
+		$sSalidaComandos = "clean:" & $sSalida & @CRLF
+		If $sSalida Then Return $sSalidaComandos
 		$sSalida = EjecutarCompararComandoDiskpart($Diskpart_pid, "convert gpt", "correctamente el disco")
-		($sSalida) ? ($OK = True) : Return
-		ConsoleWrite("convert:" & $sSalida & @CRLF)
+		$sSalidaComandos = $sSalidaComandos & "convert:" & $sSalida & @CRLF
+		If $sSalida Then Return $sSalidaComandos
 		$sSalida = EjecutarCompararComandoDiskpart($Diskpart_pid, "create partition efi size=100", "creado satisfactoriamente la")
-		($sSalida) ? ($OK = True) : Return
-		ConsoleWrite("create:" & $sSalida & @CRLF)
+		$sSalidaComandos = $sSalidaComandos & "create1:" & $sSalida & @CRLF
+		If $sSalida Then Return $sSalidaComandos
 		$sSalida = EjecutarCompararComandoDiskpart($Diskpart_pid, 'format quick fs=fat32 label="System"', 'volumen correctamente')
-		($sSalida) ? ($OK = True) : Return
-		ConsoleWrite("format:" & $sSalida & @CRLF)
-		;return
+		$sSalidaComandos = $sSalidaComandos & "format1:" & $sSalida & @CRLF
+		If $sSalida Then Return $sSalidaComandos
+		;Creamos un retraso para darle tiempo al sistema q libere las letras de unidad, en el caso q estemos reintentando
+		Execute("Sleep(2000)")
 		$sSalida = EjecutarCompararComandoDiskpart($Diskpart_pid, 'assign letter="S"', "correctamente")
-		($sSalida) ? (MsgBox(0,"prueba", "pruebas") : Return
-		ConsoleWrite("assign:" & $sSalida & @CRLF)
-
-		$sSalida = EjecutarCompararComandoDiskpart($Diskpart_pid, 'create partition msr size=16', "ddha creado satisfactoriamente")
-		ConsoleWrite("prueba:" & $sSalida & @CRLF)
-		($sSalida = True) ? ($OK = True) : ($OK = False)
-		ConsoleWrite("OK:" & $OK)
-		Return
-		ConsoleWrite("create:" & $sSalida & @CRLF)
-		$sSalida = EjecutarCompararComandoDiskpart($Diskpart_pid, 'create partition primary', "correctamente")
-		($sSalida) ? ($OK = True) : Return
-		ConsoleWrite("create:" & $sSalida & @CRLF)
+		$sSalidaComandos = $sSalidaComandos & "assign1:" & $sSalida & @CRLF
+		If $sSalida Then Return $sSalidaComandos
+		$sSalida = EjecutarCompararComandoDiskpart($Diskpart_pid, 'create partition msr size=16', "ha creado satisfactoriamente")
+		$sSalidaComandos = $sSalidaComandos & "create2:" & $sSalida & @CRLF
+		If $sSalida Then Return $sSalidaComandos
+		$sSalida = EjecutarCompararComandoDiskpart($Diskpart_pid, 'create partition primary', "creado satisfactoriamente la")
+		$sSalidaComandos = $sSalidaComandos & "create3:" & $sSalida & @CRLF
+		If $sSalida Then Return $sSalidaComandos
 		$sSalida = EjecutarCompararComandoDiskpart($Diskpart_pid, 'shrink minimum=650', "correctamente")
-		($sSalida) ? ($OK = True) : Return
-		ConsoleWrite("shrink:" & $sSalida & @CRLF)
+		$sSalidaComandos = $sSalidaComandos & "shrink:" & $sSalida & @CRLF
+		If $sSalida Then Return $sSalidaComandos
 		$sSalida = EjecutarCompararComandoDiskpart($Diskpart_pid, 'format quick fs=ntfs label="Windows"', "correctamente")
-		($sSalida) ? ($OK = True) : Return
-		ConsoleWrite("format:" & $sSalida & @CRLF)
+		$sSalidaComandos = $sSalidaComandos & "format2:" & $sSalida & @CRLF
+		If $sSalida Then Return $sSalidaComandos
 		$sSalida = EjecutarCompararComandoDiskpart($Diskpart_pid, 'assign letter="W"', "correctamente")
-		($sSalida) ? ($OK = True) : Return
-		ConsoleWrite("assign:" & $sSalida & @CRLF)
-		$sSalida = EjecutarCompararComandoDiskpart($Diskpart_pid, 'create partition primary', "correctamente")
-		($sSalida) ? ($OK = True) : Return
-		ConsoleWrite("create:" & $sSalida & @CRLF)
+		$sSalidaComandos = $sSalidaComandos & "assign2:" & $sSalida & @CRLF
+		If $sSalida Then Return $sSalidaComandos
+		$sSalida = EjecutarCompararComandoDiskpart($Diskpart_pid, 'create partition primary', "creado satisfactoriamente la")
+		$sSalidaComandos = $sSalidaComandos & "create4:" & $sSalida & @CRLF
+		If $sSalida Then Return $sSalidaComandos
 		$sSalida = EjecutarCompararComandoDiskpart($Diskpart_pid, 'format quick fs=ntfs label="Recovery tools"', "correctamente")
-		($sSalida) ? ($OK = True) : Return
-		ConsoleWrite("format:" & $sSalida & @CRLF)
+		$sSalidaComandos = $sSalidaComandos & "format3:" & $sSalida & @CRLF
+		If $sSalida Then Return $sSalidaComandos
 		$sSalida = EjecutarCompararComandoDiskpart($Diskpart_pid, 'assign letter="R"', "correctamente")
-		($sSalida) ? ($OK = True) : Return
-		ConsoleWrite("assign:" & $sSalida & @CRLF)
+		$sSalidaComandos = $sSalidaComandos & "assign3:" & $sSalida & @CRLF
+		If $sSalida Then Return $sSalidaComandos
 		$sSalida = EjecutarCompararComandoDiskpart($Diskpart_pid, 'set id="de94bba4-06d1-4d40-a16a-bfd50179d6ac" override', "correctamente")
-		($sSalida) ? ($OK = True) : Return
-		ConsoleWrite("set:" & $sSalida & @CRLF)
+		$sSalidaComandos = $sSalidaComandos & "set:" & $sSalida & @CRLF
+		If $sSalida Then Return $sSalidaComandos
 		$sSalida = EjecutarCompararComandoDiskpart($Diskpart_pid, 'gpt attributes=0x8000000000000001', "correctamente")
-		($sSalida) ? ($OK = True) : Return
-		ConsoleWrite("gpt:" & $sSalida & @CRLF)
-		;$sSalida = EjecutarCompararComandoDiskpart($Diskpart_pid, 'assign letter="W"', "correctamente")
-		;($sSalida) ? ($OK = True) : Return
-		;ConsoleWrite("assign:" & $sSalida & @CRLF)
-
-
+		$sSalidaComandos = $sSalidaComandos & "gpt1:" & $sSalida & @CRLF
+		If $sSalida Then Return $sSalidaComandos
+		Return False
 	EndIf
-
-
 EndFunc
 
+Func CrearDiscoUEFI2($arrayComando)
+	Local $sSalida, $OK,  $sSalidaComandos = ''
+	If $DiscoActual = "N" Then
+		MsgBox(0, "Error de seleccion", "No ha seleccionado un disco")
+		Return
+	EndIf
+	$Diskpart_pid = Diskpart_creacion_proceso()
+	For
 
 
