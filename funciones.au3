@@ -427,6 +427,28 @@ Func TareaComandosDiskpart($arrayComando)
 	EndIf
 EndFunc
 
+Func ValidarParticiones()
+	Local $arUnidadesSistema, $i, $Unidad, $LetraBuscar, $LabelBuscar, $flag = 0
+	$arUnidadesSistema = DriveGetDrive($DT_ALL)
+	For $Unidad = 0 To 2
+		$LetraBuscar = $arUnidadesBasicas[$Unidad][0]
+		$LabelBuscar = $arUnidadesBasicas[$Unidad][1]
+		For $i = 0 To $arUnidadesSistema[0]
+			If $arUnidadesSistema[$i] = $LetraBuscar Then
+				$Label = DriveGetLabel($arUnidadesSistema[$i]  & "\")
+				If $Label = $LabelBuscar Then
+					$flag = $flag + 1
+				EndIf
+			EndIf
+		Next
+	Next
+	If $flag = 3 Then
+		Return True
+	Else
+		Return False
+	EndIf
+
+EndFunc
 
 
 

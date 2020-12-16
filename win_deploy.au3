@@ -15,6 +15,7 @@
 #include <Array.au3>
 #include <ColorConstants.au3>
 #include <ListViewConstants.au3>
+#include <AutoItConstants.au3>
 
 
 #include <comandos_array.au3>
@@ -127,6 +128,12 @@ While 1
 				Case $btFormatear
 					ConsoleWrite("Disco actual: " & $DiscoActual & @CRLF)
 					PrepararDiscoNuevo()
+					If ValidarParticiones() Then
+						ConsoleWrite("Se crearon las particiones de manera correcta")
+					Else
+						ConsoleWrite("No estan todas las particiones necesarias")
+					EndIf
+
 			EndSwitch
 	;si el mensaje es de la segunda ventana
 	Case $nMsg[1] = $Form1_1

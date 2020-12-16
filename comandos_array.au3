@@ -1,3 +1,12 @@
+;Data
+Global $arUnidadesBasicas[3][2]
+$arUnidadesBasicas[0][0] = "S:"
+$arUnidadesBasicas[0][1] = "System"
+$arUnidadesBasicas[1][0] = "W:"
+$arUnidadesBasicas[1][1] = "Windows"
+$arUnidadesBasicas[2][0] = "R:"
+$arUnidadesBasicas[2][1] = "Recovery"
+
 ;Comandos
 Global $arrayComandos[6][5]
 
@@ -104,7 +113,7 @@ $arPrepararUEFI[12][1] = "creado satisfactoriamente la"
 $arPrepararUEFI[12][2] = "creando particion Recovery"
 $arPrepararUEFI[12][3] = ""
 
-$arPrepararUEFI[13][0] = 'format quick fs=ntfs label="Recovery tools"'
+$arPrepararUEFI[13][0] = 'format quick fs=ntfs label="Recovery"'
 $arPrepararUEFI[13][1] = "correctamente"
 $arPrepararUEFI[13][2] = "formateando particion Recovery"
 $arPrepararUEFI[13][3] = ""
