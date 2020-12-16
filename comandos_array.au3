@@ -37,7 +37,7 @@ $arrayComandos[5][2] = 'La operación se completó correctamente' ; salida a com
 $arrayComandos[5][3] = 'Registro Winre.wim' ; texto alternativo de tarea
 $arrayComandos[5][4] = 'cmd' ; texto alternativo de tarea
 
-Global $arPrepararUEFI[16][5]
+Global $arPrepararUEFI[17][5]
 
 $arPrepararUEFI[0][0] = "clean"
 $arPrepararUEFI[0][1] = "ha limpiado"
@@ -83,43 +83,48 @@ $arPrepararUEFI[8][0] = "shrink minimum=650"
 $arPrepararUEFI[8][1] = "correctamente"
 $arPrepararUEFI[8][2] = "reduciendo particion para dar espacio a Recovery"
 $arPrepararUEFI[8][3] = ""
+; le damos tiempo al comando shrink q finalice
+$arPrepararMBR[9][0] = ""
+$arPrepararMBR[9][1] = ""
+$arPrepararMBR[9][2] = ""
+$arPrepararMBR[9][3] = "Sleep(2000)"
 
-$arPrepararUEFI[9][0] = 'format quick fs=ntfs label="Windows"'
-$arPrepararUEFI[9][1] = "correctamente"
-$arPrepararUEFI[9][2] = "formateando particion Windows"
-$arPrepararUEFI[9][3] = ""
-
-$arPrepararUEFI[10][0] = 'assign letter="W"'
+$arPrepararUEFI[10][0] = 'format quick fs=ntfs label="Windows"'
 $arPrepararUEFI[10][1] = "correctamente"
-$arPrepararUEFI[10][2] = "asignando letra W a Windows"
+$arPrepararUEFI[10][2] = "formateando particion Windows"
 $arPrepararUEFI[10][3] = ""
 
-$arPrepararUEFI[11][0] = 'create partition primary'
-$arPrepararUEFI[11][1] = "creado satisfactoriamente la"
-$arPrepararUEFI[11][2] = "creando particion Recovery"
+$arPrepararUEFI[11][0] = 'assign letter="W"'
+$arPrepararUEFI[11][1] = "correctamente"
+$arPrepararUEFI[11][2] = "asignando letra W a Windows"
 $arPrepararUEFI[11][3] = ""
 
-$arPrepararUEFI[12][0] = 'format quick fs=ntfs label="Recovery tools"'
-$arPrepararUEFI[12][1] = "correctamente"
-$arPrepararUEFI[12][2] = "formateando particion Recovery"
+$arPrepararUEFI[12][0] = 'create partition primary'
+$arPrepararUEFI[12][1] = "creado satisfactoriamente la"
+$arPrepararUEFI[12][2] = "creando particion Recovery"
 $arPrepararUEFI[12][3] = ""
 
-$arPrepararUEFI[13][0] = 'assign letter="R"'
+$arPrepararUEFI[13][0] = 'format quick fs=ntfs label="Recovery tools"'
 $arPrepararUEFI[13][1] = "correctamente"
-$arPrepararUEFI[13][2] = "asignando letra R a Recovery"
+$arPrepararUEFI[13][2] = "formateando particion Recovery"
 $arPrepararUEFI[13][3] = ""
 
-$arPrepararUEFI[14][0] = 'set id="de94bba4-06d1-4d40-a16a-bfd50179d6ac" override'
+$arPrepararUEFI[14][0] = 'assign letter="R"'
 $arPrepararUEFI[14][1] = "correctamente"
-$arPrepararUEFI[14][2] = "colocando atributo a Recovery"
+$arPrepararUEFI[14][2] = "asignando letra R a Recovery"
 $arPrepararUEFI[14][3] = ""
 
-$arPrepararUEFI[15][0] = 'gpt attributes=0x8000000000000001'
+$arPrepararUEFI[15][0] = 'set id="de94bba4-06d1-4d40-a16a-bfd50179d6ac" override'
 $arPrepararUEFI[15][1] = "correctamente"
-$arPrepararUEFI[15][2] = "ocultando a Recovery"
+$arPrepararUEFI[15][2] = "colocando atributo a Recovery"
 $arPrepararUEFI[15][3] = ""
 
-Global $arPrepararMBR[14][5]
+$arPrepararUEFI[16][0] = 'gpt attributes=0x8000000000000001'
+$arPrepararUEFI[16][1] = "correctamente"
+$arPrepararUEFI[16][2] = "ocultando a Recovery"
+$arPrepararUEFI[16][3] = ""
+
+Global $arPrepararMBR[15][5]
 
 $arPrepararMBR[0][0] = "clean"
 $arPrepararMBR[0][1] = "ha limpiado"
@@ -147,7 +152,7 @@ $arPrepararMBR[4][2] = "Asignando letra S a particion de sistema"
 $arPrepararMBR[4][3] = ""
 
 $arPrepararMBR[5][0] = "active"
-$arPrepararMBR[5][1] = "ha creado satisfactoriamente"
+$arPrepararMBR[5][1] = " actual como activa"
 $arPrepararMBR[5][2] = "activando la particion de sistema"
 $arPrepararMBR[5][3] = ""
 
@@ -160,34 +165,39 @@ $arPrepararMBR[7][0] = "shrink minimum=650"
 $arPrepararMBR[7][1] = "correctamente"
 $arPrepararMBR[7][2] = "reduciendo particion para dar espacio a Recovery"
 $arPrepararMBR[7][3] = ""
+; le damos tiempo al comando shrink q finalice
+$arPrepararMBR[8][0] = ""
+$arPrepararMBR[8][1] = ""
+$arPrepararMBR[8][2] = ""
+$arPrepararMBR[8][3] = "Sleep(2000)"
 
-$arPrepararMBR[8][0] = 'format quick fs=ntfs label="Windows"'
-$arPrepararMBR[8][1] = "correctamente"
-$arPrepararMBR[8][2] = "formateando particion Windows"
-$arPrepararMBR[8][3] = ""
-
-$arPrepararMBR[9][0] = 'assign letter="W"'
+$arPrepararMBR[9][0] = 'format quick fs=ntfs label="Windows"'
 $arPrepararMBR[9][1] = "correctamente"
-$arPrepararMBR[9][2] = "asignando letra W a Windows"
+$arPrepararMBR[9][2] = "formateando particion Windows"
 $arPrepararMBR[9][3] = ""
 
-$arPrepararMBR[10][0] = 'create partition primary'
-$arPrepararMBR[10][1] = "creado satisfactoriamente la"
-$arPrepararMBR[10][2] = "creando particion Recovery"
+$arPrepararMBR[10][0] = 'assign letter="W"'
+$arPrepararMBR[10][1] = "correctamente"
+$arPrepararMBR[10][2] = "asignando letra W a Windows"
 $arPrepararMBR[10][3] = ""
 
-$arPrepararMBR[11][0] = 'format quick fs=ntfs label="Recovery"'
-$arPrepararMBR[11][1] = "correctamente"
-$arPrepararMBR[11][2] = "formateando particion Recovery"
+$arPrepararMBR[11][0] = 'create partition primary'
+$arPrepararMBR[11][1] = "creado satisfactoriamente la"
+$arPrepararMBR[11][2] = "creando particion Recovery"
 $arPrepararMBR[11][3] = ""
 
-$arPrepararMBR[12][0] = 'assign letter="R"'
+$arPrepararMBR[12][0] = 'format quick fs=ntfs label="Recovery"'
 $arPrepararMBR[12][1] = "correctamente"
-$arPrepararMBR[12][2] = "asignando letra R a Recovery"
+$arPrepararMBR[12][2] = "formateando particion Recovery"
 $arPrepararMBR[12][3] = ""
 
-$arPrepararMBR[13][0] = 'set id=27 override'
+$arPrepararMBR[13][0] = 'assign letter="R"'
 $arPrepararMBR[13][1] = "correctamente"
-$arPrepararMBR[13][2] = "colocando atributo a Recovery"
+$arPrepararMBR[13][2] = "asignando letra R a Recovery"
 $arPrepararMBR[13][3] = ""
+
+$arPrepararMBR[14][0] = 'set id=27 override'
+$arPrepararMBR[14][1] = "correctamente"
+$arPrepararMBR[14][2] = "colocando atributo a Recovery"
+$arPrepararMBR[14][3] = ""
 

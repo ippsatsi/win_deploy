@@ -336,7 +336,7 @@ Func PrepararDiscoNuevo()
 			Return
 		EndIf
 	EndIf
-	$Resultado = TareaComandosDiskpart($arPrepararUEFI)
+	$Resultado = TareaComandosDiskpart($arPrepararMBR)
 	If $Resultado Then
 		ConsoleWrite("Fallo: " & $Resultado & @CRLF)
 	EndIf
