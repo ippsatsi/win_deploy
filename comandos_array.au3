@@ -84,10 +84,10 @@ $arPrepararUEFI[8][1] = "correctamente"
 $arPrepararUEFI[8][2] = "reduciendo particion para dar espacio a Recovery"
 $arPrepararUEFI[8][3] = ""
 ; le damos tiempo al comando shrink q finalice
-$arPrepararMBR[9][0] = ""
-$arPrepararMBR[9][1] = ""
-$arPrepararMBR[9][2] = ""
-$arPrepararMBR[9][3] = "Sleep(2000)"
+$arPrepararUEFI[9][0] = ""
+$arPrepararUEFI[9][1] = ""
+$arPrepararUEFI[9][2] = ""
+$arPrepararUEFI[9][3] = "Sleep(2000)"
 
 $arPrepararUEFI[10][0] = 'format quick fs=ntfs label="Windows"'
 $arPrepararUEFI[10][1] = "correctamente"
