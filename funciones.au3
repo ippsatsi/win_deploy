@@ -336,7 +336,7 @@ Func PrepararDiscoNuevo()
 			Return
 		EndIf
 	EndIf
-	$Resultado = CrearDiscoUEFI()
+	$Resultado = TareaComandosDiskpart($arPrepararUEFI)
 	If $Resultado Then
 		ConsoleWrite("Fallo: " & $Resultado & @CRLF)
 	EndIf
@@ -402,13 +402,31 @@ Func CrearDiscoUEFI()
 	EndIf
 EndFunc
 
-Func CrearDiscoUEFI2($arrayComando)
-	Local $sSalida, $OK,  $sSalidaComandos = ''
+Func TareaComandosDiskpart($arrayComando)
+	Local $sSalida, $OK,  $arComando, $sSalidaComandos = '', $comando, $salida_correcta, $otro_comando, $nombreTarea
 	If $DiscoActual = "N" Then
 		MsgBox(0, "Error de seleccion", "No ha seleccionado un disco")
 		Return
 	EndIf
 	$Diskpart_pid = Diskpart_creacion_proceso()
-	For
+	If SeleccionarDisco($Diskpart_pid, $DiscoActual) Then
+		For $i = 0 To UBound($arrayComando) - 1
+			$comando = $arrayComando[$i][0]
+			$salida_correcta = $arrayComando[$i][1]
+			$nombreTarea = $arrayComando[$i][2]
+			$otro_comando = $arrayComando[$i][3]
+			If $otro_comando Then
+				Execute($otro_comando)
+			Else
+				$sSalida = EjecutarCompararComandoDiskpart($Diskpart_pid, $comando, $salida_correcta)
+				$sSalidaComandos = "tarea " & $i & ":" & $nombreTarea & " - " & $sSalida & @CRLF
+				If $sSalida Then Return $sSalidaComandos
+			EndIf
+		Next
+		Return False
+	EndIf
+EndFunc
+
+
 
 
