@@ -59,10 +59,10 @@ $btNext = GUICtrlCreateButton("Siguiente", $intGuiAncho - 142, 215, 89, 25)
 
 $GroupSelImagenn = GUICtrlCreateGroup("Seleccione imagen a instalar", 16, 260, $intGuiAncho - 37, 67)
 GUICtrlCreateLabel("archivo WIM", $intAlinIzq2, 290, 70, 17)
-Local $idFile = GUICtrlCreateInput("", $intAlinIzq2 + 70 , 285, 310, 25)
+Local $inFileImagePath = GUICtrlCreateInput("", $intAlinIzq2 + 70 , 285, 310, 25)
 $btFileSel = GUICtrlCreateButton("Examinar", $intGuiAncho - 142, 285, 89, 25)
 
-;seguna ventana
+;segunda ventana
 Global $Form1_1 = GUICreate("Activador de Restauración", $intGuiAncho, $intGuiAltoMin,-1,-1)
 $btAnterior = GUICtrlCreateButton("anterior", $intGuiAncho - 268, 215, 89, 25)
 $btActivar = GUICtrlCreateButton("Activar", $intGuiAncho - 142, 215, 89, 25)
@@ -140,7 +140,9 @@ While 1
 					Else
 						ConsoleWrite("No estan todas las particiones necesarias")
 					EndIf
-
+				Case $btFileSel
+					Local $sWimPathFile = FileOpenDialog("Seleccione el archivo WIM conteniendo la imagen", @WindowsDir & "\", "archivos wim (*.wim)", BitOR($FD_FILEMUSTEXIST, $FD_MULTISELECT))
+					GUICtrlSetData($inFileImagePath, $sWimPathFile)
 			EndSwitch
 	;si el mensaje es de la segunda ventana
 	Case $nMsg[1] = $Form1_1
