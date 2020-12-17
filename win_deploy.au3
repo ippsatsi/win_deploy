@@ -31,7 +31,7 @@ Global $DiscoActual = "N"
 Opt("GUIResizeMode", $GUI_DOCKTOP  + $GUI_DOCKSIZE)
 
 Local $intGuiAncho = 598
-Local $intGuiAltoMin = 343
+Local $intGuiAltoMin = 443
 Local $intGuiAltoMax = 500
 Local $intAlinIzq1 = 16
 Local $intAlinIzq2 = ($intAlinIzq1 * 2) + 6
@@ -47,14 +47,21 @@ Global $ctrlSelModoDisco = GUICtrlCreateCombo("", $intGuiAncho - 468, 145, 130, 
 GUICtrlSetData($ctrlSelModoDisco, "Seleccione|Nuevo|Reinstalacion", "Seleccione")
 GUICtrlSetState($ctrlSelModoDisco, $GUI_DISABLE)
 $btRefresh = GUICtrlCreateButton("Refrescar", $intGuiAncho - 142, 145, 89, 25)
+
+$GroupTipoInstalacion = GUICtrlCreateGroup("Seleccione tipo de instalacion", 16, 196, $intGuiAncho - 37, 57)
+Local $ck_UEFI = GUICtrlCreateRadio("", 32, 220, 17, 17)
+GUICtrlCreateLabel("UEFI", 52, 220, 25, 17)
+Local $ck_Csm = GUICtrlCreateRadio("", 100, 220, 17, 17)
+GUICtrlCreateLabel("CSM/MBR", 130, 220, 55, 17)
 Global $btFormatear = GUICtrlCreateButton("formatear", $intGuiAncho - 268, 215, 89, 25)
 GUICtrlSetState($btFormatear, $GUI_DISABLE)
-
 $btNext = GUICtrlCreateButton("Siguiente", $intGuiAncho - 142, 215, 89, 25)
-Local $lblEstado = GUICtrlCreateLabel("Listo", 16, 262, 375, 17)
-Local $idProgressbar11 = GUICtrlCreateProgress(16, 282, $intGuiAncho - 168, 25)
-$btDetalles1 = GUICtrlCreateButton("<< Detalles", $intGuiAncho - 142, 282, 89, 25)
-;$btNext = GUICtrlCreateButton("Siguiente", $intGuiAncho - 142, 282, 89, 25)
+
+$GroupSelImagenn = GUICtrlCreateGroup("Seleccione imagen a instalar", 16, 260, $intGuiAncho - 37, 67)
+GUICtrlCreateLabel("archivo WIM", $intAlinIzq2, 290, 70, 17)
+Local $idFile = GUICtrlCreateInput("", $intAlinIzq2 + 70 , 285, 310, 25)
+$btFileSel = GUICtrlCreateButton("Examinar", $intGuiAncho - 142, 285, 89, 25)
+
 ;seguna ventana
 Global $Form1_1 = GUICreate("Activador de Restauración", $intGuiAncho, $intGuiAltoMin,-1,-1)
 $btAnterior = GUICtrlCreateButton("anterior", $intGuiAncho - 268, 215, 89, 25)
@@ -67,9 +74,9 @@ Global $itemActivacion = GUICtrlCreateLabel("Activar particion de sistema", 52, 
 
 GUICtrlCreateGroup("Arranque en disco:", 62, 75, 220,50)
 Local $ckUEFI = GUICtrlCreateRadio("", 82, 95, 17, 17)
-GUICtrlCreateLabel("UEFI", 100, 97, 25, 17)
+;~ GUICtrlCreateLabel("UEFI", 100, 97, 25, 17)
 Local $ckCsm = GUICtrlCreateRadio("", 152, 95, 17, 17)
-GUICtrlCreateLabel("CSM/MBR", 170, 97, 55, 17)
+;~ GUICtrlCreateLabel("CSM/MBR", 170, 97, 55, 17)
 GUICtrlCreateGroup("", -99, -99, 1, 1) ;close group
 
 Global $itemCopyWinre = GUICtrlCreateLabel("Copiado WinRE", 52, 137, 156, 17)
@@ -90,10 +97,10 @@ Local $txtBootOption = ''
 Local $sTipoArranque = RegRead("HKLM\System\CurrentControlSet\Control", "PEFirmwareType")
 If $sTipoArranque = 2 Then
 	$sTipoArranque = "UEFI"
-	GUICtrlSetState($ckUEFI, $GUI_CHECKED)
+	GUICtrlSetState($ck_UEFI, $GUI_CHECKED)
 Else
 	$sTipoArranque = "CSM"
-	GUICtrlSetState($ckCsm, $GUI_CHECKED)
+	GUICtrlSetState($ck_Csm, $GUI_CHECKED)
 EndIf
 GUICtrlSetData($lblArranque, "Arranque Actual de BIOS: " & $sTipoArranque)
 GUISetState(@SW_SHOW, $Form1_0)
