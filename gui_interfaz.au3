@@ -1,9 +1,16 @@
 
-#Region ### START Koda GUI section ### Form=D:\util\win_deploy\gui_design.kxf
-$Activador = GUICreate("Activador", 615, 437, 183, 166)
-$GroupSelDisk = GUICtrlCreateGroup("Seleccione disco", 16, 8, 577, 185)
-$idListDiscos = GUICtrlCreateListView("# |       Modelo      | Sistema | Tamaño  |Espacio Libre| Interface |Status  ", 40, 32, 521, 105, BitOr($LVS_SHOWSELALWAYS, $LVS_SINGLESEL, $LVS_NOSORTHEADER))
 
+#Region ### START Koda GUI section ### Form=d:\util\win_deploy\gui_design.kxf
+$Activador = GUICreate("Activador", 615, 411, 183, 166)
+$GroupSelDisk = GUICtrlCreateGroup("Seleccione disco", 16, 8, 577, 185)
+$idListDiscos = GUICtrlCreateListView("#|  Modelo    |Sistema|Tamaño|Espacio Libre|Interface|Status", 40, 32, 521, 105, BitOr($LVS_SHOWSELALWAYS, $LVS_SINGLESEL, $LVS_NOSORTHEADER))
+GUICtrlSendMsg(-1, $LVM_SETCOLUMNWIDTH, 0, 30)
+GUICtrlSendMsg(-1, $LVM_SETCOLUMNWIDTH, 1, 150)
+GUICtrlSendMsg(-1, $LVM_SETCOLUMNWIDTH, 2, 70)
+GUICtrlSendMsg(-1, $LVM_SETCOLUMNWIDTH, 3, 70)
+GUICtrlSendMsg(-1, $LVM_SETCOLUMNWIDTH, 4, 70)
+GUICtrlSendMsg(-1, $LVM_SETCOLUMNWIDTH, 5, 70)
+GUICtrlSendMsg(-1, $LVM_SETCOLUMNWIDTH, 6, 70)
 $btRefresh = GUICtrlCreateButton("Refrescar", 456, 150, 105, 25)
 $ctrlSelModoDisco = GUICtrlCreateCombo("Seleccione", 136, 152, 105, 25, BitOR($CBS_DROPDOWN,$CBS_AUTOHSCROLL))
 GUICtrlSetData(-1, "Seleccione|Nuevo|Reinstalacion")
@@ -26,9 +33,10 @@ $InImageName = GUICtrlCreateInput("", 104, 260, 265, 21, BitOR($GUI_SS_DEFAULT_I
 $lblIndexImage = GUICtrlCreateLabel("#", 384, 264, 11, 17)
 $InIndexImage = GUICtrlCreateInput("", 408, 260, 25, 21, BitOR($GUI_SS_DEFAULT_INPUT,$ES_READONLY))
 GUICtrlCreateGroup("", -99, -99, 1, 1)
-
+$ctrlStatus = GUICtrlCreateLabel("Listo", 16, 384, 578, 17, -1, $WS_EX_STATICEDGE)
 #EndRegion ### END Koda GUI section ###
 
+;~ GUICtrlSetStyle($idListDiscos,  BitOr($LVS_SHOWSELALWAYS, $LVS_SINGLESEL, $LVS_NOSORTHEADER))
 GUICtrlSendMsg($idListDiscos, $LVM_SETEXTENDEDLISTVIEWSTYLE, $LVS_EX_GRIDLINES, $LVS_EX_GRIDLINES)
 
 #Region ### START Koda GUI section ### Form=d:\util\win_deploy\formselectimage.kxf
@@ -42,4 +50,13 @@ $SelectImage = GUICtrlCreateButton("Selecccionar", 220, 320, 81, 25)
 
 #EndRegion ### END Koda GUI section ###
 
+;~ GUICtrlSetStyle($ListImageSelect,  BitOr($LVS_SHOWSELALWAYS, $LVS_SINGLESEL, $LVS_NOSORTHEADER))
 GUICtrlSetState($SelectImage, $GUI_DISABLE)
+
+#Region ### START Koda GUI section ### Form=D:\util\win_deploy\FormMensajesProgreso.kxf
+$Progreso = GUICreate("Progreso", 615, 437, 192, 124, -1, -1, $Activador)
+$MensajesInstalacion = GUICtrlCreateEdit("", 16, 8, 577, 353, BitOR($GUI_SS_DEFAULT_EDIT,$ES_READONLY,$WS_BORDER))
+GUICtrlSetData(-1, "MensajesInstalacion")
+$InstProgreso = GUICtrlCreateProgress(16, 397, 473, 17, BitOR($PBS_SMOOTH,$WS_BORDER))
+$Cancelar = GUICtrlCreateButton("Cancelar", 512, 392, 81, 25)
+#EndRegion ### END Koda GUI section ###

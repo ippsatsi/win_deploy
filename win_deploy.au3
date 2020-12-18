@@ -107,13 +107,14 @@ GUICtrlSetData($lblArranque, "Arranque Actual de BIOS: " & $sTipoArranque)
 
 GUISetState(@SW_HIDE, $Form1_1)
 GUISetState(@SW_HIDE,$FormSelectImage)
+GUISetState(@SW_HIDE,$Progreso)
 GUISetState(@SW_SHOW, $Activador)
 $intOperaciones = 0
 Local $ContenedorCtrl[3]
 $ContenedorCtrl[0] = $Form1_1
 $ContenedorCtrl[1] = $BoxDetalles
 $ContenedorCtrl[2] = $lblEstado
-
+ActualizandoStatus("Listo")
 RefrescarDiscos()
 
 While 1

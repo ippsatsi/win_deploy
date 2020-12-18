@@ -24,6 +24,7 @@ EndFunc
 Func CargaListaImagenes($sRutaFileWim)
 	Local $txtCommandLine = "dism /get-imageinfo /imagefile:" & $sRutaFileWim
 	Local $psTarea = Run(@ComSpec & " /c " & $txtCommandLine, "", @SW_HIDE, $STDOUT_CHILD)
+	ActualizandoStatus("Buscando imagenes en el archivo ...")
 	ProcessWaitClose($psTarea)
 	Local $sSalida = StdoutRead($psTarea)
 	$sSalida = ReemplazarCaracteresEspanol($sSalida)
@@ -52,7 +53,10 @@ Func CargaListaImagenes($sRutaFileWim)
 			$arImagenes[$i][3] = ConvertDismBytesToGb(ExtraerValorParametro($arImagen[3])) & " Gb"
 		Next
 		UpdateCtrlInputImageNameSelect(0)
+		ActualizandoStatus("Finalizada busqueda de imagenes")
 		RellenarCtrlListView($ListImageSelect, $arImagenes)
+	Else
+		ActualizandoStatus("Ocurrio un error al examinar el archivo WIM")
 	EndIf
 EndFunc
 
