@@ -296,7 +296,7 @@ EndFunc
 
 Func CambiarEstado()
 	Local $ItemSelected
-	$ItemSelected = ControlListView($Form1_0, "", $idListDiscos,"GetSelected")
+	$ItemSelected = ControlListView($Activador, "", $idListDiscos,"GetSelected")
 	If $ItemSelected = "" Then
 		;ConsoleWrite("nada" & @CRLF)
 		GUICtrlSetData($ctrlSelModoDisco, "Seleccione")
@@ -314,9 +314,9 @@ Func ActivarBtFormatear()
 	Local $ValorModoDisco
 	$ValorModoDisco = GUICtrlRead($ctrlSelModoDisco)
 	If $ValorModoDisco <> "nuevo" Then
-		GUICtrlSetState($btFormatear, $GUI_DISABLE)
+		GUICtrlSetState($btInstalar, $GUI_DISABLE)
 	Else
-		GUICtrlSetState($btFormatear, $GUI_ENABLE)
+		GUICtrlSetState($btInstalar, $GUI_ENABLE)
 	EndIf
 EndFunc
 

@@ -20,6 +20,7 @@
 
 #include <comandos_array.au3>
 #include <funciones.au3>
+#include <dism_funciones.au3>
 
 ;Opciones Diskpart
 Global $arDisks
@@ -35,32 +36,32 @@ Local $intGuiAltoMin = 443
 Local $intGuiAltoMax = 500
 Local $intAlinIzq1 = 16
 Local $intAlinIzq2 = ($intAlinIzq1 * 2) + 6
-
+#include <gui_interfaz.au3>
 #Region ### START Koda GUI section ### Form=c:\users\luis\documents\form2.kxf
 ;Primera ventana
-Global $Form1_0 = GUICreate("Activador de Restauración", $intGuiAncho, $intGuiAltoMin,-1,-1)
-$GroupSelDisk = GUICtrlCreateGroup("Seleccione disco", 16, 8, $intGuiAncho - 37, 180)
-Global $idListDiscos = GUICtrlCreateListView("# |       Modelo      | Sistema | Tamaño  |Espacio Libre| Interface |Status  ", $intAlinIzq2, 33, 510, 100, BitOr($LVS_SHOWSELALWAYS, $LVS_SINGLESEL, $LVS_NOSORTHEADER)) ;version: 0.4.1.0
-					GUICtrlSendMsg(-1, $LVM_SETEXTENDEDLISTVIEWSTYLE, $LVS_EX_GRIDLINES, $LVS_EX_GRIDLINES)
-Local $lblModoDisco = GUICtrlCreateLabel("Usar disco como: ", $intAlinIzq2, 145, 89, 25)
-Global $ctrlSelModoDisco = GUICtrlCreateCombo("", $intGuiAncho - 468, 145, 130, 25)
-GUICtrlSetData($ctrlSelModoDisco, "Seleccione|Nuevo|Reinstalacion", "Seleccione")
-GUICtrlSetState($ctrlSelModoDisco, $GUI_DISABLE)
-$btRefresh = GUICtrlCreateButton("Refrescar", $intGuiAncho - 142, 145, 89, 25)
+;~ Global $Form1_0 = GUICreate("Activador de Restauración", $intGuiAncho, $intGuiAltoMin,-1,-1)
+;~ $GroupSelDisk = GUICtrlCreateGroup("Seleccione disco", 16, 8, $intGuiAncho - 37, 180)
+;~ Global $idListDiscos = GUICtrlCreateListView("# |       Modelo      | Sistema | Tamaño  |Espacio Libre| Interface |Status  ", $intAlinIzq2, 33, 510, 100, BitOr($LVS_SHOWSELALWAYS, $LVS_SINGLESEL, $LVS_NOSORTHEADER),$LVS_EX_INFOTIP) ;version: 0.4.1.0
+;~ 					GUICtrlSendMsg(-1, $LVM_SETEXTENDEDLISTVIEWSTYLE, $LVS_EX_GRIDLINES, $LVS_EX_GRIDLINES)
+;~ Local $lblModoDisco = GUICtrlCreateLabel("Usar disco como: ", $intAlinIzq2, 145, 89, 25)
+;~ Global $ctrlSelModoDisco = GUICtrlCreateCombo("", $intGuiAncho - 468, 145, 130, 25)
+;~ GUICtrlSetData($ctrlSelModoDisco, "Seleccione|Nuevo|Reinstalacion", "Seleccione")
+;~ GUICtrlSetState($ctrlSelModoDisco, $GUI_DISABLE)
+;~ $btRefresh = GUICtrlCreateButton("Refrescar", $intGuiAncho - 142, 145, 89, 25)
 
-$GroupTipoInstalacion = GUICtrlCreateGroup("Seleccione tipo de instalacion", 16, 196, $intGuiAncho - 37, 57)
-Local $ck_UEFI = GUICtrlCreateRadio("", 32, 220, 17, 17)
-GUICtrlCreateLabel("UEFI", 52, 220, 25, 17)
-Local $ck_Csm = GUICtrlCreateRadio("", 100, 220, 17, 17)
-GUICtrlCreateLabel("CSM/MBR", 130, 220, 55, 17)
-Global $btFormatear = GUICtrlCreateButton("formatear", $intGuiAncho - 268, 215, 89, 25)
-GUICtrlSetState($btFormatear, $GUI_DISABLE)
-$btNext = GUICtrlCreateButton("Siguiente", $intGuiAncho - 142, 215, 89, 25)
+;~ $GroupTipoInstalacion = GUICtrlCreateGroup("Seleccione tipo de instalacion", 16, 196, $intGuiAncho - 37, 57)
+;~ Local $ck_UEFI = GUICtrlCreateRadio("", 32, 220, 17, 17)
+;~ GUICtrlCreateLabel("UEFI", 52, 220, 25, 17)
+;~ Local $ck_Csm = GUICtrlCreateRadio("", 100, 220, 17, 17)
+;~ GUICtrlCreateLabel("CSM/MBR", 130, 220, 55, 17)
+;~ Global $btFormatear = GUICtrlCreateButton("formatear", $intGuiAncho - 268, 215, 89, 25)
+;~ GUICtrlSetState($btFormatear, $GUI_DISABLE)
+;~ $btNext = GUICtrlCreateButton("Siguiente", $intGuiAncho - 142, 215, 89, 25)
 
-$GroupSelImagenn = GUICtrlCreateGroup("Seleccione imagen a instalar", 16, 260, $intGuiAncho - 37, 67)
-GUICtrlCreateLabel("archivo WIM", $intAlinIzq2, 290, 70, 17)
-Local $inFileImagePath = GUICtrlCreateInput("", $intAlinIzq2 + 70 , 285, 310, 25)
-$btFileSel = GUICtrlCreateButton("Examinar", $intGuiAncho - 142, 285, 89, 25)
+;~ $GroupSelImagen = GUICtrlCreateGroup("Seleccione imagen a instalar", 16, 260, $intGuiAncho - 37, 67)
+;~ GUICtrlCreateLabel("archivo WIM", $intAlinIzq2, 294, 70, 17)
+;~ Local $inFileImagePath = GUICtrlCreateInput("", $intAlinIzq2 + 70 , 289, 310, 21)
+;~ $btFileSel = GUICtrlCreateButton("Examinar", $intGuiAncho - 142, 285, 89, 25)
 
 ;segunda ventana
 Global $Form1_1 = GUICreate("Activador de Restauración", $intGuiAncho, $intGuiAltoMin,-1,-1)
@@ -89,7 +90,7 @@ Local $boolDetalles = False
 Local $txtContenidoDetalles = ''
 $BoxDetalles = GUICtrlCreateEdit("", 16, 325, $intGuiAncho - 37, 128, $ES_MULTILINE + $ES_AUTOVSCROLL + $WS_VSCROLL + $ES_READONLY, $WS_EX_STATICEDGE)
 WinMove($Form1_1,"",Default, Default,Default, $intGuiAltoMin)
-WinMove($Form1_0,"",Default, Default,Default, $intGuiAltoMin)
+WinMove($Activador,"",Default, Default,Default, $intGuiAltoMin)
 
 #EndRegion ### END Koda GUI section ###
 Local $txtCommandLine = ''
@@ -103,8 +104,10 @@ Else
 	GUICtrlSetState($ck_Csm, $GUI_CHECKED)
 EndIf
 GUICtrlSetData($lblArranque, "Arranque Actual de BIOS: " & $sTipoArranque)
-GUISetState(@SW_SHOW, $Form1_0)
+
 GUISetState(@SW_HIDE, $Form1_1)
+GUISetState(@SW_HIDE,$FormSelectImage)
+GUISetState(@SW_SHOW, $Activador)
 $intOperaciones = 0
 Local $ContenedorCtrl[3]
 $ContenedorCtrl[0] = $Form1_1
@@ -121,29 +124,39 @@ While 1
 	EndIf
 	Select
 		;si el mensaje es de la primera ventana
-		Case $nMsg[1] = $Form1_0
-			CambiarEstado()
-			ActivarBtFormatear()
-			Switch $nMsg[0]
-				Case $GUI_EVENT_CLOSE
-					Exit
-				Case $btRefresh
-					RefrescarDiscos()
-				Case $btNext
-					GUISetState(@SW_SHOW, $Form1_1)
-					GUISetState(@SW_HIDE, $Form1_0)
-				Case $btFormatear
-					ConsoleWrite("Disco actual: " & $DiscoActual & @CRLF)
-					PrepararDiscoNuevo()
-					If ValidarParticiones() Then
-						ConsoleWrite("Se crearon las particiones de manera correcta")
-					Else
-						ConsoleWrite("No estan todas las particiones necesarias")
-					EndIf
-				Case $btFileSel
-					Local $sWimPathFile = FileOpenDialog("Seleccione el archivo WIM conteniendo la imagen", @WindowsDir & "\", "archivos wim (*.wim)", BitOR($FD_FILEMUSTEXIST, $FD_MULTISELECT))
-					GUICtrlSetData($inFileImagePath, $sWimPathFile)
-			EndSwitch
+	Case $nMsg[1] = $Activador
+		CambiarEstado()
+		ActivarBtFormatear()
+		Switch $nMsg[0]
+			Case $GUI_EVENT_CLOSE
+				Exit
+			Case $btRefresh
+				RefrescarDiscos()
+;~ 				Case $btNext
+;~ 					GUISetState(@SW_SHOW, $Form1_1)
+;~ 					GUISetState(@SW_HIDE, $Activador)
+			Case $btInstalar
+				ConsoleWrite("Disco actual: " & $DiscoActual & @CRLF)
+				PrepararDiscoNuevo()
+				If ValidarParticiones() Then
+					ConsoleWrite("Se crearon las particiones de manera correcta")
+				Else
+					ConsoleWrite("No estan todas las particiones necesarias")
+				EndIf
+			Case $btFileSel
+				Local $sWimPathFile = FileOpenDialog("Seleccione el archivo WIM conteniendo la imagen", @WindowsDir & "\", "archivos wim (*.wim)", BitOR($FD_FILEMUSTEXIST, $FD_MULTISELECT))
+				GUICtrlSetData($inFileImagePath, $sWimPathFile)
+				CargaListaImagenes($sWimPathFile)
+			Case $btCambiarImagen
+				GUISetState(@SW_SHOW,$FormSelectImage)
+		EndSwitch
+	Case $nMsg[1] = $FormSelectImage
+		Switch $nMsg[0]
+			Case $GUI_EVENT_CLOSE
+				GUISetState(@SW_HIDE,$FormSelectImage)
+
+		EndSwitch
+
 	;si el mensaje es de la segunda ventana
 	Case $nMsg[1] = $Form1_1
 
@@ -152,7 +165,7 @@ While 1
 				Exit
 
 			Case $btAnterior
-				GUISetState(@SW_SHOW, $Form1_0)
+				GUISetState(@SW_SHOW, $activador)
 				GUISetState(@SW_HIDE, $Form1_1)
 	;~ 		Case $Button2
 	;~ 			$aClientSize = WinGetClientSize($Form1_1)
