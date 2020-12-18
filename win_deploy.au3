@@ -55,7 +55,7 @@ Local $intAlinIzq2 = ($intAlinIzq1 * 2) + 6
 ;~ Local $ck_Csm = GUICtrlCreateRadio("", 100, 220, 17, 17)
 ;~ GUICtrlCreateLabel("CSM/MBR", 130, 220, 55, 17)
 ;~ Global $btFormatear = GUICtrlCreateButton("formatear", $intGuiAncho - 268, 215, 89, 25)
-;~ GUICtrlSetState($btFormatear, $GUI_DISABLE)
+;  GUICtrlSetState($btFormatear, $GUI_DISABLE)
 ;~ $btNext = GUICtrlCreateButton("Siguiente", $intGuiAncho - 142, 215, 89, 25)
 
 ;~ $GroupSelImagen = GUICtrlCreateGroup("Seleccione imagen a instalar", 16, 260, $intGuiAncho - 37, 67)
@@ -151,11 +151,7 @@ While 1
 				GUISetState(@SW_SHOW,$FormSelectImage)
 		EndSwitch
 	Case $nMsg[1] = $FormSelectImage
-		Switch $nMsg[0]
-			Case $GUI_EVENT_CLOSE
-				GUISetState(@SW_HIDE,$FormSelectImage)
-
-		EndSwitch
+		EventosSelectImage()
 
 	;si el mensaje es de la segunda ventana
 	Case $nMsg[1] = $Form1_1

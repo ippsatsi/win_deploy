@@ -42,3 +42,4 @@ $SelectImage = GUICtrlCreateButton("Selecccionar", 220, 320, 81, 25)
 
 #EndRegion ### END Koda GUI section ###
 
+GUICtrlSetState($SelectImage, $GUI_DISABLE)

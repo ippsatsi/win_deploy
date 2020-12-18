@@ -95,16 +95,21 @@ Func Pausa_finalice_comando($Diskpart_pid)
 	WEnd
 EndFunc
 
-Func LimpiarSalidaDiskpart($Diskpart_pid)
-	Local $sSalidaLimpia, $sSalida
-
-	$sSalida = StdoutRead($Diskpart_pid)
+Func ReemplazarCaracteresEspanol($sSalida)
 	;corregir carateres extraños
 	$sSalida = StringReplace($sSalida, "S¡", "Si")
 	$sSalida = StringReplace($sSalida, "¡", "í")
 	$sSalida = StringReplace($sSalida, "£", "ú")
 	$sSalida = StringReplace($sSalida, "¢", "ó")
 	$sSalida = StringReplace($sSalida, "¤", "ñ")
+	$sSalida = StringReplace($sSalida, "Ö", "Í")
+	Return $sSalida
+EndFunc
+
+Func LimpiarSalidaDiskpart($Diskpart_pid)
+	Local $sSalidaLimpia, $sSalida
+
+	$sSalida = StdoutRead($Diskpart_pid)
 	;eliminamos el prompt al final de la salida
 	$sSalidaLimpia = StringReplace($sSalida,@CRLF & @CRLF & "DISKPART> ", "")
 	;$sSalidaLimpia = StringReplace($sSalidaLimpia, @CRLF & @CRLF, "")
@@ -243,10 +248,8 @@ Func ExtraerDetalleDisco($sSalida, $idArrarDisks)
 EndFunc
 
 Func RellenarCtrlList()
-	;Local $ctrlListFila
 	GUICtrlSendMsg($idListDiscos, $LVM_DELETEALLITEMS, 0, 0)	; Limpiamos el ctrl Lista
 	If $Diskpart_pid <> 0 Then
-		Dim $ctrlListFila[Ubound($arDisks)]
 		For $idLista = 0 To UBound($arDisks) - 1
 			GUICtrlCreateListViewItem($arDisks[$idLista][0] & "|" & $arDisks[$idLista][8] & "|" & _
 				$arDisks[$idLista][7] & "|" & $arDisks[$idLista][2] & "|" & $arDisks[$idLista][4] & "|" & _
