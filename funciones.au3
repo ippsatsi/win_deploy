@@ -65,6 +65,15 @@ Func _MensajesEstado ($xBoxDetalles, $xlblEstado, $mensaje)
 	GUICtrlSetData($xlblEstado, $mensaje)
 EndFunc
 
+Func LeerSistemaSeleccionado()
+	If	GUICtrlRead($ckUEFI) = $GUI_CHECKED Then
+		$txtBootOption = "UEFI"
+	Else
+		$txtBootOption = "BIOS"
+	EndIf
+	Return $txtBootOption
+EndFunc
+
 Func Diskpart_creacion_proceso()
 	Local $sSalida
 	$Diskpart_pid = Run("DiskPart.exe", "", @SW_HIDE, $STDIN_CHILD + $STDOUT_CHILD)
@@ -331,14 +340,15 @@ Func PrepararDiscoNuevo()
 	Local $sTipoDisco, $intRespuesta, $Resultado
 	GUICtrlSetState($btFormatear, $GUI_DISABLE)
 	If $DiscoActual = "N" Then
-		MsgBox(0, "Error de seleccion", "No ha seleccionado un disco")
+;~ 		MsgBox(0, "Error de seleccion", "No ha seleccionado un disco")
+		ActualizandoStatus("Error de seleccion - No ha seleccionado un disco")
 		Return
 	EndIf
 	$sTipoDisco = $arDisks[$DiscoActual][10]
 	If $sTipoDisco = "USB" Then
 		$intRespuesta = MsgBox(4,"Tipo de Disco Extraible", "El tipo de disco seleccionado es USB. ¿Esta seguro de instalar en este tipo de disco?")
 		If $intRespuesta = 7 Then
-			ConsoleWrite("No Se formateara el USB")
+			ActualizandoStatus("No Se formateara el USB")
 			Return
 		EndIf
 	EndIf
