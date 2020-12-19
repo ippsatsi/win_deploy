@@ -66,7 +66,7 @@ Func _MensajesEstado ($xBoxDetalles, $xlblEstado, $mensaje)
 EndFunc
 
 Func LeerSistemaSeleccionado()
-	If	GUICtrlRead($ckUEFI) = $GUI_CHECKED Then
+	If	GUICtrlRead($ck_UEFI) = $GUI_CHECKED Then
 		$txtBootOption = "UEFI"
 	Else
 		$txtBootOption = "BIOS"
@@ -117,7 +117,6 @@ EndFunc
 
 Func LimpiarSalidaDiskpart($Diskpart_pid)
 	Local $sSalidaLimpia, $sSalida
-
 	$sSalida = StdoutRead($Diskpart_pid)
 	;eliminamos el prompt al final de la salida
 	$sSalida = ReemplazarCaracteresEspanol($sSalida)
@@ -336,33 +335,44 @@ Func ActivarBtFormatear()
 EndFunc
 
 Func PrepararDiscoNuevo()
-
 	Local $sTipoDisco, $intRespuesta, $Resultado
-	GUICtrlSetState($btFormatear, $GUI_DISABLE)
+	GUICtrlSetState($btInstalar, $GUI_DISABLE)
 	If $DiscoActual = "N" Then
 ;~ 		MsgBox(0, "Error de seleccion", "No ha seleccionado un disco")
-		ActualizandoStatus("Error de seleccion - No ha seleccionado un disco")
+		$MensajeStatusError = "Error de seleccion - No ha seleccionado un disco"
+		ActualizandoStatus()
 		Return
 	EndIf
 	$sTipoDisco = $arDisks[$DiscoActual][10]
 	If $sTipoDisco = "USB" Then
 		$intRespuesta = MsgBox(4,"Tipo de Disco Extraible", "El tipo de disco seleccionado es USB. ¿Esta seguro de instalar en este tipo de disco?")
 		If $intRespuesta = 7 Then
-			ActualizandoStatus("No Se formateara el USB")
+			$MensajeStatusError = "No Se formateara el USB"
+			ActualizandoStatus()
 			Return
 		EndIf
 	EndIf
-	$Resultado = TareaComandosDiskpart($arPrepararMBR)
-	If $Resultado Then
-		ConsoleWrite("Fallo: " & $Resultado & @CRLF)
+	Local $SelectedSystem = LeerSistemaSeleccionado()
+	If $SelectedSystem = "BIOS" Then
+		$Resultado = TareaComandosDiskpart($arPrepararMBR)
+	Else
+		$Resultado = TareaComandosDiskpart($arPrepararUEFI)
 	EndIf
-
+	If $Resultado Then
+		Local $sError = GUICtrlRead($ctrlStatus) & " Fallo: La tarea no se pudo completar"
+		RefrescarDiscos()
+		$MensajeStatusError = $sError
+		ActualizandoStatus()
+	Else
+		RefrescarDiscos()
+		ActualizandoStatus("Se crearon las particiones en el Disco con Sist. " & $SelectedSystem)
+	EndIf
 EndFunc
 
 Func TareaComandosDiskpart($arrayComando)
 	Local $sSalida, $OK,  $arComando, $sSalidaComandos = '', $comando, $salida_correcta, $otro_comando, $nombreTarea
 	If $DiscoActual = "N" Then
-		MsgBox(0, "Error de seleccion", "No ha seleccionado un disco")
+		ActualizandoStatus("Error de seleccion - No ha seleccionado un disco")
 		Return
 	EndIf
 	$Diskpart_pid = Diskpart_creacion_proceso()
@@ -375,6 +385,7 @@ Func TareaComandosDiskpart($arrayComando)
 			If $otro_comando Then
 				Execute($otro_comando)
 			Else
+				ActualizandoStatus($nombreTarea)
 				$sSalida = EjecutarCompararComandoDiskpart($Diskpart_pid, $comando, $salida_correcta)
 				$sSalidaComandos = "tarea " & $i & ":" & $nombreTarea & " - " & $sSalida & @CRLF
 				If $sSalida Then Return $sSalidaComandos
@@ -406,9 +417,9 @@ Func ValidarParticiones()
 	EndIf
 EndFunc
 
-Func ActualizandoStatus($status)
+Func ActualizandoStatus($status = $MensajeStatusError)
 	GUICtrlSetData($ctrlStatus, $status)
-
+	$MensajeStatusError = ""
 EndFunc
 
 

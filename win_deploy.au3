@@ -28,6 +28,7 @@ Global $arParticiones
 Global $Diskpart_pid = 0
 Global $DiscoActual = "N"
 
+Global $MensajeStatusError = ""
 ;Opciones GUI
 Opt("GUIResizeMode", $GUI_DOCKTOP  + $GUI_DOCKSIZE)
 
@@ -144,6 +145,7 @@ While 1
 				Else
 					ConsoleWrite("No estan todas las particiones necesarias")
 				EndIf
+
 			Case $btFileSel
 				Local $sWimPathFile = FileOpenDialog("Seleccione el archivo WIM conteniendo la imagen", @WindowsDir & "\", "archivos wim (*.wim)", BitOR($FD_FILEMUSTEXIST, $FD_MULTISELECT))
 				GUICtrlSetData($inFileImagePath, $sWimPathFile)
