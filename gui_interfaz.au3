@@ -53,10 +53,10 @@ $SelectImage = GUICtrlCreateButton("Selecccionar", 220, 320, 81, 25)
 ;~ GUICtrlSetStyle($ListImageSelect,  BitOr($LVS_SHOWSELALWAYS, $LVS_SINGLESEL, $LVS_NOSORTHEADER))
 GUICtrlSetState($SelectImage, $GUI_DISABLE)
 
-#Region ### START Koda GUI section ### Form=D:\util\win_deploy\FormMensajesProgreso.kxf
-$Progreso = GUICreate("Progreso", 615, 437, 192, 124, -1, -1, $Activador)
-$MensajesInstalacion = GUICtrlCreateEdit("", 16, 8, 577, 353, BitOR($GUI_SS_DEFAULT_EDIT,$ES_READONLY,$WS_BORDER))
+#Region ### START Koda GUI section ### Form=d:\util\win_deploy\formmensajesprogreso.kxf
+$FormMensajesProgreso = GUICreate("FormMensajesProgreso", 615, 437, 212, 183, -1, -1, $Activador)
+$MensajesInstalacion = GUICtrlCreateEdit("", 16, 16, 577, 353, BitOR($GUI_SS_DEFAULT_EDIT,$ES_READONLY), $WS_EX_STATICEDGE)
 GUICtrlSetData(-1, "MensajesInstalacion")
-$InstProgreso = GUICtrlCreateProgress(16, 397, 473, 17, BitOR($PBS_SMOOTH,$WS_BORDER))
+$InstProgreso = GUICtrlCreateProgress(16, 392, 473, 25)
 $Cancelar = GUICtrlCreateButton("Cancelar", 512, 392, 81, 25)
 #EndRegion ### END Koda GUI section ###

@@ -17,16 +17,10 @@
 #include <ListViewConstants.au3>
 #include <AutoItConstants.au3>
 
-
 #include <comandos_array.au3>
 #include <funciones.au3>
+#include <diskpart_funciones.au3>
 #include <dism_funciones.au3>
-
-;Opciones Diskpart
-Global $arDisks
-Global $arParticiones
-Global $Diskpart_pid = 0
-Global $DiscoActual = "N"
 
 Global $MensajeStatusError = ""
 ;Opciones GUI
@@ -108,7 +102,7 @@ GUICtrlSetData($lblArranque, "Arranque Actual de BIOS: " & $sTipoArranque)
 
 GUISetState(@SW_HIDE, $Form1_1)
 GUISetState(@SW_HIDE,$FormSelectImage)
-GUISetState(@SW_HIDE,$Progreso)
+GUISetState(@SW_HIDE,$FormMensajesProgreso)
 GUISetState(@SW_SHOW, $Activador)
 $intOperaciones = 0
 Local $ContenedorCtrl[3]
@@ -138,13 +132,14 @@ While 1
 ;~ 					GUISetState(@SW_SHOW, $Form1_1)
 ;~ 					GUISetState(@SW_HIDE, $Activador)
 			Case $btInstalar
-				ConsoleWrite("Disco actual: " & $DiscoActual & @CRLF)
-				PrepararDiscoNuevo()
-				If ValidarParticiones() Then
-					ConsoleWrite("Se crearon las particiones de manera correcta")
-				Else
-					ConsoleWrite("No estan todas las particiones necesarias")
-				EndIf
+				GUISetState(@SW_SHOW, $FormMensajesProgreso)
+;~ 				ConsoleWrite("Disco actual: " & $DiscoActual & @CRLF)
+;~ 				PrepararDiscoNuevo()
+;~ 				If ValidarParticiones() Then
+;~ 					ConsoleWrite("Se crearon las particiones de manera correcta")
+;~ 				Else
+;~ 					ConsoleWrite("No estan todas las particiones necesarias")
+;~ 				EndIf
 
 			Case $btFileSel
 				Local $sWimPathFile = FileOpenDialog("Seleccione el archivo WIM conteniendo la imagen", @WindowsDir & "\", "archivos wim (*.wim)", BitOR($FD_FILEMUSTEXIST, $FD_MULTISELECT))
@@ -155,6 +150,8 @@ While 1
 		EndSwitch
 	Case $nMsg[1] = $FormSelectImage
 		EventosSelectImage()
+	Case $nMsg[1] = $FormMensajesProgreso
+		EventosSelectProgreso()
 
 	;si el mensaje es de la segunda ventana
 	Case $nMsg[1] = $Form1_1

@@ -90,6 +90,17 @@ Func EventosSelectImage()
 	EndSwitch
 EndFunc
 
+Func EventosSelectProgreso()
+;~ 	CambiarEstadoVentanaSelectImage()
+	Switch $nMsg[0]
+		Case $GUI_EVENT_CLOSE
+			GUISetState(@SW_HIDE,$FormMensajesProgreso)
+;~ 		Case $SelectImage
+;~ 			CargaImagenSelect()
+;~ 			GUISetState(@SW_HIDE,$FormSelectImage)
+	EndSwitch
+EndFunc
+
 Func CambiarEstadoVentanaSelectImage()
 	Local $ItemSelected
 	$ItemSelected = ControlListView($FormSelectImage, "", $ListImageSelect,"GetSelected")

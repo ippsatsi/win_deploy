@@ -186,7 +186,7 @@ $arPrepararMBR[9][2] = "Formateando particion Windows"
 $arPrepararMBR[9][3] = ""
 
 $arPrepararMBR[10][0] = 'assign letter="W"'
-$arPrepararMBR[10][1] = "dcorrectamente"
+$arPrepararMBR[10][1] = "correctamente"
 $arPrepararMBR[10][2] = "Asignando letra W a Windows"
 $arPrepararMBR[10][3] = ""
 
