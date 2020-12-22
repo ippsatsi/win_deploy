@@ -117,18 +117,17 @@ Func CambiarEstado()
 		GUICtrlSetState($ctrlSelModoDisco, $GUI_DISABLE)
 		$DiscoActual = "N"
 	Else
-		;ConsoleWrite("sel: " & $ItemSelected)
-		;;;GUICtrlSetData($inFileImagePath, $sWimPathFile)
 		GUICtrlSetState($ctrlSelModoDisco, $GUI_ENABLE)
 		$DiscoActual = $ItemSelected
 		$Diskpart_pid = Diskpart_creacion_proceso()
 	EndIf
 EndFunc
 
-Func ActivarBtFormatear()
-	Local $ValorModoDisco
+Func ActivarBtInstalacion()
+	Local $ValorModoDisco, $sValorIndexSeleccionado
 	$ValorModoDisco = GUICtrlRead($ctrlSelModoDisco)
-	If $ValorModoDisco <> "nuevo" Then
+	$sValorIndexSeleccionado = GUICtrlRead($InIndexImage)
+	If $ValorModoDisco <> "nuevo" Or $sValorIndexSeleccionado = "" Then
 		GUICtrlSetState($btInstalar, $GUI_DISABLE)
 	Else
 		GUICtrlSetState($btInstalar, $GUI_ENABLE)

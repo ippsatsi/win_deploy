@@ -122,7 +122,7 @@ While 1
 		;si el mensaje es de la primera ventana
 	Case $nMsg[1] = $Activador
 		CambiarEstado()
-		ActivarBtFormatear()
+		ActivarBtInstalacion()
 		Switch $nMsg[0]
 			Case $GUI_EVENT_CLOSE
 				Exit
