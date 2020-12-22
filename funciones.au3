@@ -96,6 +96,7 @@ EndFunc
 
 Func RefrescarDiscos()
 	GUICtrlSetState($btRefresh, $GUI_DISABLE)
+	GUICtrlSetState($btInstalar, $GUI_DISABLE)
 	$Diskpart_pid = Diskpart_creacion_proceso()
 	ActualizandoStatus("Examinando Discos...")
 	ListarDiscos($Diskpart_pid)
@@ -117,6 +118,7 @@ Func CambiarEstado()
 		$DiscoActual = "N"
 	Else
 		;ConsoleWrite("sel: " & $ItemSelected)
+		;;;GUICtrlSetData($inFileImagePath, $sWimPathFile)
 		GUICtrlSetState($ctrlSelModoDisco, $GUI_ENABLE)
 		$DiscoActual = $ItemSelected
 		$Diskpart_pid = Diskpart_creacion_proceso()
