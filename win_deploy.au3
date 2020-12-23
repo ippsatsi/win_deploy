@@ -136,7 +136,7 @@ While 1
 				GUISetState(@SW_SHOW, $FormMensajesProgreso)
 ;~ 				ConsoleWrite("Disco actual: " & $DiscoActual & @CRLF)
 				MensajesProgreso($MensajesInstalacion, "Iniciando Instalacion en Disco")
-				MensajesProgreso($MensajesInstalacion, "----------------------------------------")
+				MensajesProgreso($MensajesInstalacion, "---------------------------------------")
 				MensajesProgreso($MensajesInstalacion, " ")
 				MensajesProgreso($MensajesInstalacion, "Preparando disco " & $DiscoActual & ":")
 				PrepararDiscoNuevo()
