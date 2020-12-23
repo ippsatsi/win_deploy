@@ -9,12 +9,17 @@ Global $arParticiones
 Global $Diskpart_pid = 0
 Global $DiscoActual = "N"
 
+Func DiskpartIdle()
+	Sleep(100)
+EndFunc
 
-Func Diskpart_creacion_proceso()
+
+Func Diskpart_creacion_proceso($idle_process = "DiskparIdle")
 	Local $sSalida
 	$Diskpart_pid = Run("DiskPart.exe", "", @SW_HIDE, $STDIN_CHILD + $STDOUT_CHILD)
 	While StringRight(StdoutRead($Diskpart_pid, True, False), 10) <> "DISKPART> "
-		Sleep(100)
+		Call($idle_process)
+;~ 		Sleep(100)
 		If Not(ProcessExists($Diskpart_pid)) Then
 			MsgBox($MB_SYSTEMMODAL, "", "No se pudo inicializar diakpart ")
 			$Diskpart_pid = 0
@@ -234,8 +239,11 @@ Func TareaComandosDiskpart($arrayComando)
 				$sSalidaComandos = "tarea " & $i & ":" & $nombreTarea & " - " & $sSalida & @CRLF
 				If $sSalida Then Return $sSalidaComandos
 			EndIf
+			;Hablitamos sondeo del batan cancelar entre cada tarea
+			;hacemos un barrido de los eventos q se van encolando
+			;se encolan muchos eventos, ya q al mover el mouse se van generando eventos
 			$n = 0
-			While $n < 10
+			While $n < 10 ;fijamos en 10 el numero de eventos a procesar de la cola
 			If FormProgreso_SondearCancelacionCierre() Then
 ;~ 				Return MensajesProgreso($MensajesInstalacion, "  ----- Operacion Cancelada ----- ")
 				Return "  ----- Operacion Cancelada ----- "

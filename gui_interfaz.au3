@@ -1,7 +1,7 @@
 
 
 #Region ### START Koda GUI section ### Form=d:\util\win_deploy\gui_design.kxf
-$Activador = GUICreate("Activador", 615, 411, 183, 166)
+$Activador = GUICreate("Instalador de Imagenes de SO", 615, 411, 183, 166)
 $GroupSelDisk = GUICtrlCreateGroup("Seleccione disco", 16, 8, 577, 185)
 $idListDiscos = GUICtrlCreateListView("#|  Modelo    |Sistema|Tamaño|Espacio Libre|Interface|Status", 40, 32, 521, 105, BitOr($LVS_SHOWSELALWAYS, $LVS_SINGLESEL, $LVS_NOSORTHEADER))
 GUICtrlSendMsg(-1, $LVM_SETCOLUMNWIDTH, 0, 30)
@@ -54,7 +54,7 @@ $SelectImage = GUICtrlCreateButton("Selecccionar", 220, 320, 81, 25)
 GUICtrlSetState($SelectImage, $GUI_DISABLE)
 
 #Region ### START Koda GUI section ### Form=d:\util\win_deploy\formmensajesprogreso.kxf
-$FormMensajesProgreso = GUICreate("FormMensajesProgreso", 615, 437, 212, 183, -1, -1, $Activador)
+$FormMensajesProgreso = GUICreate("Instalacion en curso", 615, 437, 212, 183, -1, -1, $Activador)
 $MensajesInstalacion = GUICtrlCreateEdit("", 16, 16, 577, 353, BitOR($GUI_SS_DEFAULT_EDIT,$ES_READONLY), $WS_EX_STATICEDGE)
 GUICtrlSetData(-1, "MensajesInstalacion")
 $InstProgreso = GUICtrlCreateProgress(16, 392, 473, 25)
@@ -74,23 +74,11 @@ EndFunc
 Func FormProgreso_SondearCancelacionCierre()
 	Local $msg
 	$msg = GUIGetMsg()
-;~ 	ConsoleWrite("sondeando")
-;~ 	ConsoleWrite("form_msg_1:" & $msg & @CRLF)
-;~ 	ConsoleWrite("form_msg_0:" & $msg[0] & @CRLF)
-;~ 	If $msg[1] = $FormMensajesProgreso And $msg[0] = $Cancelar Then
-;~ 		Return True
-;~ 	Else
-;~ 		Return False
-;~ 	EndIf
 	If $msg <> $GUI_EVENT_MOUSEMOVE Then
-		ConsoleWrite("form_msg_1:" & $msg & " y Cancelar es:" & $Cancelar & @CRLF)
 		If $msg = $Cancelar Then
-			ConsoleWrite("Sera cancelado")
 			Return True
 		Else
 			Return False
 		EndIf
 	EndIf
-
-
 EndFunc

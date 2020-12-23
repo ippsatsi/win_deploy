@@ -136,9 +136,9 @@ While 1
 				GUISetState(@SW_SHOW, $FormMensajesProgreso)
 ;~ 				ConsoleWrite("Disco actual: " & $DiscoActual & @CRLF)
 				MensajesProgreso($MensajesInstalacion, "Iniciando Instalacion en Disco")
-				MensajesProgreso($MensajesInstalacion, "------------------------------------")
+				MensajesProgreso($MensajesInstalacion, "----------------------------------------")
 				MensajesProgreso($MensajesInstalacion, " ")
-				MensajesProgreso($MensajesInstalacion, "Preparando disco:")
+				MensajesProgreso($MensajesInstalacion, "Preparando disco " & $DiscoActual & ":")
 				PrepararDiscoNuevo()
 				If ValidarParticiones() Then
 					MensajesProgreso($MensajesInstalacion, "Se crearon las particiones de manera correcta")
