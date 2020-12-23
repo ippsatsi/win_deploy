@@ -60,3 +60,37 @@ GUICtrlSetData(-1, "MensajesInstalacion")
 $InstProgreso = GUICtrlCreateProgress(16, 392, 473, 25)
 $Cancelar = GUICtrlCreateButton("Cancelar", 512, 392, 81, 25)
 #EndRegion ### END Koda GUI section ###
+
+;Funciones GUI
+
+Func FormProgreso_CambiarBtCancelarXCerrar()
+	GUICtrlSetData($Cancelar, "Cerrar")
+EndFunc
+
+Func FormProgreso_CambiarBtCerrarXCancelar()
+	GUICtrlSetData($Cancelar, "Cancelar")
+EndFunc
+
+Func FormProgreso_SondearCancelacionCierre()
+	Local $msg
+	$msg = GUIGetMsg()
+;~ 	ConsoleWrite("sondeando")
+;~ 	ConsoleWrite("form_msg_1:" & $msg & @CRLF)
+;~ 	ConsoleWrite("form_msg_0:" & $msg[0] & @CRLF)
+;~ 	If $msg[1] = $FormMensajesProgreso And $msg[0] = $Cancelar Then
+;~ 		Return True
+;~ 	Else
+;~ 		Return False
+;~ 	EndIf
+	If $msg <> $GUI_EVENT_MOUSEMOVE Then
+		ConsoleWrite("form_msg_1:" & $msg & " y Cancelar es:" & $Cancelar & @CRLF)
+		If $msg = $Cancelar Then
+			ConsoleWrite("Sera cancelado")
+			Return True
+		Else
+			Return False
+		EndIf
+	EndIf
+
+
+EndFunc

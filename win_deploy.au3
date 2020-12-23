@@ -132,14 +132,20 @@ While 1
 ;~ 					GUISetState(@SW_SHOW, $Form1_1)
 ;~ 					GUISetState(@SW_HIDE, $Activador)
 			Case $btInstalar
+				LimpiarVentanaProgreso()
 				GUISetState(@SW_SHOW, $FormMensajesProgreso)
 ;~ 				ConsoleWrite("Disco actual: " & $DiscoActual & @CRLF)
-;~ 				PrepararDiscoNuevo()
-;~ 				If ValidarParticiones() Then
-;~ 					ConsoleWrite("Se crearon las particiones de manera correcta")
-;~ 				Else
-;~ 					ConsoleWrite("No estan todas las particiones necesarias")
-;~ 				EndIf
+				MensajesProgreso($MensajesInstalacion, "Iniciando Instalacion en Disco")
+				MensajesProgreso($MensajesInstalacion, "------------------------------------")
+				MensajesProgreso($MensajesInstalacion, " ")
+				MensajesProgreso($MensajesInstalacion, "Preparando disco:")
+				PrepararDiscoNuevo()
+				If ValidarParticiones() Then
+					MensajesProgreso($MensajesInstalacion, "Se crearon las particiones de manera correcta")
+
+				Else
+					MensajesProgreso($MensajesInstalacion, "No estan todas las particiones necesarias")
+				EndIf
 
 			Case $btFileSel
 				Local $sWimPathFile = FileOpenDialog("Seleccione el archivo WIM conteniendo la imagen", @WindowsDir & "\", "archivos wim (*.wim)", BitOR($FD_FILEMUSTEXIST, $FD_MULTISELECT))

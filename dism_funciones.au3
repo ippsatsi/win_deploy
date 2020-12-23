@@ -92,12 +92,15 @@ EndFunc
 
 Func EventosSelectProgreso()
 ;~ 	CambiarEstadoVentanaSelectImage()
+
 	Switch $nMsg[0]
 		Case $GUI_EVENT_CLOSE
 			GUISetState(@SW_HIDE,$FormMensajesProgreso)
-;~ 		Case $SelectImage
-;~ 			CargaImagenSelect()
-;~ 			GUISetState(@SW_HIDE,$FormSelectImage)
+		Case $Cancelar
+			If GUICtrlRead($Cancelar) = "Cerrar" Then
+				GUISetState(@SW_HIDE,$FormMensajesProgreso)
+				LimpiarVentanaProgreso()
+			EndIf
 	EndSwitch
 EndFunc
 

@@ -159,14 +159,15 @@ Func PrepararDiscoNuevo()
 		$Resultado = TareaComandosDiskpart($arPrepararUEFI)
 	EndIf
 	If $Resultado Then
-		Local $sError = GUICtrlRead($ctrlStatus) & " Fallo: La tarea no se pudo completar"
+		Local $sError = $Resultado & " Fallo: La tarea no se pudo completar"
 		RefrescarDiscos()
 		$MensajeStatusError = $sError
-		ActualizandoStatus()
+		MensajesProgreso($MensajesInstalacion, $sError)
 	Else
 		RefrescarDiscos()
 		ActualizandoStatus("Se crearon las particiones en el Disco con Sist. " & $SelectedSystem)
 	EndIf
+	FormProgreso_CambiarBtCancelarXCerrar()
 EndFunc
 
 Func ValidarParticiones()
@@ -196,9 +197,13 @@ Func ActualizandoStatus($status = $MensajeStatusError)
 	$MensajeStatusError = ""
 EndFunc
 
-Func _MensajesProgreso($xBoxProgreso, $mensaje, $xlblEstado = 0)
-	GUICtrlSetData($xBoxProgreso, $mensaje & @CRLF, 1)
-;~ 	GUICtrlSetData($xlblEstado, $mensaje)
+Func MensajesProgreso($xBoxProgreso, $mensaje, $xlblEstado = 0)
+	GUICtrlSetData($xBoxProgreso," " & $mensaje & @CRLF, 1)
+	Return $mensaje
+EndFunc
+
+Func LimpiarVentanaProgreso()
+	GUICtrlSetData($MensajesInstalacion, "")
 EndFunc
 
 

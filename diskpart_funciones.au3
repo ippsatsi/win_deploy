@@ -219,19 +219,31 @@ Func TareaComandosDiskpart($arrayComando)
 	EndIf
 	$Diskpart_pid = Diskpart_creacion_proceso()
 	If SeleccionarDisco($Diskpart_pid, $DiscoActual) Then
+		FormProgreso_CambiarBtCerrarXCancelar()
 		For $i = 0 To UBound($arrayComando) - 1
 			$comando = $arrayComando[$i][0]
 			$salida_correcta = $arrayComando[$i][1]
-			$nombreTarea = $arrayComando[$i][2]
+			$nombreTarea = "    " & $arrayComando[$i][2]
 			$otro_comando = $arrayComando[$i][3]
 			If $otro_comando Then
 				Execute($otro_comando)
 			Else
-				ActualizandoStatus($nombreTarea)
+				;ActualizandoStatus($nombreTarea)
+				MensajesProgreso($MensajesInstalacion, $nombreTarea)
 				$sSalida = EjecutarCompararComandoDiskpart($Diskpart_pid, $comando, $salida_correcta)
 				$sSalidaComandos = "tarea " & $i & ":" & $nombreTarea & " - " & $sSalida & @CRLF
 				If $sSalida Then Return $sSalidaComandos
 			EndIf
+			$n = 0
+			While $n < 10
+			If FormProgreso_SondearCancelacionCierre() Then
+;~ 				Return MensajesProgreso($MensajesInstalacion, "  ----- Operacion Cancelada ----- ")
+				Return "  ----- Operacion Cancelada ----- "
+			EndIf
+			Sleep(1)
+			$n = $n + 1
+			WEnd
+
 		Next
 		Return False
 	EndIf
