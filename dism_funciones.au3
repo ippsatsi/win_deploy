@@ -128,3 +128,9 @@ Func UpdateCtrlInputImageNameSelect($intNumImage)
 	GUICtrlSetData($InIndexImage, $arImagenes[$intNumImage][0])
 EndFunc
 
+Func df_AplicarImagen($FilePath, $IndexImage)
+	;dism /Apply-Image /ImageFile:%1 /Index:1 /ApplyDir:W:\
+	Local $txtCommandLine = "/Apply-Image /ImageFile:" & $FilePath & " /Index:" & $IndexImage & " /ApplyDir:W:\"
+	Local $psTarea = Run(@ComSpec & " /c " & $txtCommandLine, "", @SW_HIDE, $STDOUT_CHILD)
+
+EndFunc

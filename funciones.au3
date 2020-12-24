@@ -205,5 +205,3 @@ EndFunc
 Func LimpiarVentanaProgreso()
 	GUICtrlSetData($MensajesInstalacion, "")
 EndFunc
-
-

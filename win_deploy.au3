@@ -148,7 +148,7 @@ While 1
 				EndIf
 
 			Case $btFileSel
-				Local $sWimPathFile = FileOpenDialog("Seleccione el archivo WIM conteniendo la imagen", @WindowsDir & "\", "archivos wim (*.wim)", BitOR($FD_FILEMUSTEXIST, $FD_MULTISELECT))
+				Global $sWimPathFile = FileOpenDialog("Seleccione el archivo WIM conteniendo la imagen", @WindowsDir & "\", "archivos wim (*.wim)", BitOR($FD_FILEMUSTEXIST, $FD_MULTISELECT))
 				If $sWimPathFile <> "" Then
 					GUICtrlSetData($inFileImagePath, $sWimPathFile)
 					CargaListaImagenes($sWimPathFile)
