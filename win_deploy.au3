@@ -142,6 +142,7 @@ While 1
 				PrepararDiscoNuevo()
 				If ValidarParticiones() Then
 					MensajesProgreso($MensajesInstalacion, "Se crearon las particiones de manera correcta")
+					df_AplicarImagen($sWimPathFile, GUICtrlRead($InIndexImage ))
 
 				Else
 					MensajesProgreso($MensajesInstalacion, "No estan todas las particiones necesarias")

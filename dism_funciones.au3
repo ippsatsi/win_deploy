@@ -130,7 +130,39 @@ EndFunc
 
 Func df_AplicarImagen($FilePath, $IndexImage)
 	;dism /Apply-Image /ImageFile:%1 /Index:1 /ApplyDir:W:\
-	Local $txtCommandLine = "/Apply-Image /ImageFile:" & $FilePath & " /Index:" & $IndexImage & " /ApplyDir:W:\"
+	Local $txtCommandLine = "dism /Apply-Image /ImageFile:" & $FilePath & " /Index:" & $IndexImage & " /ApplyDir:W:\"
 	Local $psTarea = Run(@ComSpec & " /c " & $txtCommandLine, "", @SW_HIDE, $STDOUT_CHILD)
+	Local $value = 0
+	Local $percent = 0
+	Local $hTimer = TimerInit()
+
+;ProgressOn("Image Load", "Deploying Image", "0 percent")
+While ProcessExists($psTarea)
+    $line = StdoutRead($psTarea, False)
+	ConsoleWrite("dism:")
+	ConsoleWrite("linea:" & $line & @CRLF)
+    If StringInStr($line, ".0%") Then
+        $line1 = StringSplit($line, ".")
+        $value = StringRight($line1[$line1[0] - 1], 2) ; agarramos el ultimo % leido
+
+        ;$value = StringStripWS($value, 7)
+    EndIf
+    If $value == "00" Then $value = 100
+    If @error Then ExitLoop
+    Sleep(50)
+    If $percent <> $value Then
+		$iRatioRestante = (100 - $value)/$value
+		$mmTiempoTranscurrido = TimerDiff($hTimer)
+		$mmTiempoEstimadoTotal = ($mmTiempoTranscurrido * $iRatioRestante) + $mmTiempoTranscurrido
+		$ssTiempoTranscurrido = Floor($mmTiempoTranscurrido/1000)
+		$ssTiempoTotal = Floor($mmTiempoEstimadoTotal/1000)
+		MensajesProgreso($MensajesInstalacion, $value)
+		;FormProgreso_ActualizarLabelProgreso("Aplicando imagen, Total Est: " & $ssTiempoTotal & " seg ", "Boot.wim Trancurrido: " & $ssTiempoTranscurrido & " seg " & $value & "%")
+        ProgressSet($value, "Aplicando imagen, Total Est: " & $ssTiempoTotal & " seg ", "Trancurrido: " & $ssTiempoTranscurrido & " seg " & $value & "%")
+        $percent = $value
+    EndIf
+    If $value = 100 Then ExitLoop
+WEnd
+
 
 EndFunc

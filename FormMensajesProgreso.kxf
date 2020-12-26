@@ -4,8 +4,8 @@
 		<property name="Left" vt="Int16">192</property>
 		<property name="Top" vt="Int8">124</property>
 		<property name="Width" vt="Int16">630</property>
-		<property name="Height" vt="Int16">475</property>
-		<property name="Caption" vt="String">FormMensajesProgreso</property>
+		<property name="Height" vt="Int16">492</property>
+		<property name="Caption" vt="String">Instalacion en curso</property>
 		<property name="Color" vt="Ident">clBtnFace</property>
 		<property name="Font.Charset" vt="Ident">DEFAULT_CHARSET</property>
 		<property name="Font.Color" vt="Ident">clWindowText</property>
@@ -38,7 +38,7 @@
 				<property name="Height" vt="Int16">353</property>
 				<property name="Lines.Strings" vt="List">
 					<list>
-						<li vt="String">MensajesInstalacion</li>
+						<li vt="String"/>
 					</list>
 				</property>
 				<property name="TabOrder" vt="Int8">0</property>
@@ -51,7 +51,7 @@
 		<object type="TAProgress" name="InstProgreso">
 			<properties>
 				<property name="Left" vt="Int8">16</property>
-				<property name="Top" vt="Int16">392</property>
+				<property name="Top" vt="Int16">416</property>
 				<property name="Width" vt="Int16">473</property>
 				<property name="Height" vt="Int8">25</property>
 				<property name="TabOrder" vt="Int8">1</property>
@@ -64,7 +64,7 @@
 		<object type="TAButton" name="Cancelar">
 			<properties>
 				<property name="Left" vt="Int16">512</property>
-				<property name="Top" vt="Int16">392</property>
+				<property name="Top" vt="Int16">416</property>
 				<property name="Width" vt="Int8">81</property>
 				<property name="Height" vt="Int8">25</property>
 				<property name="Caption" vt="String">Cancelar</property>
@@ -73,6 +73,21 @@
 				<property name="CtrlStyle" vt="Int32">1342373888</property>
 				<property name="CtrlExStyle" vt="Int8">0</property>
 				<property name="Resizing" vt="Set">DockWidth, DockHeight</property>
+			</properties>
+			<components/>
+		</object>
+		<object type="TALabel" name="lblTextoProgreso">
+			<properties>
+				<property name="Left" vt="Int8">16</property>
+				<property name="Top" vt="Int16">392</property>
+				<property name="Width" vt="Int8">49</property>
+				<property name="Height" vt="Int8">17</property>
+				<property name="Caption" vt="String">Copiando</property>
+				<property name="TabOrder" vt="Int8">3</property>
+				<property name="HaveVariable" vt="False">False</property>
+				<property name="CtrlStyle" vt="Int32">1342308608</property>
+				<property name="CtrlExStyle" vt="Int8">0</property>
+				<property name="Resizing" vt="Set"/>
 			</properties>
 			<components/>
 		</object>
