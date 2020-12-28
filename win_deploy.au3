@@ -23,6 +23,12 @@
 #include <dism_funciones.au3>
 
 Global $MensajeStatusError = ""
+
+Global $strSistemaSel = ""
+Global $pathFileWimSel = ""
+Global $strImageNameSel = ""
+Global $intIndexImageSel = 1
+
 ;Opciones GUI
 Opt("GUIResizeMode", $GUI_DOCKTOP  + $GUI_DOCKSIZE)
 

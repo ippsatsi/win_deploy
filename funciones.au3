@@ -148,8 +148,8 @@ Func PrepararDiscoNuevo()
 			Return False
 		EndIf
 	EndIf
-	Local $SelectedSystem = LeerSistemaSeleccionado()
-	If $SelectedSystem = "BIOS" Then
+	;Local $SelectedSystem = LeerSistemaSeleccionado()
+	If $strSistemaSel = "BIOS" Then
 		$Resultado = TareaComandosDiskpart($arPrepararMBR)
 	Else
 		$Resultado = TareaComandosDiskpart($arPrepararUEFI)
@@ -162,7 +162,7 @@ Func PrepararDiscoNuevo()
 		Return False
 	Else
 		RefrescarDiscos()
-		ActualizandoStatus("Se crearon las particiones en el Disco con Sist. " & $SelectedSystem)
+		ActualizandoStatus("Se crearon las particiones en el Disco con Sist. " & $strSistemaSel)
 		Return True
 	EndIf
 EndFunc
@@ -184,7 +184,6 @@ Func ValidarParticiones()
 	Next
 	If $flag = 3 Then
 		MensajesProgreso($MensajesInstalacion, "Se crearon las particiones de manera correcta" & @CRLF )
-		f_MensajeTitulo("Aplicando imagen a Particion")
 		Return True
 	Else
 		MensajesProgreso($MensajesInstalacion, "No estan todas las particiones necesarias")
@@ -233,6 +232,7 @@ EndFunc
 
 Func f_InstalarEnDiscoNuevo()
 	LimpiarVentanaProgreso()
+	f_AsignarParametros()
 	GUISetState(@SW_SHOW, $FormMensajesProgreso)
 	;ConsoleWrite("Disco actual: " & $DiscoActual & @CRLF)
 	f_MensajeTitulo("Iniciando Instalacion en Disco")
@@ -240,6 +240,14 @@ Func f_InstalarEnDiscoNuevo()
 	FormProgreso_lblProgreso("Preparando disco... ")
 	If Not PrepararDiscoNuevo() Then Return
 	If Not ValidarParticiones() Then Return
-	If Not df_AplicarImagen($sWimPathFile, GUICtrlRead($InIndexImage )) Then Return
+	If Not df_AplicarImagen($pathFileWimSel, $intIndexImageSel) Then Return
 
 EndFunc
+
+Func f_AsignarParametros()
+	$strSistemaSel = LeerSistemaSeleccionado()
+	$pathFileWimSel = GUICtrlRead($inFileImagePath)
+	$intIndexImageSel = GUICtrlRead($InIndexImage)
+	$strImageNameSel = GUICtrlRead($InImageName)
+EndFunc
+

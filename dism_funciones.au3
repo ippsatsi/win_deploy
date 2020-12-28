@@ -121,6 +121,7 @@ Func df_AplicarImagen($FilePath, $IndexImage)
 	Local $percent = 0
 	Local $GoodApply = False
 	Local $hTimer = TimerInit()
+	f_MensajeTitulo("Aplicando imagen a Particion: " & $strImageNameSel)
 	MensajesProgresoSinCRLF($MensajesInstalacion,"   [")
 	While ProcessExists($psTarea)
 		FormProgreso_EnableCancelar()
