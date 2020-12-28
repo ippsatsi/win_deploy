@@ -88,7 +88,6 @@ EndFunc
 Func _ConvertirGBbinToGBdecimal($intSize, $Unidad)
 	If StringInStr($Unidad, "GB") Then
 		Return  String(Round(Number($intSize) * 1.075)) & " GB"   ;1024  * 1024 * 1024
-;		Return  String(Round(Number($size) * $FactorConversion)) & " GB"   ;1024  * 1024 * 1024
 	Else
 		Return $intSize & " " & $Unidad
 	EndIf
@@ -112,14 +111,12 @@ Func CambiarEstado()
 	Local $ItemSelected
 	$ItemSelected = ControlListView($Activador, "", $idListDiscos,"GetSelected")
 	If $ItemSelected = "" Then
-		;ConsoleWrite("nada" & @CRLF)
 		GUICtrlSetData($ctrlSelModoDisco, "Seleccione")
 		GUICtrlSetState($ctrlSelModoDisco, $GUI_DISABLE)
 		$DiscoActual = "N"
 	Else
 		GUICtrlSetState($ctrlSelModoDisco, $GUI_ENABLE)
 		$DiscoActual = $ItemSelected
-		$Diskpart_pid = Diskpart_creacion_proceso()
 	EndIf
 EndFunc
 
@@ -138,10 +135,9 @@ Func PrepararDiscoNuevo()
 	Local $sTipoDisco, $intRespuesta, $Resultado
 	GUICtrlSetState($btInstalar, $GUI_DISABLE)
 	If $DiscoActual = "N" Then
-;~ 		MsgBox(0, "Error de seleccion", "No ha seleccionado un disco")
 		$MensajeStatusError = "Error de seleccion - No ha seleccionado un disco"
 		ActualizandoStatus()
-		Return
+		Return False
 	EndIf
 	$sTipoDisco = $arDisks[$DiscoActual][10]
 	If $sTipoDisco = "USB" Then
@@ -149,7 +145,7 @@ Func PrepararDiscoNuevo()
 		If $intRespuesta = 7 Then
 			$MensajeStatusError = "No Se formateara el USB"
 			ActualizandoStatus()
-			Return
+			Return False
 		EndIf
 	EndIf
 	Local $SelectedSystem = LeerSistemaSeleccionado()
@@ -163,11 +159,12 @@ Func PrepararDiscoNuevo()
 		RefrescarDiscos()
 		$MensajeStatusError = $sError
 		MensajesProgreso($MensajesInstalacion, $sError)
+		Return False
 	Else
 		RefrescarDiscos()
 		ActualizandoStatus("Se crearon las particiones en el Disco con Sist. " & $SelectedSystem)
+		Return True
 	EndIf
-	FormProgreso_CambiarBtCancelarXCerrar()
 EndFunc
 
 Func ValidarParticiones()
@@ -186,8 +183,11 @@ Func ValidarParticiones()
 		Next
 	Next
 	If $flag = 3 Then
+		MensajesProgreso($MensajesInstalacion, "Se crearon las particiones de manera correcta" & @CRLF )
+		f_MensajeTitulo("Aplicando imagen a Particion")
 		Return True
 	Else
+		MensajesProgreso($MensajesInstalacion, "No estan todas las particiones necesarias")
 		Return False
 	EndIf
 EndFunc
@@ -198,10 +198,48 @@ Func ActualizandoStatus($status = $MensajeStatusError)
 EndFunc
 
 Func MensajesProgreso($xBoxProgreso, $mensaje, $xlblEstado = 0)
-	GUICtrlSetData($xBoxProgreso," " & $mensaje & @CRLF, 1)
+	$gi_AlmacenTextoMensajes &= " " & $mensaje & @CRLF
+	GUICtrlSetData($xBoxProgreso,$gi_AlmacenTextoMensajes)
+	Return $mensaje
+EndFunc
+
+Func MensajesProgresoSinCRLF($xBoxProgreso, $mensaje, $xlblEstado = 0)
+	$gi_AlmacenTextoMensajes &= $mensaje
+	GUICtrlSetData($xBoxProgreso, $gi_AlmacenTextoMensajes)
 	Return $mensaje
 EndFunc
 
 Func LimpiarVentanaProgreso()
-	GUICtrlSetData($MensajesInstalacion, "")
+	$gi_AlmacenTextoMensajes = ""
+	GUICtrlSetData($MensajesInstalacion, $gi_AlmacenTextoMensajes)
+EndFunc
+
+Func FormProgreso_lblProgreso($mensaje, $mensaje_derecha = "")
+	GUICtrlSetData($lblTextoProgreso, $mensaje)
+	GUICtrlSetData($lblTextoProgresoDerecha, $mensaje_derecha)
+EndFunc
+
+Func f_MensajeTitulo($mensaje)
+	MensajesProgreso($MensajesInstalacion, $mensaje)
+	MensajesProgreso($MensajesInstalacion, _StringRepeat("-", StringLen($mensaje)*1.7))
+	MensajesProgreso($MensajesInstalacion, " ")
+EndFunc
+
+Func f_KillIfProcessExists($process_name)
+	While ProcessExists($process_name)
+		ProcessClose($process_name)
+	WEnd
+EndFunc
+
+Func f_InstalarEnDiscoNuevo()
+	LimpiarVentanaProgreso()
+	GUISetState(@SW_SHOW, $FormMensajesProgreso)
+	;ConsoleWrite("Disco actual: " & $DiscoActual & @CRLF)
+	f_MensajeTitulo("Iniciando Instalacion en Disco")
+	MensajesProgreso($MensajesInstalacion, "Preparando disco " & $DiscoActual & ":")
+	FormProgreso_lblProgreso("Preparando disco... ")
+	If Not PrepararDiscoNuevo() Then Return
+	If Not ValidarParticiones() Then Return
+	If Not df_AplicarImagen($sWimPathFile, GUICtrlRead($InIndexImage )) Then Return
+
 EndFunc

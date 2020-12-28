@@ -260,9 +260,10 @@ Func TareaComandosDiskpart($arrayComando)
 		ActualizandoStatus("Error de seleccion - No ha seleccionado un disco")
 		Return
 	EndIf
+	f_KillIfProcessExists("Diskpart.exe")
 	$Diskpart_pid = Diskpart_creacion_proceso()
 	If SeleccionarDisco($Diskpart_pid, $DiscoActual) Then
-		FormProgreso_CambiarBtCerrarXCancelar()
+		FormProgreso_EnableCancelar()
 		For $i = 0 To UBound($arrayComando) - 1
 			$comando = $arrayComando[$i][0]
 			$salida_correcta = $arrayComando[$i][1]
@@ -271,7 +272,6 @@ Func TareaComandosDiskpart($arrayComando)
 			If $otro_comando Then
 				Execute($otro_comando)
 			Else
-				;ActualizandoStatus($nombreTarea)
 				MensajesProgreso($MensajesInstalacion, $nombreTarea)
 				$sSalida = EjecutarCompararComandoDiskpart($Diskpart_pid, $comando, $salida_correcta)
 				$sSalidaComandos = "tarea " & $i & ":" & $nombreTarea & " - " & $sSalida & @CRLF
@@ -282,14 +282,21 @@ Func TareaComandosDiskpart($arrayComando)
 			;se encolan muchos eventos, ya q al mover el mouse se van generando eventos
 			$n = 0
 			While $n < 15 ;fijamos en 10 el numero de eventos a procesar de la cola
-			If FormProgreso_SondearCancelacionCierre() Then
-				Return "  ----- Operacion Cancelada ----- "
-			EndIf
-			Sleep(1)
-			$n = $n + 1
+				If FormProgreso_SondearCancelacionCierre() Then
+					DiskpartCerrarProceso($Diskpart_pid)
+					;gi_VaciarColadeEventos()
+					FormProgreso_DisableCancelar()
+					ActualizandoStatus("Operacion Cancelada")
+					Return "  ----- Operacion Cancelada ----- "
+				EndIf
+				Sleep(1)
+				$n = $n + 1
 			WEnd
 		Next
+		FormProgreso_DisableCancelar()
+		DiskpartCerrarProceso($Diskpart_pid)
 		Return False
 	EndIf
+	DiskpartCerrarProceso($Diskpart_pid)
 EndFunc
 

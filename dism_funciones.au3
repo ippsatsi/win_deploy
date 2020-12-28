@@ -90,20 +90,6 @@ Func EventosSelectImage()
 	EndSwitch
 EndFunc
 
-Func EventosSelectProgreso()
-;~ 	CambiarEstadoVentanaSelectImage()
-
-	Switch $nMsg[0]
-		Case $GUI_EVENT_CLOSE
-			GUISetState(@SW_HIDE,$FormMensajesProgreso)
-		Case $Cancelar
-			If GUICtrlRead($Cancelar) = "Cerrar" Then
-				GUISetState(@SW_HIDE,$FormMensajesProgreso)
-				LimpiarVentanaProgreso()
-			EndIf
-	EndSwitch
-EndFunc
-
 Func CambiarEstadoVentanaSelectImage()
 	Local $ItemSelected
 	$ItemSelected = ControlListView($FormSelectImage, "", $ListImageSelect,"GetSelected")
@@ -120,7 +106,6 @@ Func CargaImagenSelect()
 		$ItemSelected = ControlListView($FormSelectImage, "", $ListImageSelect,"GetSelected")
 		UpdateCtrlInputImageNameSelect($ItemSelected)
 	EndIf
-
 EndFunc
 
 Func UpdateCtrlInputImageNameSelect($intNumImage)
@@ -134,35 +119,64 @@ Func df_AplicarImagen($FilePath, $IndexImage)
 	Local $psTarea = Run(@ComSpec & " /c " & $txtCommandLine, "", @SW_HIDE, $STDOUT_CHILD)
 	Local $value = 0
 	Local $percent = 0
+	Local $GoodApply = False
 	Local $hTimer = TimerInit()
-
-;ProgressOn("Image Load", "Deploying Image", "0 percent")
-While ProcessExists($psTarea)
-    $line = StdoutRead($psTarea, False)
-	ConsoleWrite("dism:")
-	ConsoleWrite("linea:" & $line & @CRLF)
-    If StringInStr($line, ".0%") Then
-        $line1 = StringSplit($line, ".")
-        $value = StringRight($line1[$line1[0] - 1], 2) ; agarramos el ultimo % leido
-
-        ;$value = StringStripWS($value, 7)
-    EndIf
-    If $value == "00" Then $value = 100
-    If @error Then ExitLoop
-    Sleep(50)
-    If $percent <> $value Then
-		$iRatioRestante = (100 - $value)/$value
-		$mmTiempoTranscurrido = TimerDiff($hTimer)
-		$mmTiempoEstimadoTotal = ($mmTiempoTranscurrido * $iRatioRestante) + $mmTiempoTranscurrido
-		$ssTiempoTranscurrido = Floor($mmTiempoTranscurrido/1000)
-		$ssTiempoTotal = Floor($mmTiempoEstimadoTotal/1000)
-		MensajesProgreso($MensajesInstalacion, $value)
-		;FormProgreso_ActualizarLabelProgreso("Aplicando imagen, Total Est: " & $ssTiempoTotal & " seg ", "Boot.wim Trancurrido: " & $ssTiempoTranscurrido & " seg " & $value & "%")
-        ProgressSet($value, "Aplicando imagen, Total Est: " & $ssTiempoTotal & " seg ", "Trancurrido: " & $ssTiempoTranscurrido & " seg " & $value & "%")
-        $percent = $value
-    EndIf
-    If $value = 100 Then ExitLoop
-WEnd
-
-
+	MensajesProgresoSinCRLF($MensajesInstalacion,"   [")
+	While ProcessExists($psTarea)
+		FormProgreso_EnableCancelar()
+		$line = StdoutRead($psTarea, True)
+		;ConsoleWrite("linea:" & $line & "ssss" & @CRLF)
+		If StringInStr($line, ".0%") Then
+			$line1 = StringSplit($line, ".0%",$STR_ENTIRESPLIT)
+			;ConsoleWrite("$line1[" & ($line1[0] - 1) & "]:" & $line1[$line1[0]] & @CRLF)
+			$value = StringRight($line1[$line1[0] - 1], 2) ; agarramos el ultimo % leido
+			;ConsoleWrite("----" & $value & "????" & @CRLF)
+		EndIf
+		; Si llega a 00 es porque llego al 100%
+		If $value == "00" Then $value = 100
+		;si llega a 98 establecemos una variable como bandera de posiblemente finalice
+		;correctamente Dism, por q no siempre llega al 100% cuando finaliza
+		;correctamente, y como no podemos saber el exit code de dism, usamos GoodApply
+		If $value == "98" Then $GoodApply = True
+		Local $n = 0
+		While $n < 15 ;fijamos en 10 el numero de eventos a procesar de la cola
+			If FormProgreso_SondearCancelacionCierre() Then
+				f_KillIfProcessExists("Dism.exe")
+				;gi_VaciarColadeEventos()
+				ActualizandoStatus("Operacion Cancelada")
+				MensajesProgreso($MensajesInstalacion, " ")
+				MensajesProgreso($MensajesInstalacion, "   ---- Operacion Cancelada ----   ")
+				$n = 15
+			EndIf
+			Sleep(1)
+			$n = $n + 1
+		WEnd
+		Sleep(100)
+		If $percent <> $value Then
+			$iRatioRestante = (100 - $value)/$value
+			$mmTiempoTranscurrido = TimerDiff($hTimer)
+			$mmTiempoEstimadoTotal = ($mmTiempoTranscurrido * $iRatioRestante) + $mmTiempoTranscurrido
+			$ssTiempoTranscurrido = Floor($mmTiempoTranscurrido/1000)
+			$ssTiempoTotal = Floor($mmTiempoEstimadoTotal/1000)
+			If Mod($value,5) = 0 Then
+				MensajesProgresoSinCRLF($MensajesInstalacion,"=")
+			EndIf
+			FormProgreso_lblProgreso("Aplicando imagen, Total Est: " & $ssTiempoTotal & " seg" ,"Trancurrido: " & $ssTiempoTranscurrido & " seg   " & $value & "%")
+			$percent = $value
+		EndIf
+		If $value = 100 Then
+			$GoodApply = True
+			ExitLoop
+		EndIf
+	WEnd
+	If $GoodApply Then
+		MensajesProgresoSinCRLF($MensajesInstalacion,"]")
+		MensajesProgreso($MensajesInstalacion, " ")
+		MensajesProgreso($MensajesInstalacion, "Imagen aplicada correctamente")
+		Return True
+	Else
+		MensajesProgreso($MensajesInstalacion, " ")
+		MensajesProgreso($MensajesInstalacion, "Error, no se pudo completar la aplicacion de la imagen")
+		Return False
+	EndIf
 EndFunc

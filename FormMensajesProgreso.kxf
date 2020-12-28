@@ -80,10 +80,23 @@
 			<properties>
 				<property name="Left" vt="Int8">16</property>
 				<property name="Top" vt="Int16">392</property>
-				<property name="Width" vt="Int8">49</property>
+				<property name="Width" vt="Int16">290</property>
 				<property name="Height" vt="Int8">17</property>
-				<property name="Caption" vt="String">Copiando</property>
 				<property name="TabOrder" vt="Int8">3</property>
+				<property name="HaveVariable" vt="False">False</property>
+				<property name="CtrlStyle" vt="Int32">1342308608</property>
+				<property name="CtrlExStyle" vt="Int8">0</property>
+				<property name="Resizing" vt="Set"/>
+			</properties>
+			<components/>
+		</object>
+		<object type="TALabel" name="lblTextoProgresoDerecha">
+			<properties>
+				<property name="Left" vt="Int16">312</property>
+				<property name="Top" vt="Int16">392</property>
+				<property name="Width" vt="Int16">182</property>
+				<property name="Height" vt="Int8">17</property>
+				<property name="TabOrder" vt="Int8">4</property>
 				<property name="HaveVariable" vt="False">False</property>
 				<property name="CtrlStyle" vt="Int32">1342308608</property>
 				<property name="CtrlExStyle" vt="Int8">0</property>

@@ -53,24 +53,22 @@ $SelectImage = GUICtrlCreateButton("Selecccionar", 220, 320, 81, 25)
 ;~ GUICtrlSetStyle($ListImageSelect,  BitOr($LVS_SHOWSELALWAYS, $LVS_SINGLESEL, $LVS_NOSORTHEADER))
 GUICtrlSetState($SelectImage, $GUI_DISABLE)
 
-#Region ### START Koda GUI section ### Form=d:\util\win_deploy\formmensajesprogreso.kxf
-;$FormMensajesProgreso = GUICreate("Instalacion en curso", 615, 437, 212, 183, -1, -1, $Activador)
-;$MensajesInstalacion = GUICtrlCreateEdit("", 16, 16, 577, 353, BitOR($GUI_SS_DEFAULT_EDIT,$ES_READONLY), $WS_EX_STATICEDGE)
-;GUICtrlSetData(-1, "MensajesInstalacion")
-;$InstProgreso = GUICtrlCreateProgress(16, 392, 473, 25)
-;$Cancelar = GUICtrlCreateButton("Cancelar", 512, 392, 81, 25)
-#EndRegion ### END Koda GUI section ###
-
-
 #Region ### START Koda GUI section ### Form=c:\users\luis\documents\win_deploy\formmensajesprogreso.kxf
 $FormMensajesProgreso = GUICreate("Instalacion en curso", 615, 454, 192, 124, -1, -1, $Activador)
 $MensajesInstalacion = GUICtrlCreateEdit("", 16, 16, 577, 353, BitOR($GUI_SS_DEFAULT_EDIT,$ES_READONLY), $WS_EX_STATICEDGE)
 GUICtrlSetData(-1, "")
 $InstProgreso = GUICtrlCreateProgress(16, 416, 473, 25)
 $Cancelar = GUICtrlCreateButton("Cancelar", 512, 416, 81, 25)
-$lblTextoProgreso = GUICtrlCreateLabel("Copiando", 16, 392, 49, 17)
+$lblTextoProgreso = GUICtrlCreateLabel("", 16, 392, 260, 17)
+$lblTextoProgresoDerecha = GUICtrlCreateLabel("", 280, 392, 210, 17, $SS_RIGHT)
 #EndRegion ### END Koda GUI section ###
+
 ;Funciones GUI
+$lblMensajesInstalacion = GUICtrlCreateLabel("", 16, 16, 577, 353)
+GUICtrlSetState($lblMensajesInstalacion,$GUI_ONTOP+$GUI_FOCUS)
+
+Global $gi_boolPuedoCerrarProgreso = True
+Global $gi_AlmacenTextoMensajes = ""
 
 Func FormProgreso_ActualizarLabelProgreso($status)
 	GUICtrlSetData($lblTextoProgreso, $status)
@@ -84,6 +82,16 @@ Func FormProgreso_CambiarBtCerrarXCancelar()
 	GUICtrlSetData($Cancelar, "Cancelar")
 EndFunc
 
+Func FormProgreso_DisableCancelar()
+	$gi_boolPuedoCerrarProgreso = False
+	GUICtrlSetState($Cancelar, $GUI_DISABLE)
+EndFunc
+
+Func FormProgreso_EnableCancelar()
+	$gi_boolPuedoCerrarProgreso = True
+	GUICtrlSetState($Cancelar, $GUI_ENABLE)
+EndFunc
+
 Func FormProgreso_SondearCancelacionCierre()
 	Local $msg
 	$msg = GUIGetMsg()
@@ -95,3 +103,24 @@ Func FormProgreso_SondearCancelacionCierre()
 		EndIf
 	EndIf
 EndFunc
+
+Func gi_VaciarColadeEventos()
+	Local $msg
+	;While GUIGetMsg() <> 0
+	For $i = 0 To 100
+		$msg = GUIGetMsg()
+	Next
+EndFunc
+
+Func gi_EventosSelectProgreso()
+	Switch $nMsg[0]
+		Case $GUI_EVENT_CLOSE
+			GUISetState(@SW_HIDE,$FormMensajesProgreso)
+		;Case $Cancelar
+			;If GUICtrlRead($Cancelar) = "Cerrar" Then
+			;	GUISetState(@SW_HIDE,$FormMensajesProgreso)
+			;	LimpiarVentanaProgreso()
+			;EndIf
+	EndSwitch
+EndFunc
+

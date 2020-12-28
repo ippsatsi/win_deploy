@@ -32,31 +32,6 @@ Local $intGuiAltoMax = 500
 Local $intAlinIzq1 = 16
 Local $intAlinIzq2 = ($intAlinIzq1 * 2) + 6
 #include <gui_interfaz.au3>
-#Region ### START Koda GUI section ### Form=c:\users\luis\documents\form2.kxf
-;Primera ventana
-;~ Global $Form1_0 = GUICreate("Activador de Restauración", $intGuiAncho, $intGuiAltoMin,-1,-1)
-;~ $GroupSelDisk = GUICtrlCreateGroup("Seleccione disco", 16, 8, $intGuiAncho - 37, 180)
-;~ Global $idListDiscos = GUICtrlCreateListView("# |       Modelo      | Sistema | Tamaño  |Espacio Libre| Interface |Status  ", $intAlinIzq2, 33, 510, 100, BitOr($LVS_SHOWSELALWAYS, $LVS_SINGLESEL, $LVS_NOSORTHEADER),$LVS_EX_INFOTIP) ;version: 0.4.1.0
-;~ 					GUICtrlSendMsg(-1, $LVM_SETEXTENDEDLISTVIEWSTYLE, $LVS_EX_GRIDLINES, $LVS_EX_GRIDLINES)
-;~ Local $lblModoDisco = GUICtrlCreateLabel("Usar disco como: ", $intAlinIzq2, 145, 89, 25)
-;~ Global $ctrlSelModoDisco = GUICtrlCreateCombo("", $intGuiAncho - 468, 145, 130, 25)
-;~ GUICtrlSetData($ctrlSelModoDisco, "Seleccione|Nuevo|Reinstalacion", "Seleccione")
-;~ GUICtrlSetState($ctrlSelModoDisco, $GUI_DISABLE)
-;~ $btRefresh = GUICtrlCreateButton("Refrescar", $intGuiAncho - 142, 145, 89, 25)
-
-;~ $GroupTipoInstalacion = GUICtrlCreateGroup("Seleccione tipo de instalacion", 16, 196, $intGuiAncho - 37, 57)
-;~ Local $ck_UEFI = GUICtrlCreateRadio("", 32, 220, 17, 17)
-;~ GUICtrlCreateLabel("UEFI", 52, 220, 25, 17)
-;~ Local $ck_Csm = GUICtrlCreateRadio("", 100, 220, 17, 17)
-;~ GUICtrlCreateLabel("CSM/MBR", 130, 220, 55, 17)
-;~ Global $btFormatear = GUICtrlCreateButton("formatear", $intGuiAncho - 268, 215, 89, 25)
-;  GUICtrlSetState($btFormatear, $GUI_DISABLE)
-;~ $btNext = GUICtrlCreateButton("Siguiente", $intGuiAncho - 142, 215, 89, 25)
-
-;~ $GroupSelImagen = GUICtrlCreateGroup("Seleccione imagen a instalar", 16, 260, $intGuiAncho - 37, 67)
-;~ GUICtrlCreateLabel("archivo WIM", $intAlinIzq2, 294, 70, 17)
-;~ Local $inFileImagePath = GUICtrlCreateInput("", $intAlinIzq2 + 70 , 289, 310, 21)
-;~ $btFileSel = GUICtrlCreateButton("Examinar", $intGuiAncho - 142, 285, 89, 25)
 
 ;segunda ventana
 Global $Form1_1 = GUICreate("Activador de Restauración", $intGuiAncho, $intGuiAltoMin,-1,-1)
@@ -132,22 +107,8 @@ While 1
 ;~ 					GUISetState(@SW_SHOW, $Form1_1)
 ;~ 					GUISetState(@SW_HIDE, $Activador)
 			Case $btInstalar
-				LimpiarVentanaProgreso()
-				GUISetState(@SW_SHOW, $FormMensajesProgreso)
-;~ 				ConsoleWrite("Disco actual: " & $DiscoActual & @CRLF)
-				MensajesProgreso($MensajesInstalacion, "Iniciando Instalacion en Disco")
-				MensajesProgreso($MensajesInstalacion, "-------------------------------------------")
-				MensajesProgreso($MensajesInstalacion, " ")
-				MensajesProgreso($MensajesInstalacion, "Preparando disco " & $DiscoActual & ":")
-				PrepararDiscoNuevo()
-				If ValidarParticiones() Then
-					MensajesProgreso($MensajesInstalacion, "Se crearon las particiones de manera correcta")
-					df_AplicarImagen($sWimPathFile, GUICtrlRead($InIndexImage ))
-
-				Else
-					MensajesProgreso($MensajesInstalacion, "No estan todas las particiones necesarias")
-				EndIf
-
+				f_InstalarEnDiscoNuevo()
+				FormProgreso_DisableCancelar()
 			Case $btFileSel
 				Global $sWimPathFile = FileOpenDialog("Seleccione el archivo WIM conteniendo la imagen", @WindowsDir & "\", "archivos wim (*.wim)", BitOR($FD_FILEMUSTEXIST, $FD_MULTISELECT))
 				If $sWimPathFile <> "" Then
@@ -160,7 +121,7 @@ While 1
 	Case $nMsg[1] = $FormSelectImage
 		EventosSelectImage()
 	Case $nMsg[1] = $FormMensajesProgreso
-		EventosSelectProgreso()
+		gi_EventosSelectProgreso()
 
 	;si el mensaje es de la segunda ventana
 	Case $nMsg[1] = $Form1_1
