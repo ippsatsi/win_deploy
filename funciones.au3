@@ -1,4 +1,6 @@
 
+Global $rutaWinre = "R:\Recovery\WindowsRE"
+
 Func _CirculoResultado ($x, $y, $color)
 
 	Local $Verde = 0x00ff00
@@ -14,7 +16,7 @@ Func _CirculoResultado ($x, $y, $color)
 	Return $a
 EndFunc
 
-Func _EjecutarTarea ($xContenedorCtrl, $arrayComandos,$ctrlItem, $numTarea, $parametro = '')
+Func _EjecutarTarea2 ($xContenedorCtrl, $arrayComandos,$ctrlItem, $numTarea, $parametro = '')
 	Local $txtCommandLine
 	Local $posX, $posY
 	Local $arrayComando[4]
@@ -148,7 +150,6 @@ Func PrepararDiscoNuevo()
 			Return False
 		EndIf
 	EndIf
-	;Local $SelectedSystem = LeerSistemaSeleccionado()
 	If $strSistemaSel = "BIOS" Then
 		$Resultado = TareaComandosDiskpart($arPrepararMBR)
 	Else
@@ -250,4 +251,88 @@ Func f_AsignarParametros()
 	$intIndexImageSel = GUICtrlRead($InIndexImage)
 	$strImageNameSel = GUICtrlRead($InImageName)
 EndFunc
+
+Func f_ActivarParticiones()
+	f_MensajeTitulo("Activando Particiones de Sistema y Recovery:")
+	;activamos particion sistema
+	If Not f_TareaCMD($arrayComandos, 0, $strSistemaSel) Then Return False
+	;creamos carpeta Recovery
+	If DirCreate($rutaWinre)) Then
+		MensajesProgreso($MensajesInstalacion, $arrayComandos[1][0])
+	Else
+		MensajesProgreso($MensajesInstalacion, "No se pudo crear la carpeta Recovery")
+		Return False
+	EndIf
+	;ubicar la ruta de WinRE
+	Local $rutaWinRE = f_UbicarWinreImagen()
+	If $rutaWinRE = '' Then
+		MensajesProgreso($MensajesInstalacion, "No se ubica el archivo WinRE, no puede continuar la instalacion")
+		Return False
+	EndIf
+	;copiado de imagen winre
+	If Not f_TareaCMD($arrayComandos, 2, $rutaWinRE) Then Return False
+
+
+	Return True
+EndFunc
+
+Func f_ReemplazarParametro($comando, $parametro)
+	if $parametro <> '' Then
+		Return StringReplace($comando,"??param??", $parametro)
+	Else
+		Return $comando
+	EndIf
+EndFunc
+
+
+Func f_TareaCMD($arrayComando, $intNumTarea, $parametro = "")
+	Local $strTxtCommando, $mensaje
+	$comando = f_ReemplazarParametro($arrayComando[$intNumTarea][1], $parametro)
+	$salida_correcta = $arrayComando[$intNumTarea][2]
+	$nombreTarea = "    " & $arrayComando[$intNumTarea][0]
+	$otro_comando = $arrayComando[$intNumTarea][3]
+	MensajesProgreso($MensajesInstalacion, $nombreTarea)
+	;Ejecutamos el comando
+	Local $psTarea = Run(@ComSpec & " /c " & $comando, "", @SW_HIDE, $STDOUT_CHILD)
+	ProcessWaitClose($psTarea)
+	Local $readConsole = StdoutRead($psTarea)
+	If StringInStr($readConsole, $salida_correcta) Then
+		Return True
+	Else
+		MensajesProgreso($MensajesInstalacion, "Error: " & $nombreTarea & " no se pudo completar la tarea")
+		MensajesProgreso($MensajesInstalacion, "La tarea produjo esta salida:" & @CRLF & $readConsole)
+;~ 		GUICtrlSetData($xContenedorCtrl[1], $readConsole & @CRLF, 1)
+		Return False
+	EndIf
+EndFunc
+
+Func f_UbicarWinreImagen()
+	Local $RutaArchivo, $rutaWinreRaiz
+	Local $RutaCopiadoOrigen = "W:\Windows\System32\Recovery"
+	Local $LetrasUnidad = "C:|D:|E:|F:|G:|H:|I:|J:|K:|L:|M:|N:|O:|P:|Q:|R:|S:|T:|U:|V:|W:|X:|Y:|Z:"
+	Local $arrayLetras = StringSplit($LetrasUnidad, '|', 1)
+
+	;Verificamos donde esta winre.wim antes de copiarlo
+	; si existe en la imagen ya desplegada
+	Local $parametro = ''
+	If FileExists($RutaCopiadoOrigen & "\winre.wim") Then
+		$parametro = $RutaCopiadoOrigen
+		;Aca deberiamos ir a registrar directamente, codifcar despues
+	Else ; sino esta en la imagen despleada la buscamos en algun usb ya sea en la raiz o en usb\IMA
+		Local $archivo_wim = "\winre.wim"
+		Local $rutaFinalWinre = "\usb\IMA"
+		For $Letra in $arrayLetras
+			$RutaArchivo = $Letra & $rutaFinalWinre & $archivo_wim
+			$rutaWinreRaiz = $Letra & $archivo_wim
+			If FileExists($RutaArchivo) Then
+				$parametro = $Letra & $rutaFinalWinre
+			ElseIf FileExists($rutaWinreRaiz) Then
+				$parametro = $Letra
+			EndIf
+		Next
+	EndIf
+	Return $parametro
+EndFunc
+
+
 

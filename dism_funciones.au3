@@ -119,6 +119,7 @@ Func df_AplicarImagen($FilePath, $IndexImage)
 	Local $psTarea = Run(@ComSpec & " /c " & $txtCommandLine, "", @SW_HIDE, $STDOUT_CHILD)
 	Local $value = 0
 	Local $percent = 0
+	;para validar la aplicacion correcta de la imagen
 	Local $GoodApply = False
 	Local $hTimer = TimerInit()
 	f_MensajeTitulo("Aplicando imagen a Particion: " & $strImageNameSel)
@@ -126,16 +127,15 @@ Func df_AplicarImagen($FilePath, $IndexImage)
 	While ProcessExists($psTarea)
 		FormProgreso_EnableCancelar()
 		$line = StdoutRead($psTarea, True)
-		;ConsoleWrite("linea:" & $line & "ssss" & @CRLF)
 		If StringInStr($line, ".0%") Then
 			$line1 = StringSplit($line, ".0%",$STR_ENTIRESPLIT)
 			;ConsoleWrite("$line1[" & ($line1[0] - 1) & "]:" & $line1[$line1[0]] & @CRLF)
 			$value = StringRight($line1[$line1[0] - 1], 2) ; agarramos el ultimo % leido
 			;ConsoleWrite("----" & $value & "????" & @CRLF)
 		EndIf
-		; Si llega a 00 es porque llego al 100%
+		; Si llega a 00 es porque llego al 100% y finalizo correctamente
 		If $value == "00" Then $value = 100
-		;si llega a 98 establecemos una variable como bandera de posiblemente finalice
+		;si llega a 98, establecemos una variable como bandera de q posiblemente finalice
 		;correctamente Dism, por q no siempre llega al 100% cuando finaliza
 		;correctamente, y como no podemos saber el exit code de dism, usamos GoodApply
 		If $value == "98" Then $GoodApply = True
@@ -143,7 +143,6 @@ Func df_AplicarImagen($FilePath, $IndexImage)
 		While $n < 15 ;fijamos en 10 el numero de eventos a procesar de la cola
 			If FormProgreso_SondearCancelacionCierre() Then
 				f_KillIfProcessExists("Dism.exe")
-				;gi_VaciarColadeEventos()
 				ActualizandoStatus("Operacion Cancelada")
 				MensajesProgreso($MensajesInstalacion, " ")
 				MensajesProgreso($MensajesInstalacion, "   ---- Operacion Cancelada ----   ")
@@ -154,12 +153,14 @@ Func df_AplicarImagen($FilePath, $IndexImage)
 		WEnd
 		Sleep(100)
 		If $percent <> $value Then
+			;calculamos el tiempo transcurrido y estimado
 			$iRatioRestante = (100 - $value)/$value
 			$mmTiempoTranscurrido = TimerDiff($hTimer)
 			$mmTiempoEstimadoTotal = ($mmTiempoTranscurrido * $iRatioRestante) + $mmTiempoTranscurrido
 			$ssTiempoTranscurrido = Floor($mmTiempoTranscurrido/1000)
 			$ssTiempoTotal = Floor($mmTiempoEstimadoTotal/1000)
-			If Mod($value,5) = 0 Then
+			;Establecemos cada cuanto deben agregarse "="
+			If Mod($value,4) = 0 Then
 				MensajesProgresoSinCRLF($MensajesInstalacion,"=")
 			EndIf
 			FormProgreso_lblProgreso("Aplicando imagen, Total Est: " & $ssTiempoTotal & " seg" ,"Trancurrido: " & $ssTiempoTranscurrido & " seg   " & $value & "%")
