@@ -242,7 +242,9 @@ Func f_InstalarEnDiscoNuevo()
 	If Not PrepararDiscoNuevo() Then Return
 	If Not ValidarParticiones() Then Return
 	If Not df_AplicarImagen($pathFileWimSel, $intIndexImageSel) Then Return
-
+	If Not f_ActivarParticiones() Then Return
+	MensajesProgreso($MensajesInstalacion, "Finalizaron todas las tareas correctamente")
+	MensajesProgreso($MensajesInstalacion, "Se instalo correctamente la imagen en el Disco")
 EndFunc
 
 Func f_AsignarParametros()
@@ -264,15 +266,16 @@ Func f_ActivarParticiones()
 		Return False
 	EndIf
 	;ubicar la ruta de WinRE
-	Local $rutaWinRE = f_UbicarWinreImagen()
-	If $rutaWinRE = '' Then
+	Local $rutaFileWinREaCopiar = f_UbicarWinreImagen()
+	If $rutaFileWinREaCopiar = '' Then
 		MensajesProgreso($MensajesInstalacion, "No se ubica el archivo WinRE, no puede continuar la instalacion")
 		Return False
 	EndIf
+	MensajesProgreso($MensajesInstalacion, "Ubicado WinRE en: " & $rutaFileWinREaCopiar)
 	;copiado de imagen winre
-	If Not f_TareaCMD($arrayComandos, 2, $rutaWinRE) Then Return False
-
-
+	If Not f_TareaCMD($arrayComandos, 2, $rutaFileWinREaCopiar) Then Return False
+	;registrando WinRE: Global $rutaWinre
+	If Not f_TareaCMD($arrayComandos, 3, $rutaWinre) Then Return False
 	Return True
 EndFunc
 
