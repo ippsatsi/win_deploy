@@ -113,7 +113,7 @@ While 1
 ;~ 					GUISetState(@SW_SHOW, $Form1_1)
 ;~ 					GUISetState(@SW_HIDE, $Activador)
 			Case $btInstalar
-				f_InstalarEnDiscoNuevo()
+				If Not f_InstalarEnDiscoNuevo() Then FormProgreso_lblProgreso("Se encontraron problemas en la instalacion")
 				FormProgreso_DisableCancelar()
 			Case $btFileSel
 				Global $sWimPathFile = FileOpenDialog("Seleccione el archivo WIM conteniendo la imagen", @WindowsDir & "\", "archivos wim (*.wim)", BitOR($FD_FILEMUSTEXIST, $FD_MULTISELECT))

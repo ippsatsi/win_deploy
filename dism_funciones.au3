@@ -115,6 +115,8 @@ EndFunc
 
 Func df_AplicarImagen($FilePath, $IndexImage)
 	;dism /Apply-Image /ImageFile:%1 /Index:1 /ApplyDir:W:\
+	;dism /Apply-Image /ImageFile:C:\Users\Luis\Documents\ima_files\install.wim /Index:1 /ApplyDir:W:\
+	;La operación se completó correctamente.
 	Local $txtCommandLine = "dism /Apply-Image /ImageFile:" & $FilePath & " /Index:" & $IndexImage & " /ApplyDir:W:\"
 	Local $psTarea = Run(@ComSpec & " /c " & $txtCommandLine, "", @SW_HIDE, $STDOUT_CHILD)
 	Local $value = 0
@@ -138,7 +140,7 @@ Func df_AplicarImagen($FilePath, $IndexImage)
 		;si llega a 98, establecemos una variable como bandera de q posiblemente finalice
 		;correctamente Dism, por q no siempre llega al 100% cuando finaliza
 		;correctamente, y como no podemos saber el exit code de dism, usamos GoodApply
-		If $value == "98" Then $GoodApply = True
+		If $value == "96" Then $GoodApply = True
 		Local $n = 0
 		While $n < 15 ;fijamos en 10 el numero de eventos a procesar de la cola
 			If FormProgreso_SondearCancelacionCierre() Then
@@ -163,7 +165,7 @@ Func df_AplicarImagen($FilePath, $IndexImage)
 			If Mod($value,4) = 0 Then
 				MensajesProgresoSinCRLF($MensajesInstalacion,"=")
 			EndIf
-			FormProgreso_lblProgreso("Aplicando imagen, Total Est: " & $ssTiempoTotal & " seg" ,"Trancurrido: " & $ssTiempoTranscurrido & " seg   " & $value & "%")
+			FormProgreso_lblProgreso("Aplicando imagen, Total Est: " & f_CambiarAMinutos($ssTiempoTotal) ,"Trancurrido: " & f_CambiarAMinutos($ssTiempoTranscurrido)& "  " & $value & "%")
 			$percent = $value
 		EndIf
 		If $value = 100 Then
@@ -174,11 +176,11 @@ Func df_AplicarImagen($FilePath, $IndexImage)
 	If $GoodApply Then
 		MensajesProgresoSinCRLF($MensajesInstalacion,"]")
 		MensajesProgreso($MensajesInstalacion, " ")
-		MensajesProgreso($MensajesInstalacion, "Imagen aplicada correctamente")
+		MensajesProgreso($MensajesInstalacion, "Imagen aplicada correctamente" & @CRLF & $txtCommandLine & @CRLF & $line)
 		Return True
 	Else
 		MensajesProgreso($MensajesInstalacion, " ")
-		MensajesProgreso($MensajesInstalacion, "Error, no se pudo completar la aplicacion de la imagen")
+		MensajesProgreso($MensajesInstalacion, "Error, no se pudo completar la aplicacion de la imagen" & @CRLF & $txtCommandLine & @CRLF & $line)
 		Return False
 	EndIf
 EndFunc

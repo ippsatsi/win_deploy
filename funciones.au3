@@ -1,5 +1,8 @@
 
 Global $rutaWinre = "R:\Recovery\WindowsRE"
+;20 puntos para preparacion de disco
+;60 puntos para aplicacion de imagenes
+;20 puntos para activacion de particiones
 
 Func _CirculoResultado ($x, $y, $color)
 
@@ -239,12 +242,14 @@ Func f_InstalarEnDiscoNuevo()
 	f_MensajeTitulo("Iniciando Instalacion en Disco")
 	MensajesProgreso($MensajesInstalacion, "Preparando disco " & $DiscoActual & ":")
 	FormProgreso_lblProgreso("Preparando disco... ")
-	If Not PrepararDiscoNuevo() Then Return
-	If Not ValidarParticiones() Then Return
-	If Not df_AplicarImagen($pathFileWimSel, $intIndexImageSel) Then Return
-	If Not f_ActivarParticiones() Then Return
+	If Not PrepararDiscoNuevo() Then Return False
+	If Not ValidarParticiones() Then Return False
+	If Not df_AplicarImagen($pathFileWimSel, $intIndexImageSel) Then Return False
+	If Not f_ActivarParticiones() Then Return False
 	MensajesProgreso($MensajesInstalacion, "Finalizaron todas las tareas correctamente")
 	MensajesProgreso($MensajesInstalacion, "Se instalo correctamente la imagen en el Disco")
+	FormProgreso_lblProgreso("Instalacion correcta de la imagen")
+	Return True
 EndFunc
 
 Func f_AsignarParametros()
@@ -256,11 +261,12 @@ EndFunc
 
 Func f_ActivarParticiones()
 	f_MensajeTitulo("Activando Particiones de Sistema y Recovery:")
+	FormProgreso_lblProgreso("Activando Particiones ...")
 	;activamos particion sistema
 	If Not f_TareaCMD($arrayComandos, 0, $strSistemaSel) Then Return False
 	;creamos carpeta Recovery
-	If DirCreate($rutaWinre)) Then
-		MensajesProgreso($MensajesInstalacion, $arrayComandos[1][0])
+	If DirCreate($rutaWinre) Then
+		MensajesProgreso($MensajesInstalacion, "    " & $arrayComandos[1][0])
 	Else
 		MensajesProgreso($MensajesInstalacion, "No se pudo crear la carpeta Recovery")
 		Return False
@@ -271,7 +277,7 @@ Func f_ActivarParticiones()
 		MensajesProgreso($MensajesInstalacion, "No se ubica el archivo WinRE, no puede continuar la instalacion")
 		Return False
 	EndIf
-	MensajesProgreso($MensajesInstalacion, "Ubicado WinRE en: " & $rutaFileWinREaCopiar)
+	MensajesProgreso($MensajesInstalacion, "    Ubicado WinRE en: " & $rutaFileWinREaCopiar)
 	;copiado de imagen winre
 	If Not f_TareaCMD($arrayComandos, 2, $rutaFileWinREaCopiar) Then Return False
 	;registrando WinRE: Global $rutaWinre
@@ -287,7 +293,6 @@ Func f_ReemplazarParametro($comando, $parametro)
 	EndIf
 EndFunc
 
-
 Func f_TareaCMD($arrayComando, $intNumTarea, $parametro = "")
 	Local $strTxtCommando, $mensaje
 	$comando = f_ReemplazarParametro($arrayComando[$intNumTarea][1], $parametro)
@@ -296,13 +301,14 @@ Func f_TareaCMD($arrayComando, $intNumTarea, $parametro = "")
 	$otro_comando = $arrayComando[$intNumTarea][3]
 	MensajesProgreso($MensajesInstalacion, $nombreTarea)
 	;Ejecutamos el comando
-	Local $psTarea = Run(@ComSpec & " /c " & $comando, "", @SW_HIDE, $STDOUT_CHILD)
+	Local $psTarea = Run(@ComSpec & " /c " & $comando, "", @SW_HIDE, $STDERR_MERGED)
 	ProcessWaitClose($psTarea)
 	Local $readConsole = StdoutRead($psTarea)
 	If StringInStr($readConsole, $salida_correcta) Then
 		Return True
 	Else
 		MensajesProgreso($MensajesInstalacion, "Error: " & $nombreTarea & " no se pudo completar la tarea")
+		MensajesProgreso($MensajesInstalacion, "Este comando se ejecuto:" & @CRLF & $comando)
 		MensajesProgreso($MensajesInstalacion, "La tarea produjo esta salida:" & @CRLF & $readConsole)
 ;~ 		GUICtrlSetData($xContenedorCtrl[1], $readConsole & @CRLF, 1)
 		Return False
@@ -337,5 +343,12 @@ Func f_UbicarWinreImagen()
 	Return $parametro
 EndFunc
 
+Func f_CambiarAMinutos($segundos)
+	Local $strUnidadTiempo
+If $segundos > 60 Then
+	Return Int($segundos/60) & " min " & Mod($segundos,60) & " seg"
+Else
+	Return $segundos & " seg"
+EndIf
 
-
+EndFunc
