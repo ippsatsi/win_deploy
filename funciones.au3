@@ -3,6 +3,7 @@ Global $rutaWinre = "R:\Recovery\WindowsRE"
 ;20 puntos para preparacion de disco
 ;60 puntos para aplicacion de imagenes
 ;20 puntos para activacion de particiones
+;GUICtrlSetData($idProgressbar1, $i)
 
 Func _CirculoResultado ($x, $y, $color)
 
@@ -212,9 +213,28 @@ Func MensajesProgresoSinCRLF($xBoxProgreso, $mensaje, $xlblEstado = 0)
 	Return $mensaje
 EndFunc
 
+Func f_MensajesProgreso_MostrarProgresoTexto($xBoxProgreso, $mensaje)
+	GUICtrlSetData($xBoxProgreso, $gi_AlmacenTextoMensajes & $mensaje)
+	Return $mensaje
+EndFunc
+
+Func f_ProgresoTexto($intValor, $intMOD)
+	If $intValor > 100 Or $intValor < 0 Then Return "Error en lectura progreso"
+	$strProgresoTexto = "   ["
+	For $i = 0 To $intValor
+		If Mod($i,$intMOD) = 0 Then $strProgresoTexto &= "="
+	Next
+	For $i = ($intValor + 1) To 100
+		If Mod($i,$intMOD) = 0 Then $strProgresoTexto &= "  "
+	Next
+	$strProgresoTexto &= "]"
+	Return $strProgresoTexto
+EndFunc
+
 Func LimpiarVentanaProgreso()
 	$gi_AlmacenTextoMensajes = ""
 	GUICtrlSetData($MensajesInstalacion, $gi_AlmacenTextoMensajes)
+	$intBarraProgresoGUI = 0
 EndFunc
 
 Func FormProgreso_lblProgreso($mensaje, $mensaje_derecha = "")
@@ -264,6 +284,8 @@ Func f_ActivarParticiones()
 	FormProgreso_lblProgreso("Activando Particiones ...")
 	;activamos particion sistema
 	If Not f_TareaCMD($arrayComandos, 0, $strSistemaSel) Then Return False
+	$intBarraProgresoGUI = 84
+	gi_MostrarAvanceBarraProgresoGUI($InstProgreso, $intBarraProgresoGUI)
 	;creamos carpeta Recovery
 	If DirCreate($rutaWinre) Then
 		MensajesProgreso($MensajesInstalacion, "    " & $arrayComandos[1][0])
@@ -271,6 +293,8 @@ Func f_ActivarParticiones()
 		MensajesProgreso($MensajesInstalacion, "No se pudo crear la carpeta Recovery")
 		Return False
 	EndIf
+	$intBarraProgresoGUI = 88
+	gi_MostrarAvanceBarraProgresoGUI($InstProgreso, $intBarraProgresoGUI)
 	;ubicar la ruta de WinRE
 	Local $rutaFileWinREaCopiar = f_UbicarWinreImagen()
 	If $rutaFileWinREaCopiar = '' Then
@@ -278,10 +302,16 @@ Func f_ActivarParticiones()
 		Return False
 	EndIf
 	MensajesProgreso($MensajesInstalacion, "    Ubicado WinRE en: " & $rutaFileWinREaCopiar)
+	$intBarraProgresoGUI = 92
+	gi_MostrarAvanceBarraProgresoGUI($InstProgreso, $intBarraProgresoGUI)
 	;copiado de imagen winre
 	If Not f_TareaCMD($arrayComandos, 2, $rutaFileWinREaCopiar) Then Return False
+	$intBarraProgresoGUI = 96
+	gi_MostrarAvanceBarraProgresoGUI($InstProgreso, $intBarraProgresoGUI)
 	;registrando WinRE: Global $rutaWinre
 	If Not f_TareaCMD($arrayComandos, 3, $rutaWinre) Then Return False
+	$intBarraProgresoGUI = 100
+	gi_MostrarAvanceBarraProgresoGUI($InstProgreso, $intBarraProgresoGUI)
 	Return True
 EndFunc
 
@@ -345,10 +375,18 @@ EndFunc
 
 Func f_CambiarAMinutos($segundos)
 	Local $strUnidadTiempo
-If $segundos > 60 Then
-	Return Int($segundos/60) & " min " & Mod($segundos,60) & " seg"
-Else
-	Return $segundos & " seg"
-EndIf
+	If $segundos > 60 Then
+		Return Int($segundos/60) & " min " & Mod($segundos,60) & " seg"
+	Else
+		Return $segundos & " seg"
+	EndIf
+EndFunc
 
+Func f_UltNElemArray_to_Texto($arSalida, $intIndice, $intN)
+	Local $strTexto = ""
+	If UBound($arSalida) < $intN Then Return "Error en array"
+	For $i = ($intIndice - $intN) To $intIndice
+		$strTexto &= $arSalida[$i] & @CRLF
+	Next
+	Return $strTexto
 EndFunc

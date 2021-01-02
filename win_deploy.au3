@@ -23,6 +23,7 @@
 #include <dism_funciones.au3>
 
 Global $MensajeStatusError = ""
+Global $intBarraProgresoGUI = 0
 
 Global $strSistemaSel = ""
 Global $pathFileWimSel = ""

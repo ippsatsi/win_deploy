@@ -255,6 +255,7 @@ Func ObtenerInfoDisco($Diskpart_pid)
 EndFunc
 
 Func TareaComandosDiskpart($arrayComando)
+	Local $intPrcentajeTarea = 20
 	Local $sSalida, $OK,  $arComando, $sSalidaComandos = '', $comando, $salida_correcta, $otro_comando, $nombreTarea
 	If $DiscoActual = "N" Then
 		ActualizandoStatus("Error de seleccion - No ha seleccionado un disco")
@@ -264,6 +265,7 @@ Func TareaComandosDiskpart($arrayComando)
 	$Diskpart_pid = Diskpart_creacion_proceso()
 	If SeleccionarDisco($Diskpart_pid, $DiscoActual) Then
 		FormProgreso_EnableCancelar()
+		Local $floatRatioProgreso = $intPrcentajeTarea/UBound($arrayComando)
 		For $i = 0 To UBound($arrayComando) - 1
 			$comando = $arrayComando[$i][0]
 			$salida_correcta = $arrayComando[$i][1]
@@ -277,6 +279,8 @@ Func TareaComandosDiskpart($arrayComando)
 				$sSalidaComandos = "tarea " & $i & ":" & $nombreTarea & " - " & $sSalida & @CRLF
 				If $sSalida Then Return $sSalidaComandos
 			EndIf
+			$intBarraProgresoGUI += $floatRatioProgreso
+			gi_MostrarAvanceBarraProgresoGUI($InstProgreso, $intBarraProgresoGUI)
 			;Hablitamos sondeo del batan cancelar entre cada tarea
 			;hacemos un barrido de los eventos q se van encolando
 			;se encolan muchos eventos, ya q al mover el mouse se van generando eventos

@@ -55,7 +55,7 @@ GUICtrlSetState($SelectImage, $GUI_DISABLE)
 
 #Region ### START Koda GUI section ### Form=c:\users\luis\documents\win_deploy\formmensajesprogreso.kxf
 $FormMensajesProgreso = GUICreate("Instalacion en curso", 615, 454, 192, 124, -1, -1, $Activador)
-$MensajesInstalacion = GUICtrlCreateEdit("", 16, 16, 577, 353, BitOR($GUI_SS_DEFAULT_EDIT,$ES_READONLY), $WS_EX_STATICEDGE)
+$MensajesInstalacion = GUICtrlCreateEdit("", 16, 16, 577, 353, BitOR($GUI_SS_DEFAULT_EDIT,$ES_AUTOHSCROLL,$ES_AUTOVSCROLL,$ES_READONLY), $WS_EX_STATICEDGE)
 GUICtrlSetData(-1, "")
 $InstProgreso = GUICtrlCreateProgress(16, 416, 473, 25)
 $Cancelar = GUICtrlCreateButton("Cancelar", 512, 416, 81, 25)
@@ -64,8 +64,8 @@ $lblTextoProgresoDerecha = GUICtrlCreateLabel("", 280, 392, 210, 17, $SS_RIGHT)
 #EndRegion ### END Koda GUI section ###
 
 ;Funciones GUI
-$lblMensajesInstalacion = GUICtrlCreateLabel("", 16, 16, 577, 353)
-GUICtrlSetState($lblMensajesInstalacion,$GUI_ONTOP+$GUI_FOCUS)
+;$lblMensajesInstalacion = GUICtrlCreateLabel("", 16, 16, 577, 353)
+;GUICtrlSetState($lblMensajesInstalacion,$GUI_ONTOP+$GUI_FOCUS)
 
 Global $gi_boolPuedoCerrarProgreso = True
 Global $gi_AlmacenTextoMensajes = ""
@@ -116,11 +116,9 @@ Func gi_EventosSelectProgreso()
 	Switch $nMsg[0]
 		Case $GUI_EVENT_CLOSE
 			GUISetState(@SW_HIDE,$FormMensajesProgreso)
-		;Case $Cancelar
-			;If GUICtrlRead($Cancelar) = "Cerrar" Then
-			;	GUISetState(@SW_HIDE,$FormMensajesProgreso)
-			;	LimpiarVentanaProgreso()
-			;EndIf
 	EndSwitch
 EndFunc
 
+Func gi_MostrarAvanceBarraProgresoGUI($idProgressbar, $value)
+	GUICtrlSetData($idProgressbar, Int($value))
+EndFunc
