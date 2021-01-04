@@ -1,4 +1,3 @@
-#include <GuiEdit.au3>
 #Dependencias
 ;ReemplazarCaracteresEspanol()
 ;_ConvertirGBbinToGBdecimal()

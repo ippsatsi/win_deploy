@@ -1,9 +1,10 @@
+#include <GuiEdit.au3>
+#include <ScrollBarsConstants.au3>
 
 Global $rutaWinre = "R:\Recovery\WindowsRE"
 ;20 puntos para preparacion de disco
 ;60 puntos para aplicacion de imagenes
 ;20 puntos para activacion de particiones
-;GUICtrlSetData($idProgressbar1, $i)
 
 Func _CirculoResultado ($x, $y, $color)
 
@@ -204,6 +205,7 @@ EndFunc
 Func MensajesProgreso($xBoxProgreso, $mensaje, $xlblEstado = 0)
 	$gi_AlmacenTextoMensajes &= " " & $mensaje & @CRLF
 	GUICtrlSetData($xBoxProgreso,$gi_AlmacenTextoMensajes)
+	_GUICtrlEdit_Scroll($xBoxProgreso, $SB_SCROLLCARET)
 	Return $mensaje
 EndFunc
 
@@ -233,8 +235,8 @@ EndFunc
 
 Func LimpiarVentanaProgreso()
 	$gi_AlmacenTextoMensajes = ""
-	GUICtrlSetData($MensajesInstalacion, $gi_AlmacenTextoMensajes)
 	$intBarraProgresoGUI = 0
+	GUICtrlSetData($MensajesInstalacion, $gi_AlmacenTextoMensajes)
 EndFunc
 
 Func FormProgreso_lblProgreso($mensaje, $mensaje_derecha = "")

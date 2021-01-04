@@ -1,7 +1,7 @@
 
 
 #Region ### START Koda GUI section ### Form=d:\util\win_deploy\gui_design.kxf
-$Activador = GUICreate("Instalador de Imagenes de SO", 615, 411, 183, 166)
+$Activador = GUICreate("Instalador de Imagenes de SO" & $strVersionApp, 615, 411, 183, 166)
 $GroupSelDisk = GUICtrlCreateGroup("Seleccione disco", 16, 8, 577, 185)
 $idListDiscos = GUICtrlCreateListView("#|  Modelo    |Sistema|Tamaño|Espacio Libre|Interface|Status", 40, 32, 521, 105, BitOr($LVS_SHOWSELALWAYS, $LVS_SINGLESEL, $LVS_NOSORTHEADER))
 GUICtrlSendMsg(-1, $LVM_SETCOLUMNWIDTH, 0, 30)
