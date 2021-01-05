@@ -8,44 +8,10 @@ Global $arParticiones
 Global $Diskpart_pid = 0
 Global $DiscoActual = "N"
 
-;idle diskpart, cosas a hacer esperando diskpart termine el comando
-;array de mensajes
-Global $arEnProgreso[6]
-$arEnProgreso[0] = "1*"
-$arEnProgreso[1] = "2**"
-$arEnProgreso[2] = "3***"
-$arEnProgreso[3] = "4****"
-$arEnProgreso[4] = "5*****"
-$arEnProgreso[5] = "6******"
-
-Global $bolEnProgresoEnPantalla = False
-Global $intEnProgresoIndex = 0
-Global $intNumDiskpartSleeps = 5
-Global $intIdleContador = 0
-
-;~ _GUICtrlEdit_Undo($idEdit)
-
-Func DiskpartIdle()
-	Sleep(100)
-	If $intIdleContador >= $intNumDiskpartSleeps Then
-
-		If $bolEnProgresoEnPantalla = True Then
-;~ 			ConsoleWrite("antes del undo1:" & @CRLF & GUICtrlRead($MensajesInstalacion)  & @CRLF )
-;~ 			ConsoleWrite("Undo1:" & _GUICtrlEdit_Undo($MensajesInstalacion) & @CRLF)
-;~ 			$bolEnProgresoEnPantalla = False
-;~ 			ConsoleWrite("despues del undo1:" & @CRLF & GUICtrlRead($MensajesInstalacion)  & @CRLF )
-		EndIf
-
-		If $intEnProgresoIndex >= (UBound($arEnProgreso) - 1) Then
-			$intEnProgresoIndex = 0
-		Else
-			$intEnProgresoIndex += 1
-		EndIf
-		$intIdleContador = 0
-	Else
-		$intIdleContador += 1
-	EndIf
-EndFunc
+;~ Global $bolEnProgresoEnPantalla = False
+;~ Global $intEnProgresoIndex = 0
+;~ Global $intNumDiskpartSleeps = 5
+;~ Global $intIdleContador = 0
 
 
 Func Diskpart_creacion_proceso()
@@ -73,13 +39,10 @@ Func DiskpartCerrarProceso($Diskpart_pid)
 	EndIf
 EndFunc
 
-Func Pausa_finalice_comando($Diskpart_pid, $idle_process = "DiskpartIdle")
+Func Pausa_finalice_comando($Diskpart_pid)
 	While StringRight(StdoutRead($Diskpart_pid, True, False), 10) <> "DISKPART> "
-		Call($idle_process)
-;~ 		Sleep(100)
+		Sleep(100)
 	WEnd
-	$intEnProgresoIndex = 0
-	$intIdleContador = 0
 EndFunc
 
 Func LimpiarSalidaDiskpart($Diskpart_pid)
@@ -287,7 +250,6 @@ Func TareaComandosDiskpart($arrayComando)
 			While $n < 15 ;fijamos en 10 el numero de eventos a procesar de la cola
 				If FormProgreso_SondearCancelacionCierre() Then
 					DiskpartCerrarProceso($Diskpart_pid)
-					;gi_VaciarColadeEventos()
 					FormProgreso_DisableCancelar()
 					ActualizandoStatus("Operacion Cancelada")
 					Return "  ----- Operacion Cancelada ----- "

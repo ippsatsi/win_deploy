@@ -74,14 +74,6 @@ Func FormProgreso_ActualizarLabelProgreso($status)
 	GUICtrlSetData($lblTextoProgreso, $status)
 EndFunc
 
-Func FormProgreso_CambiarBtCancelarXCerrar()
-	GUICtrlSetData($Cancelar, "Cerrar")
-EndFunc
-
-Func FormProgreso_CambiarBtCerrarXCancelar()
-	GUICtrlSetData($Cancelar, "Cancelar")
-EndFunc
-
 Func FormProgreso_DisableCancelar()
 	$gi_boolPuedoCerrarProgreso = False
 	GUICtrlSetState($Cancelar, $GUI_DISABLE)
@@ -102,14 +94,6 @@ Func FormProgreso_SondearCancelacionCierre()
 			Return False
 		EndIf
 	EndIf
-EndFunc
-
-Func gi_VaciarColadeEventos()
-	Local $msg
-	;While GUIGetMsg() <> 0
-	For $i = 0 To 100
-		$msg = GUIGetMsg()
-	Next
 EndFunc
 
 Func gi_EventosSelectProgreso()
