@@ -164,7 +164,7 @@ Func df_AplicarImagen($FilePath, $IndexImage)
 			gi_MostrarAvanceBarraProgresoGUI($InstProgreso, $intBarraProgresoGUI)
 			$strProgresoTexto = f_ProgresoTexto($value, 3)
 			f_MensajesProgreso_MostrarProgresoTexto($MensajesInstalacion, $strProgresoTexto)
-			FormProgreso_lblProgreso("Aplicando imagen, Total Est: " & f_CambiarAMinutos($ssTiempoTotal) ,"Trancurrido: " & f_CambiarAMinutos($ssTiempoTranscurrido)& "  " & $value & "%")
+			FormProgreso_lblProgreso("Aplicando imagen, Total Est: " & f_CambiarAMinutos($ssTiempoTotal) ,"Transcurrido: " & f_CambiarAMinutos($ssTiempoTranscurrido)& "  " & $value & "%")
 			$percent = $value
 		EndIf
 

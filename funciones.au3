@@ -61,6 +61,7 @@ Func RefrescarDiscos()
 	ActualizandoStatus("Listo")
 	$Diskpart_pid = 0
 	GUICtrlSetState($ctrlSelModoDisco, $GUI_DISABLE)
+	GUICtrlSetState($btTools, $GUI_DISABLE)
 EndFunc
 
 Func CambiarEstado()
@@ -69,9 +70,11 @@ Func CambiarEstado()
 	If $ItemSelected = "" Then
 		GUICtrlSetData($ctrlSelModoDisco, "Seleccione")
 		GUICtrlSetState($ctrlSelModoDisco, $GUI_DISABLE)
+		GUICtrlSetState($btTools, $GUI_DISABLE)
 		$DiscoActual = "N"
 	Else
 		GUICtrlSetState($ctrlSelModoDisco, $GUI_ENABLE)
+		GUICtrlSetState($btTools, $GUI_ENABLE)
 		$DiscoActual = $ItemSelected
 	EndIf
 EndFunc
@@ -340,4 +343,18 @@ Func f_UltNElemArray_to_Texto($arSalida, $intIndice, $intN)
 		$strTexto &= $arSalida[$i] & @CRLF
 	Next
 	Return $strTexto
+EndFunc
+
+Func f_ExtractWinREImagen()
+	If $DiscoActual = "N" Then
+		$MensajeStatusError = "Error de seleccion - No ha seleccionado un disco"
+		ActualizandoStatus()
+		Return False
+	EndIf
+	$sTipoDisco = $arDisks[$DiscoActual][10]
+	If $sTipoDisco <> "SATA" And $sTipoDisco <> "NVME" Then
+		MsgBox(0,"Tipo de Disco", "El tipo de disco seleccionado no es SATA o M2. No esta permitida la extraccion en discos que no sean de esos formatos")
+		Return False
+	EndIf
+	dpf_AsignarLetraToRecovery()
 EndFunc

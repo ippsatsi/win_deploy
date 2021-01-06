@@ -33,16 +33,11 @@ Global $strVersionApp = " 1.002"
 
 ;Opciones GUI
 Opt("GUIResizeMode", $GUI_DOCKTOP  + $GUI_DOCKSIZE)
-
-Local $intGuiAncho = 598
-Local $intGuiAltoMin = 443
-Local $intGuiAltoMax = 500
-Local $intAlinIzq1 = 16
-Local $intAlinIzq2 = ($intAlinIzq1 * 2) + 6
+;T:\Recovery\WindowsRE
 #include <gui_interfaz.au3>
 
-; para que enga un tamaño uniforme aun cuando los controles cambien de tamaño en tiempo de ejecucion
-WinMove($Activador,"",Default, Default,Default, $intGuiAltoMin)
+; para que tenga un tamaño uniforme aun cuando los controles cambien de tamaño en tiempo de ejecucion
+;~ WinMove($Activador,"",Default, Default,Default, $intGuiAltoMin)
 
 Local $txtCommandLine = ''
 Local $txtBootOption = ''
@@ -75,6 +70,9 @@ While 1
 			Switch $nMsg[0]
 				Case $GUI_EVENT_CLOSE
 					Exit
+				Case $btTools
+;~ 					MsgBox(0,"prueba tools", @ScriptDir)
+					f_ExtractWinREImagen()
 				Case $btRefresh
 					RefrescarDiscos()
 				Case $btInstalar

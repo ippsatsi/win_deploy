@@ -1,0 +1,27 @@
+Errores WIM
+*************
+C:\Program Files (x86)\Windows Kits\10\Assessment and Deployment Kit\Deployment Tools>dism /get-imageinfo /imagefile:d:\pruebas.wim
+
+Deployment Image Servicing and Management tool
+Version: 10.0.19041.1
+
+
+Error: 11
+
+Se ha intentado cargar un programa con un formato incorrecto.
+
+The DISM log file can be found at C:\Windows\Logs\DISM\dism.log
+*********************
+DISKPART> list part
+
+  Núm Partición  Tipo              Tamaño   Desplazamiento
+  -------------  ----------------  -------  ---------------
+  Partición 1    Reservado          128 MB    17 KB
+  Partición 2    Recuperación       518 MB   129 MB
+  Partición 3    Sistema            100 MB   647 MB
+  Partición 4    Principal          300 GB   747 MB
+  Partición 5    Principal          533 GB   300 GB
+  Partición 6    Desconocido         23 GB   833 GB
+  Partición 7    Desconocido       1953 MB   857 GB
+  Partición 8    Desconocido         72 GB   859 GB
+************************

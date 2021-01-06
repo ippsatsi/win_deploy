@@ -94,15 +94,55 @@ Func ListarDiscos($Diskpart_pid)
  	;ConsoleWrite("_________")
 EndFunc
 
+Func dpf_ListarParticiones($Diskpart_pid)
+	Local $sSalida
+	$sSalida = EjecutarComandoDiskpart($Diskpart_pid, "list part")
+	If Not dpf_ExtraerListaParticiones($sSalida) Then Return False
+	Return True
+EndFunc
+
+Func dpf_ExtraerListaParticiones($sSalida)
+	Local $arFilas, $i, $sDato, $arSize
+	$arFilas = $sSalida
+	If	Not QuitarCabeceraTabla($arFilas) Then Return False
+	Dim $arParticiones[UBound($arFilas)][6]
+;~ 	_ArrayDisplay($arFilas)
+	For $i = 0 to UBound($arFilas) - 1
+		;# de Particion
+		$sDato = StringMid($arFilas[$i], 12,2)
+		$arParticiones[$i][0] = StringStripWS($sDato, 8)
+		;Tipo Particion
+		$sDato = StringMid($arFilas[$i], 17,15)
+		$arParticiones[$i][1] = StringStripWS($sDato, 8)
+		; Tamaño de particion
+		$sDato = StringMid($arFilas[$i], 35,8)
+		$arSize = StringSplit(StringStripWS($sDato,7)," ",2)
+		$arParticiones[$i][2] = _ConvertirGBbinToGBdecimal($arSize[0], $arSize[1])
+		$arParticiones[$i][3] = $arSize[1] ;Unidad
+		;Desplazamiento
+		$sDato = StringMid($arFilas[$i], 45,7)
+		$arSize = StringSplit(StringStripWS($sDato,7)," ",2)
+		$arParticiones[$i][4] = _ConvertirGBbinToGBdecimal($arSize[0], $arSize[1])
+		$arParticiones[$i][5] = $arSize[1] ;Unidad
+	Next
+	Return True
+;~ 	_ArrayDisplay($arParticiones)
+EndFunc
+
+
 Func QuitarCabeceraTabla(ByRef $sSalida)
 	;dividimos en lineas o filas
 	$sSalida = StringSplit($sSalida, @LF, $STR_NOCOUNT)
 	;eliminamos las 3 primeras filas, q son parte de la cabecera de la tabla
-	_ArrayDelete($sSalida, 0)
-	_ArrayDelete($sSalida, 0)
-	_ArrayDelete($sSalida, 0)
+	If UBound($sSalida) > 0 Then
+		_ArrayDelete($sSalida, 0)
+		_ArrayDelete($sSalida, 0)
+		_ArrayDelete($sSalida, 0)
+		Return True
+	Else
+		Return False
+	EndIf
 EndFunc
-
 
 Func ExtraerListaDiscos($sSalida)
 	Local $arFilas, $i, $arSize
@@ -146,6 +186,19 @@ Func SeleccionarDisco($Diskpart_pid, $intNumDisco)
 
 	$sSalida = EjecutarComandoDiskpart($Diskpart_pid, "sel disk " & $intNumDisco)
 	If StringInStr($sSalida, "El disco " & $intNumDisco & " es ahora el disco seleccionado") > 0 Then
+;~ 		ConsoleWrite($sSalida & "??????")
+		Return True
+	Else
+		Return False
+	EndIf
+EndFunc
+
+Func dpf_SeleccionarParticion($Diskpart_pid, $intNumParticion)
+	Local $sSalida, $OK
+
+	$sSalida = EjecutarComandoDiskpart($Diskpart_pid, "sel part " & $intNumParticion)
+;~ 	La partición 2 es ahora la partición seleccionada.
+	If StringInStr($sSalida, "La partición " & $intNumParticion & " es ahora la partición seleccionada") > 0 Then
 ;~ 		ConsoleWrite($sSalida & "??????")
 		Return True
 	Else
@@ -265,3 +318,52 @@ Func TareaComandosDiskpart($arrayComando)
 	DiskpartCerrarProceso($Diskpart_pid)
 EndFunc
 
+Func dpf_AsignarLetraToRecovery()
+	f_KillIfProcessExists("Diskpart.exe")
+	$Diskpart_pid = Diskpart_creacion_proceso()
+	If SeleccionarDisco($Diskpart_pid, $DiscoActual) Then
+		Local $intNumPartConRecovery = dpf_BuscarParticionRecovery($Diskpart_pid)
+		If $intNumPartConRecovery <> "N" Then
+			If Not dpf_SeleccionarParticion($Diskpart_pid, $intNumPartConRecovery) Then
+				dpf_MensajeExtraccionWinRE("No se pudo seleccionar la particion " & $intNumPartConRecovery )
+				Return False
+			EndIf
+			$sSalida = EjecutarCompararComandoDiskpart($Diskpart_pid, "assign letter=T", "DiskPart asignó correctamente una letra de unidad o punto de montaje")
+			If $sSalida Then
+				dpf_MensajeExtraccionWinRE("No se pudo asignar la letra T a la partición" )
+				Return False
+			EndIf
+			Local $comando = "xcopy T:\Recovery\WindowsRE\WinRE.wim " & @ScriptDir & " /h"
+			Local $cmdXcopy = Run(@ComSpec & " /c " & $comando, "", @SW_HIDE, $STDERR_MERGED)
+			ProcessWaitClose($cmdXcopy)
+			Local $readConsole = StdoutRead($cmdXcopy)
+			MsgBox(0,"pruebas", $readConsole)
+			EndIf
+
+	EndIf
+
+EndFunc
+
+Func dpf_BuscarParticionRecovery($Diskpart_pid)
+	Local $intNumPartRecovery = "N"
+	If Not dpf_ListarParticiones($Diskpart_pid) Then
+		dpf_MensajeExtraccionWinRE("El disco seleeccionado no posee ninguna partición")
+		Return False
+	EndIf
+	;Buscamos la particion del tipo Recovery
+	For $i = 0 To UBound($arParticiones) - 1
+		If StringInStr($arParticiones[$i][1], "Recovery") Or StringInStr($arParticiones[$i][1], "Recuperación") Then
+			$intNumPartRecovery = $arParticiones[$i][0]
+;~ 			MsgBox(0, " N particion", "La part con Rec es:" & $intNumPartRecovery)
+			ExitLoop
+		EndIf
+	Next
+	If $intNumPartRecovery = "N" Then
+		dpf_MensajeExtraccionWinRE("No se encontro particion de Recuperación")
+	EndIf
+	Return $intNumPartRecovery
+EndFunc
+
+Func dpf_MensajeExtraccionWinRE($mensaje)
+	MsgBox(0,"Extraccion de WinRE", $mensaje )
+EndFunc
