@@ -336,6 +336,7 @@ Func dpf_AsignarLetraToRecovery()
 			Local $comando = "xcopy T:\Recovery\WindowsRE\WinRE.wim " & @ScriptDir & " /h"
 			Local $cmdXcopy = Run(@ComSpec & " /c " & $comando, "", @SW_HIDE, $STDERR_MERGED)
 			ProcessWaitClose($cmdXcopy)
+;~ 			Local $cmdXcopy = Run(@ComSpec & " /c " & "xcopy d:\hosts d:\ISOs", "", @SW_MAXIMIZE, BitOR($STDIN_CHILD, $STDOUT_CHILD, $STDERR_CHILD))
 			Local $readConsole = StdoutRead($cmdXcopy)
 			MsgBox(0,"pruebas", $readConsole)
 			EndIf
