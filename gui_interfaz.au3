@@ -11,7 +11,7 @@ GUICtrlSendMsg(-1, $LVM_SETCOLUMNWIDTH, 3, 70)
 GUICtrlSendMsg(-1, $LVM_SETCOLUMNWIDTH, 4, 70)
 GUICtrlSendMsg(-1, $LVM_SETCOLUMNWIDTH, 5, 70)
 GUICtrlSendMsg(-1, $LVM_SETCOLUMNWIDTH, 6, 70)
-$btTools = GUICtrlCreateButton("Tools", 296, 150, 105, 25)
+$btExtractWinRE = GUICtrlCreateButton("Obtener WinRE", 296, 150, 125, 25)
 $btRefresh = GUICtrlCreateButton("Refrescar", 456, 150, 105, 25)
 $ctrlSelModoDisco = GUICtrlCreateCombo("Seleccione", 136, 152, 105, 25, BitOR($CBS_DROPDOWN,$CBS_AUTOHSCROLL))
 GUICtrlSetData(-1, "Nuevo|Reinstalacion")
@@ -41,13 +41,13 @@ $ctrlStatus = GUICtrlCreateLabel("Listo", 16, 384, 578, 17, -1, $WS_EX_STATICEDG
 GUICtrlSendMsg($idListDiscos, $LVM_SETEXTENDEDLISTVIEWSTYLE, $LVS_EX_GRIDLINES, $LVS_EX_GRIDLINES)
 
 #Region ### START Koda GUI section ### Form=d:\util\win_deploy\formselectimage.kxf
-$FormSelectImage = GUICreate("Seleccionar Imagen", 522, 359, 192, 124, -1, -1, $Activador)
-$ListImageSelect = GUICtrlCreateListView("#|Nombre                      |Descripcion                |Tamaño          ", 18, 16, 489, 281, BitOr($LVS_SHOWSELALWAYS, $LVS_SINGLESEL, $LVS_NOSORTHEADER))
-GUICtrlSendMsg(-1, $LVM_SETCOLUMNWIDTH, 0, 50)
+$FormSelectImage = GUICreate("Seleccionar Imagen", 613, 359, 192, 124, -1, -1, $Activador)
+$ListImageSelect = GUICtrlCreateListView("#|Nombre                      |Descripcion                |Tamaño          ", 18, 16, 577, 281, BitOr($LVS_SHOWSELALWAYS, $LVS_SINGLESEL, $LVS_NOSORTHEADER))
+GUICtrlSendMsg(-1, $LVM_SETCOLUMNWIDTH, 0, 20)
 GUICtrlSendMsg(-1, $LVM_SETCOLUMNWIDTH, 1, 150)
-GUICtrlSendMsg(-1, $LVM_SETCOLUMNWIDTH, 2, 150)
-GUICtrlSendMsg(-1, $LVM_SETCOLUMNWIDTH, 3, 100)
-$SelectImage = GUICtrlCreateButton("Selecccionar", 220, 320, 81, 25)
+GUICtrlSendMsg(-1, $LVM_SETCOLUMNWIDTH, 2, 350)
+GUICtrlSendMsg(-1, $LVM_SETCOLUMNWIDTH, 3, 50)
+$SelectImage = GUICtrlCreateButton("Selecccionar", 266, 320, 81, 25)
 
 #EndRegion ### END Koda GUI section ###
 

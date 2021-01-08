@@ -7,6 +7,16 @@ Global $arDisks
 Global $arParticiones
 Global $Diskpart_pid = 0
 Global $DiscoActual = "N"
+Global $arTiposPartitions[3][3]
+$arTiposPartitions[0][0] = "System"
+$arTiposPartitions[0][1] = "Sistema"
+$arTiposPartitions[0][2] = "S"
+$arTiposPartitions[1][0] = "Principal"
+$arTiposPartitions[1][1] = "Principal"
+$arTiposPartitions[1][2] = "W"
+$arTiposPartitions[2][0] = "Recovery"
+$arTiposPartitions[2][1] = "Recuperación"
+$arTiposPartitions[2][2] = "R"
 
 ;~ Global $bolEnProgresoEnPantalla = False
 ;~ Global $intEnProgresoIndex = 0
@@ -318,53 +328,47 @@ Func TareaComandosDiskpart($arrayComando)
 	DiskpartCerrarProceso($Diskpart_pid)
 EndFunc
 
-Func dpf_AsignarLetraToRecovery()
+Func dpf_AsignarLetraToPartition($intPartitionTypeNumber)
+	;Asignamos Letra a la particion segun su tipo
 	f_KillIfProcessExists("Diskpart.exe")
 	$Diskpart_pid = Diskpart_creacion_proceso()
 	If SeleccionarDisco($Diskpart_pid, $DiscoActual) Then
-		Local $intNumPartConRecovery = dpf_BuscarParticionRecovery($Diskpart_pid)
-		If $intNumPartConRecovery <> "N" Then
-			If Not dpf_SeleccionarParticion($Diskpart_pid, $intNumPartConRecovery) Then
-				dpf_MensajeExtraccionWinRE("No se pudo seleccionar la particion " & $intNumPartConRecovery )
+		Local $intNumParticion = dpf_BuscarParticion($Diskpart_pid, $intPartitionTypeNumber)
+		If $intNumParticion <> "N" Then
+			If Not dpf_SeleccionarParticion($Diskpart_pid, $intNumParticion) Then
+				MensajesProgreso($MensajesInstalacion, "No se pudo seleccionar la particion " & $intNumParticion & " del tipo " & $arTiposPartitions[$intPartitionTypeNumber][0])
 				Return False
 			EndIf
-			$sSalida = EjecutarCompararComandoDiskpart($Diskpart_pid, "assign letter=T", "DiskPart asignó correctamente una letra de unidad o punto de montaje")
+			MensajesProgreso($MensajesInstalacion, "Se selecciono la particion " & $arTiposPartitions[$intPartitionTypeNumber][1])
+			$sSalida = EjecutarCompararComandoDiskpart($Diskpart_pid, "assign letter=" & $arTiposPartitions[$intPartitionTypeNumber][2], "DiskPart asignó correctamente una letra de unidad o punto de montaje")
 			If $sSalida Then
-				dpf_MensajeExtraccionWinRE("No se pudo asignar la letra T a la partición" )
+				MensajesProgreso($MensajesInstalacion, "No se pudo asignar la letra " & $arTiposPartitions[$intPartitionTypeNumber][2] & " a la partición" )
+				MensajesProgreso($MensajesInstalacion, "La tarea produjo esta salida:" & @CRLF & $sSalida)
 				Return False
 			EndIf
-			Local $comando = "xcopy T:\Recovery\WindowsRE\WinRE.wim " & @ScriptDir & " /h"
-			Local $cmdXcopy = Run(@ComSpec & " /c " & $comando, "", @SW_HIDE, $STDERR_MERGED)
-			ProcessWaitClose($cmdXcopy)
-;~ 			Local $cmdXcopy = Run(@ComSpec & " /c " & "xcopy d:\hosts d:\ISOs", "", @SW_MAXIMIZE, BitOR($STDIN_CHILD, $STDOUT_CHILD, $STDERR_CHILD))
-			Local $readConsole = StdoutRead($cmdXcopy)
-			MsgBox(0,"pruebas", $readConsole)
-			EndIf
-
+			MensajesProgreso($MensajesInstalacion, "Se asigno la letra " & $arTiposPartitions[$intPartitionTypeNumber][2])
+			Return True
+		EndIf
 	EndIf
-
+	Return False
 EndFunc
 
-Func dpf_BuscarParticionRecovery($Diskpart_pid)
+Func dpf_BuscarParticion($Diskpart_pid, $intIndexTipoPartition)
+	;Buscamos y obtenemos el numero de la particion segun su tipo
 	Local $intNumPartRecovery = "N"
 	If Not dpf_ListarParticiones($Diskpart_pid) Then
 		dpf_MensajeExtraccionWinRE("El disco seleeccionado no posee ninguna partición")
 		Return False
 	EndIf
-	;Buscamos la particion del tipo Recovery
+	;Buscamos la particion del tipo seleccionada
 	For $i = 0 To UBound($arParticiones) - 1
-		If StringInStr($arParticiones[$i][1], "Recovery") Or StringInStr($arParticiones[$i][1], "Recuperación") Then
+		If StringInStr($arParticiones[$i][1], $arTiposPartitions[$intIndexTipoPartition][0]) Or StringInStr($arParticiones[$i][1], $arTiposPartitions[$intIndexTipoPartition][1]) Then
 			$intNumPartRecovery = $arParticiones[$i][0]
-;~ 			MsgBox(0, " N particion", "La part con Rec es:" & $intNumPartRecovery)
 			ExitLoop
 		EndIf
 	Next
 	If $intNumPartRecovery = "N" Then
-		dpf_MensajeExtraccionWinRE("No se encontro particion de Recuperación")
+		dpf_MensajeExtraccionWinRE("No se encontro particion del tipo " & $arTiposPartitions[$intIndexTipoPartition][0])
 	EndIf
 	Return $intNumPartRecovery
-EndFunc
-
-Func dpf_MensajeExtraccionWinRE($mensaje)
-	MsgBox(0,"Extraccion de WinRE", $mensaje )
 EndFunc

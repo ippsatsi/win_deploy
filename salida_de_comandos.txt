@@ -25,3 +25,13 @@ DISKPART> list part
   Partición 7    Desconocido       1953 MB   857 GB
   Partición 8    Desconocido         72 GB   859 GB
 ************************
+
+#Region ### START Koda GUI section ### Form=d:\util\win_deploy\formselectimage.kxf
+$FormSelectImage = GUICreate("Seleccionar Imagen", 613, 359, 192, 124, -1, -1, $Activador)
+$ListImageSelect = GUICtrlCreateListView("#|Nombre                      |Descripcion                |Tamaño          ", 18, 16, 577, 281)
+GUICtrlSendMsg(-1, $LVM_SETCOLUMNWIDTH, 0, 50)
+GUICtrlSendMsg(-1, $LVM_SETCOLUMNWIDTH, 1, 150)
+GUICtrlSendMsg(-1, $LVM_SETCOLUMNWIDTH, 2, 150)
+GUICtrlSendMsg(-1, $LVM_SETCOLUMNWIDTH, 3, 100)
+$SelectImage = GUICtrlCreateButton("Selecccionar", 266, 320, 81, 25)
+#EndRegion ### END Koda GUI section ###

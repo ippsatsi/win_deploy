@@ -29,7 +29,7 @@ Global $strSistemaSel = ""
 Global $pathFileWimSel = ""
 Global $strImageNameSel = ""
 Global $intIndexImageSel = 1
-Global $strVersionApp = " 1.002"
+Global $strVersionApp = " 1.010"
 
 ;Opciones GUI
 Opt("GUIResizeMode", $GUI_DOCKTOP  + $GUI_DOCKSIZE)
@@ -70,7 +70,7 @@ While 1
 			Switch $nMsg[0]
 				Case $GUI_EVENT_CLOSE
 					Exit
-				Case $btTools
+				Case $btExtractWinRE
 ;~ 					MsgBox(0,"prueba tools", @ScriptDir)
 					f_ExtractWinREImagen()
 				Case $btRefresh

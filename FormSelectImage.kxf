@@ -3,7 +3,7 @@
 	<properties>
 		<property name="Left" vt="Int16">192</property>
 		<property name="Top" vt="Int8">124</property>
-		<property name="Width" vt="Int16">537</property>
+		<property name="Width" vt="Int16">628</property>
 		<property name="Height" vt="Int16">397</property>
 		<property name="Caption" vt="String">Seleccionar Imagen</property>
 		<property name="Color" vt="Ident">clBtnFace</property>
@@ -34,7 +34,7 @@
 			<properties>
 				<property name="Left" vt="Int8">18</property>
 				<property name="Top" vt="Int8">16</property>
-				<property name="Width" vt="Int16">489</property>
+				<property name="Width" vt="Int16">577</property>
 				<property name="Height" vt="Int16">281</property>
 				<property name="CtrlStyle" vt="Int32">1342373901</property>
 				<property name="CtrlExStyle" vt="Int16">512</property>
@@ -63,7 +63,7 @@
 		</object>
 		<object type="TAButton" name="SelectImage">
 			<properties>
-				<property name="Left" vt="Int16">220</property>
+				<property name="Left" vt="Int16">266</property>
 				<property name="Top" vt="Int16">320</property>
 				<property name="Width" vt="Int8">81</property>
 				<property name="Height" vt="Int8">25</property>

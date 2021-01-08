@@ -12,6 +12,8 @@ EndFunc
 Func ConvertDismBytesToGb($sValor)
 	Local $intValor
 	$sValor = StringReplace($sValor, ",", "")
+	;para la version de Dism en ingles
+	$sValor = StringReplace($sValor, ".", "")
 	$sValor = StringReplace($sValor, "bytes", "")
 	$intValor = Number($sValor)
 	$intValor = $intValor/1024

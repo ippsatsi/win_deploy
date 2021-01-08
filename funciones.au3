@@ -61,7 +61,7 @@ Func RefrescarDiscos()
 	ActualizandoStatus("Listo")
 	$Diskpart_pid = 0
 	GUICtrlSetState($ctrlSelModoDisco, $GUI_DISABLE)
-	GUICtrlSetState($btTools, $GUI_DISABLE)
+	GUICtrlSetState($btExtractWinRE, $GUI_DISABLE)
 EndFunc
 
 Func CambiarEstado()
@@ -70,11 +70,11 @@ Func CambiarEstado()
 	If $ItemSelected = "" Then
 		GUICtrlSetData($ctrlSelModoDisco, "Seleccione")
 		GUICtrlSetState($ctrlSelModoDisco, $GUI_DISABLE)
-		GUICtrlSetState($btTools, $GUI_DISABLE)
+		GUICtrlSetState($btExtractWinRE, $GUI_DISABLE)
 		$DiscoActual = "N"
 	Else
 		GUICtrlSetState($ctrlSelModoDisco, $GUI_ENABLE)
-		GUICtrlSetState($btTools, $GUI_ENABLE)
+		GUICtrlSetState($btExtractWinRE, $GUI_ENABLE)
 		$DiscoActual = $ItemSelected
 	EndIf
 EndFunc
@@ -226,6 +226,8 @@ Func f_InstalarEnDiscoNuevo()
 	Return True
 EndFunc
 
+
+
 Func f_AsignarParametros()
 	$strSistemaSel = LeerSistemaSeleccionado()
 	$pathFileWimSel = GUICtrlRead($inFileImagePath)
@@ -346,6 +348,8 @@ Func f_UltNElemArray_to_Texto($arSalida, $intIndice, $intN)
 EndFunc
 
 Func f_ExtractWinREImagen()
+	;Tarea principal para extrear la el archivo winre.wim de la particion oculta Recovery y copiarlo a la ubicacion del ejecutable
+	Local $intNumTipoPart = 2
 	If $DiscoActual = "N" Then
 		$MensajeStatusError = "Error de seleccion - No ha seleccionado un disco"
 		ActualizandoStatus()
@@ -356,5 +360,39 @@ Func f_ExtractWinREImagen()
 		MsgBox(0,"Tipo de Disco", "El tipo de disco seleccionado no es SATA o M2. No esta permitida la extraccion en discos que no sean de esos formatos")
 		Return False
 	EndIf
-	dpf_AsignarLetraToRecovery()
+	LimpiarVentanaProgreso()
+	f_AsignarParametros()
+	WinSetTitle($FormMensajesProgreso, "", "Extraccion de WinRE")
+	FormProgreso_DisableCancelar()
+	GUISetState(@SW_SHOW, $FormMensajesProgreso)
+	If Not dpf_AsignarLetraToPartition($intNumTipoPart) Then Return False
+	MensajesProgreso($MensajesInstalacion, "Iniciando copiado de WinRE.wim...")
+	If f_CopiarWinreArchivo() Then
+		MensajesProgreso($MensajesInstalacion, "Se copió correctamente WinRE a " & @ScriptDir)
+		FileSetAttrib ( @ScriptDir &"\winre.wim", "-S-H")
+	EndIf
+
+	$sSalida = EjecutarCompararComandoDiskpart($Diskpart_pid, "remove", "DiskPart quitó correctamente la letra de unidad o el punto de montaje")
+	If $sSalida Then
+		MensajesProgreso($MensajesInstalacion, "Error al remover la letra " & $arTiposPartitions[$intNumTipoPart][2] & "" )
+		Return False
+	EndIf
+	MensajesProgreso($MensajesInstalacion, @CRLF & "FINAL de la exctraccion")
 EndFunc
+
+Func f_CopiarWinreArchivo()
+	;Copiamos Winre.wim de la particion Recovery a la ubicacion del ejecutable
+	Local $comando = "xcopy R:\Recovery\WindowsRE\WinRE.wim " & @ScriptDir & " /q /y /h"
+	;xcopy no funciona con solo $STDERR_CHILD)
+	Local $cmdXcopy = Run(@ComSpec & " /c " & $comando, "", @SW_HIDE, BitOR($STDIN_CHILD, $STDOUT_CHILD, $STDERR_CHILD))
+	ProcessWaitClose($cmdXcopy)
+	Local $readConsole = StdoutRead($cmdXcopy)
+;~ 	ConsoleWrite($readConsole)
+	If StringInStr($readConsole, "1 archivo(s) copiado(s)") Then
+		Return True
+	Else
+		MensajesProgreso($MensajesInstalacion, "Error al copiar WinRE a " & @ScriptDir)
+		Return False
+	EndIf
+EndFunc
+
