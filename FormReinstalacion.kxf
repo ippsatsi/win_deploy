@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<object type="TAForm" name="FormReinstalacion">
+	<properties>
+		<property name="Left" vt="Int16">192</property>
+		<property name="Top" vt="Int8">124</property>
+		<property name="Width" vt="Int16">342</property>
+		<property name="Height" vt="Int16">424</property>
+		<property name="Caption" vt="String">Reinstalacion</property>
+		<property name="Color" vt="Ident">clBtnFace</property>
+		<property name="Font.Charset" vt="Ident">DEFAULT_CHARSET</property>
+		<property name="Font.Color" vt="Ident">clWindowText</property>
+		<property name="Font.Height" vt="Int8">-11</property>
+		<property name="Font.Name" vt="String">MS Sans Serif</property>
+		<property name="Font.Style" vt="Set"/>
+		<property name="OldCreateOrder" vt="False">False</property>
+		<property name="Visible" vt="True">True</property>
+		<property name="Style" vt="Int32">-1798701056</property>
+		<property name="ExStyle" vt="Int16">256</property>
+		<property name="Version" vt="String">1.04</property>
+		<property name="FormOptOnEvent" vt="False">False</property>
+		<property name="FormOptExpVars" vt="False">False</property>
+		<property name="FormOptPopulate" vt="False">False</property>
+		<property name="FormOptVarsForSet" vt="False">False</property>
+		<property name="FormOptIndentChar" vt="Int8">0</property>
+		<property name="FormOptIndentCount" vt="Int8">1</property>
+		<property name="FormOptIndentInit" vt="Int8">0</property>
+		<property name="FormOptVarScope" vt="Int8">0</property>
+		<property name="Resizing" vt="Set"/>
+		<property name="PixelsPerInch" vt="Int8">96</property>
+		<property name="TextHeight" vt="Int8">13</property>
+	</properties>
+	<components>
+		<object type="TAGroup" name="grpPartInDisk">
+			<properties>
+				<property name="Left" vt="Int8">16</property>
+				<property name="Top" vt="Int8">8</property>
+				<property name="Width" vt="Int16">297</property>
+				<property name="Height" vt="Int16">129</property>
+				<property name="CtrlStyle" vt="Int32">1342308359</property>
+				<property name="CtrlExStyle" vt="Int8">0</property>
+				<property name="Caption" vt="String">Particiones del Disco</property>
+				<property name="TabOrder" vt="Int8">0</property>
+				<property name="Resizing" vt="Set"/>
+			</properties>
+			<components>
+				<object type="TAListView" name="ListViewParticionesDisco">
+					<properties>
+						<property name="Left" vt="Int8">8</property>
+						<property name="Top" vt="Int8">16</property>
+						<property name="Width" vt="Int16">281</property>
+						<property name="Height" vt="Int8">105</property>
+						<property name="CtrlStyle" vt="Int32">1345552397</property>
+						<property name="CtrlExStyle" vt="Int16">513</property>
+						<property name="Resizing" vt="Set"/>
+						<property name="Columns" vt="Collection">
+							<collection>
+								<item>
+									<property name="Caption" vt="String">#</property>
+									<property name="Width" vt="Int8">25</property>
+								</item>
+								<item>
+									<property name="Caption" vt="String">Nombre</property>
+									<property name="Width" vt="Int8">80</property>
+								</item>
+								<item>
+									<property name="Caption" vt="String">Letra</property>
+									<property name="Width" vt="Int8">40</property>
+								</item>
+								<item>
+									<property name="Caption" vt="String">Tipo</property>
+									<property name="Width" vt="Int8">60</property>
+								</item>
+								<item>
+									<property name="Caption" vt="UTF8String">Tamaсo</property>
+									<property name="Width" vt="Int8">70</property>
+								</item>
+							</collection>
+						</property>
+					</properties>
+					<components/>
+				</object>
+			</components>
+		</object>
+		<object type="TAGroup" name="grpPartUsar">
+			<properties>
+				<property name="Left" vt="Int8">16</property>
+				<property name="Top" vt="Int16">152</property>
+				<property name="Width" vt="Int16">297</property>
+				<property name="Height" vt="Int16">169</property>
+				<property name="CtrlStyle" vt="Int32">1342308359</property>
+				<property name="CtrlExStyle" vt="Int8">0</property>
+				<property name="Caption" vt="String">Particiones a utilizar: </property>
+				<property name="TabOrder" vt="Int8">1</property>
+				<property name="Resizing" vt="Set"/>
+			</properties>
+			<components>
+				<object type="TACombo" name="selSistema">
+					<properties>
+						<property name="Left" vt="Int8">120</property>
+						<property name="Top" vt="Int8">16</property>
+						<property name="Width" vt="Int8">113</property>
+						<property name="Height" vt="Int8">25</property>
+						<property name="ItemHeight" vt="Int8">13</property>
+						<property name="TabOrder" vt="Int8">0</property>
+						<property name="Text" vt="String">selSistema</property>
+						<property name="CtrlStyle" vt="Int32">1342374466</property>
+						<property name="CtrlExStyle" vt="Int8">0</property>
+						<property name="Resizing" vt="Set">DockHeight</property>
+					</properties>
+					<components/>
+				</object>
+				<object type="TALabel" name="lblSystem">
+					<properties>
+						<property name="Left" vt="Int8">18</property>
+						<property name="Top" vt="Int8">23</property>
+						<property name="Width" vt="Int8">41</property>
+						<property name="Height" vt="Int8">17</property>
+						<property name="Align" vt="Ident">alCustom</property>
+						<property name="Caption" vt="String">Sistema</property>
+						<property name="TabOrder" vt="Int8">1</property>
+						<property name="HaveVariable" vt="False">False</property>
+						<property name="CtrlStyle" vt="Int32">1342308608</property>
+						<property name="CtrlExStyle" vt="Int8">0</property>
+						<property name="Resizing" vt="Set"/>
+					</properties>
+					<components/>
+				</object>
+				<object type="TACombo" name="selWindows">
+					<properties>
+						<property name="Left" vt="Int8">120</property>
+						<property name="Top" vt="Int8">56</property>
+						<property name="Width" vt="Int8">113</property>
+						<property name="Height" vt="Int8">25</property>
+						<property name="ItemHeight" vt="Int8">13</property>
+						<property name="TabOrder" vt="Int8">2</property>
+						<property name="Text" vt="String">Combo1</property>
+						<property name="CtrlStyle" vt="Int32">1342374466</property>
+						<property name="CtrlExStyle" vt="Int8">0</property>
+						<property name="Resizing" vt="Set">DockHeight</property>
+					</properties>
+					<components/>
+				</object>
+				<object type="TALabel" name="lblWindows">
+					<properties>
+						<property name="Left" vt="Int8">18</property>
+						<property name="Top" vt="Int8">63</property>
+						<property name="Width" vt="Int8">48</property>
+						<property name="Height" vt="Int8">17</property>
+						<property name="Align" vt="Ident">alCustom</property>
+						<property name="Caption" vt="String">Windows</property>
+						<property name="TabOrder" vt="Int8">3</property>
+						<property name="HaveVariable" vt="False">False</property>
+						<property name="CtrlStyle" vt="Int32">1342308608</property>
+						<property name="CtrlExStyle" vt="Int8">0</property>
+						<property name="Resizing" vt="Set"/>
+					</properties>
+					<components/>
+				</object>
+				<object type="TACombo" name="selRecovery">
+					<properties>
+						<property name="Left" vt="Int8">120</property>
+						<property name="Top" vt="Int8">96</property>
+						<property name="Width" vt="Int8">113</property>
+						<property name="Height" vt="Int8">25</property>
+						<property name="ItemHeight" vt="Int8">13</property>
+						<property name="TabOrder" vt="Int8">4</property>
+						<property name="Text" vt="String">Combo1</property>
+						<property name="CtrlStyle" vt="Int32">1342374466</property>
+						<property name="CtrlExStyle" vt="Int8">0</property>
+						<property name="Resizing" vt="Set">DockHeight</property>
+					</properties>
+					<components/>
+				</object>
+				<object type="TALabel" name="lblRecovery">
+					<properties>
+						<property name="Left" vt="Int8">18</property>
+						<property name="Top" vt="Int8">103</property>
+						<property name="Width" vt="Int8">50</property>
+						<property name="Height" vt="Int8">17</property>
+						<property name="Align" vt="Ident">alCustom</property>
+						<property name="Caption" vt="String">Recovery</property>
+						<property name="TabOrder" vt="Int8">5</property>
+						<property name="HaveVariable" vt="False">False</property>
+						<property name="CtrlStyle" vt="Int32">1342308608</property>
+						<property name="CtrlExStyle" vt="Int8">0</property>
+						<property name="Resizing" vt="Set"/>
+					</properties>
+					<components/>
+				</object>
+				<object type="TACheckbox" name="chkRecoveryShrink">
+					<properties>
+						<property name="Left" vt="Int8">16</property>
+						<property name="Top" vt="Int16">128</property>
+						<property name="Width" vt="Int8">17</property>
+						<property name="Height" vt="Int8">17</property>
+						<property name="Caption" vt="String">chkRecoveryShrink</property>
+						<property name="TabOrder" vt="Int8">6</property>
+						<property name="CtrlStyle" vt="Int32">1342242819</property>
+						<property name="CtrlExStyle" vt="Int8">0</property>
+						<property name="Resizing" vt="Set">DockHeight</property>
+						<property name="Description" vt="String">chkRecoveryShrink</property>
+					</properties>
+					<components/>
+				</object>
+				<object type="TALabel" name="lblRecoveryShrink1">
+					<properties>
+						<property name="Left" vt="Int8">48</property>
+						<property name="Top" vt="Int16">128</property>
+						<property name="Width" vt="Int16">223</property>
+						<property name="Height" vt="Int8">17</property>
+						<property name="Caption" vt="String">Recovery se creara a partir de la reduccion de</property>
+						<property name="TabOrder" vt="Int8">7</property>
+						<property name="HaveVariable" vt="False">False</property>
+						<property name="CtrlStyle" vt="Int32">1342308620</property>
+						<property name="CtrlExStyle" vt="Int8">0</property>
+						<property name="Resizing" vt="Set"/>
+					</properties>
+					<components/>
+				</object>
+				<object type="TALabel" name="lblRecoveryShrink2">
+					<properties>
+						<property name="Left" vt="Int8">47</property>
+						<property name="Top" vt="Int16">145</property>
+						<property name="Width" vt="Int16">223</property>
+						<property name="Height" vt="Int8">17</property>
+						<property name="AutoSize" vt="False">False</property>
+						<property name="Caption" vt="String">la particion de Windows</property>
+						<property name="TabOrder" vt="Int8">8</property>
+						<property name="HaveVariable" vt="False">False</property>
+						<property name="CtrlStyle" vt="Int32">1342308620</property>
+						<property name="CtrlExStyle" vt="Int8">0</property>
+						<property name="Resizing" vt="Set"/>
+					</properties>
+					<components/>
+				</object>
+			</components>
+		</object>
+		<object type="TAButton" name="btReinstalacion">
+			<properties>
+				<property name="Left" vt="Int8">123</property>
+				<property name="Top" vt="Int16">344</property>
+				<property name="Width" vt="Int8">81</property>
+				<property name="Height" vt="Int8">25</property>
+				<property name="Caption" vt="String">Reinstalar</property>
+				<property name="TabOrder" vt="Int8">2</property>
+				<property name="Color" vt="Ident">clBtnFace</property>
+				<property name="CtrlStyle" vt="Int32">1342373888</property>
+				<property name="CtrlExStyle" vt="Int8">0</property>
+				<property name="Resizing" vt="Set">DockWidth, DockHeight</property>
+			</properties>
+			<components/>
+		</object>
+	</components>
+</object>
