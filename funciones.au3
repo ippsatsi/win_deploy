@@ -254,7 +254,7 @@ Func f_ActivarParticiones()
 	;ubicar la ruta de WinRE
 	Local $rutaFileWinREaCopiar = f_UbicarWinreImagen()
 	If $rutaFileWinREaCopiar = '' Then
-		MensajesProgreso($MensajesInstalacion, "No se ubica el archivo WinRE, no puede continuar la instalacion")
+		MensajesProgreso($MensajesInstalacion, "No se ubica el archivo WinRE, extraerlo con boton Extrear WinRE y copiarlo en la raiz del USB. No puede continuar la instalacion")
 		Return False
 	EndIf
 	MensajesProgreso($MensajesInstalacion, "    Ubicado WinRE en: " & $rutaFileWinREaCopiar)
@@ -313,7 +313,7 @@ Func f_UbicarWinreImagen()
 	If FileExists($RutaCopiadoOrigen & "\winre.wim") Then
 		$parametro = $RutaCopiadoOrigen
 		;Aca deberiamos ir a registrar directamente, codifcar despues
-	Else ; sino esta en la imagen despleada la buscamos en algun usb ya sea en la raiz o en usb\IMA
+	Else ; sino esta en la imagen desplegada, la buscamos en algun usb ya sea en la raiz o en usb\IMA
 		Local $archivo_wim = "\winre.wim"
 		Local $rutaFinalWinre = "\usb\IMA"
 		For $Letra in $arrayLetras
@@ -377,7 +377,7 @@ Func f_ExtractWinREImagen()
 		MensajesProgreso($MensajesInstalacion, "Error al remover la letra " & $arTiposPartitions[$intNumTipoPart][2] & "" )
 		Return False
 	EndIf
-	MensajesProgreso($MensajesInstalacion, @CRLF & "FINAL de la exctraccion")
+	MensajesProgreso($MensajesInstalacion, @CRLF & "FINAL de la extraccion, debe copiar el archivo WinRE a la raiz del disco Instalador de Imagenes")
 EndFunc
 
 Func f_CopiarWinreArchivo()
