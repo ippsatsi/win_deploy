@@ -83,9 +83,14 @@ Func ActivarBtInstalacion()
 	Local $ValorModoDisco, $sValorIndexSeleccionado
 	$ValorModoDisco = GUICtrlRead($ctrlSelModoDisco)
 	$sValorIndexSeleccionado = GUICtrlRead($InIndexImage)
-	If $ValorModoDisco <> "nuevo" Or $sValorIndexSeleccionado = "" Then
+	If $ValorModoDisco = "Seleccione" Or $sValorIndexSeleccionado = "" Then
+		GUICtrlSetData($btInstalar, "Inst. Rapida")
 		GUICtrlSetState($btInstalar, $GUI_DISABLE)
+	ElseIf $ValorModoDisco = "Nuevo" Then
+		GUICtrlSetData($btInstalar, "Inst. Rapida")
+		GUICtrlSetState($btInstalar, $GUI_ENABLE)
 	Else
+		GUICtrlSetData($btInstalar, "Inst. Manual")
 		GUICtrlSetState($btInstalar, $GUI_ENABLE)
 	EndIf
 EndFunc
