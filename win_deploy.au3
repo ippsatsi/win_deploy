@@ -29,7 +29,7 @@ Global $strSistemaSel = ""
 Global $pathFileWimSel = ""
 Global $strImageNameSel = ""
 Global $intIndexImageSel = 1
-Global $strVersionApp = " 1.011"
+Global $strVersionApp = " 1.012"
 
 ;Opciones GUI
 Opt("GUIResizeMode", $GUI_DOCKTOP  + $GUI_DOCKSIZE)
