@@ -29,7 +29,7 @@ Global $strSistemaSel = ""
 Global $pathFileWimSel = ""
 Global $strImageNameSel = ""
 Global $intIndexImageSel = 1
-Global $strVersionApp = " v1.013"
+Global $strVersionApp = " v1.014"
 
 ;Opciones GUI
 Opt("GUIResizeMode", $GUI_DOCKTOP  + $GUI_DOCKSIZE)
@@ -52,6 +52,7 @@ EndIf
 
 GUISetState(@SW_HIDE,$FormSelectImage)
 GUISetState(@SW_HIDE,$FormMensajesProgreso)
+GUISetState(@SW_HIDE,$FormReinstalacion)
 GUISetState(@SW_SHOW, $Activador)
 RefrescarDiscos()
 ActualizandoStatus("Listo")
@@ -76,7 +77,14 @@ While 1
 				Case $btRefresh
 					RefrescarDiscos()
 				Case $btInstalar
-					If Not f_InstalarEnDiscoNuevo() Then FormProgreso_lblProgreso("Se encontraron problemas en la instalacion")
+					$texto_btInstalar = GUICtrlRead($btInstalar)
+					If $texto_btInstalar = "Nuevo" Then
+						If Not f_InstalarEnDiscoNuevo() Then FormProgreso_lblProgreso("Se encontraron problemas en la instalacion")
+					Else
+						GUISetState(@SW_SHOW,$FormReinstalacion)
+;~ 						MsgBox(0, "prueba boton", "Manual")
+					EndIf
+
 					FormProgreso_DisableCancelar()
 				Case $btFileSel
 					Global $sWimPathFile = FileOpenDialog("Seleccione el archivo WIM conteniendo la imagen", @WindowsDir & "\", "archivos wim (*.wim)", BitOR($FD_FILEMUSTEXIST, $FD_MULTISELECT))
@@ -91,5 +99,7 @@ While 1
 			EventosSelectImage()
 		Case $nMsg[1] = $FormMensajesProgreso
 			gi_EventosSelectProgreso()
+		Case $nMsg[1] = $FormReinstalacion
+			gi_EventosReinstalacion()
 	EndSelect
 WEnd

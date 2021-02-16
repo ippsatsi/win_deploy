@@ -259,7 +259,7 @@ Func f_ActivarParticiones()
 	;ubicar la ruta de WinRE
 	Local $rutaFileWinREaCopiar = f_UbicarWinreImagen()
 	If $rutaFileWinREaCopiar = '' Then
-		MensajesProgreso($MensajesInstalacion, "No se ubica el archivo WinRE, extraerlo con boton Extrear WinRE y copiarlo en la raiz del USB. No puede continuar la instalacion")
+		MensajesProgreso($MensajesInstalacion, "No se ubica el archivo WinRE, extraerlo con boton Obtener WinRE y copiarlo en la raiz del USB. No puede continuar la instalacion")
 		Return False
 	EndIf
 	MensajesProgreso($MensajesInstalacion, "    Ubicado WinRE en: " & $rutaFileWinREaCopiar)

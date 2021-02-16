@@ -64,6 +64,33 @@ $lblTextoProgreso = GUICtrlCreateLabel("", 16, 392, 260, 17)
 $lblTextoProgresoDerecha = GUICtrlCreateLabel("", 280, 392, 210, 17, $SS_RIGHT)
 #EndRegion ### END Koda GUI section ###
 
+### --------------------------- GUI DE REISNTALACION ----------------------------------------------------------------------------------------------###
+#Region ### START Koda GUI section ### Form=D:\util\win_deploy\FormReinstalacion.kxf
+$FormReinstalacion = GUICreate("Reinstalacion", 327, 386, 192, 124)
+$grpPartInDisk = GUICtrlCreateGroup("Particiones del Disco", 16, 8, 297, 129)
+$ListViewParticionesDisco = GUICtrlCreateListView("#|Nombre|Letra|Tipo|Tamaño", 24, 24, 281, 105,  BitOr($LVS_SHOWSELALWAYS, $LVS_SINGLESEL, $LVS_NOSORTHEADER))
+GUICtrlSendMsg(-1, $LVM_SETCOLUMNWIDTH, 0, 25)
+GUICtrlSendMsg(-1, $LVM_SETCOLUMNWIDTH, 1, 80)
+GUICtrlSendMsg(-1, $LVM_SETCOLUMNWIDTH, 2, 40)
+GUICtrlSendMsg(-1, $LVM_SETCOLUMNWIDTH, 3, 60)
+GUICtrlSendMsg(-1, $LVM_SETCOLUMNWIDTH, 4, 70)
+GUICtrlCreateGroup("", -99, -99, 1, 1)
+$grpPartUsar = GUICtrlCreateGroup("Particiones a utilizar: ", 16, 152, 297, 169)
+$selSistema = GUICtrlCreateCombo("selSistema", 136, 168, 113, 25, BitOR($CBS_DROPDOWN,$CBS_AUTOHSCROLL))
+$lblSystem = GUICtrlCreateLabel("Sistema", 34, 175, 41, 17)
+$selWindows = GUICtrlCreateCombo("Combo1", 136, 208, 113, 25, BitOR($CBS_DROPDOWN,$CBS_AUTOHSCROLL))
+$lblWindows = GUICtrlCreateLabel("Windows", 34, 215, 48, 17)
+$selRecovery = GUICtrlCreateCombo("Combo1", 136, 248, 113, 25, BitOR($CBS_DROPDOWN,$CBS_AUTOHSCROLL))
+$lblRecovery = GUICtrlCreateLabel("Recovery", 34, 255, 50, 17)
+$chkRecoveryShrink = GUICtrlCreateCheckbox("chkRecoveryShrink", 32, 280, 17, 17)
+$lblRecoveryShrink1 = GUICtrlCreateLabel("Recovery se creara a partir de la reduccion de", 64, 280, 223, 17, $SS_LEFTNOWORDWRAP)
+$lblRecoveryShrink2 = GUICtrlCreateLabel("la particion de Windows", 63, 297, 223, 17, $SS_LEFTNOWORDWRAP)
+GUICtrlCreateGroup("", -99, -99, 1, 1)
+$btReinstalacion = GUICtrlCreateButton("Reinstalar", 123, 344, 81, 25)
+GUISetState(@SW_SHOW)
+#EndRegion ### END Koda GUI section ###
+GUICtrlSendMsg($ListViewParticionesDisco, $LVM_SETEXTENDEDLISTVIEWSTYLE, $LVS_EX_GRIDLINES, $LVS_EX_GRIDLINES)
+
 ;Funciones GUI
 ;$lblMensajesInstalacion = GUICtrlCreateLabel("", 16, 16, 577, 353)
 ;GUICtrlSetState($lblMensajesInstalacion,$GUI_ONTOP+$GUI_FOCUS)
@@ -107,3 +134,11 @@ EndFunc
 Func gi_MostrarAvanceBarraProgresoGUI($idProgressbar, $value)
 	GUICtrlSetData($idProgressbar, Int($value))
 EndFunc
+
+Func gi_EventosReinstalacion()
+	Switch $nMsg[0]
+		Case $GUI_EVENT_CLOSE
+			GUISetState(@SW_HIDE,$FormReinstalacion)
+	EndSwitch
+EndFunc
+
