@@ -29,7 +29,7 @@ Global $strSistemaSel = ""
 Global $pathFileWimSel = ""
 Global $strImageNameSel = ""
 Global $intIndexImageSel = 1
-Global $strVersionApp = " 1.010"
+Global $strVersionApp = " 1.011"
 
 ;Opciones GUI
 Opt("GUIResizeMode", $GUI_DOCKTOP  + $GUI_DOCKSIZE)
@@ -53,8 +53,8 @@ EndIf
 GUISetState(@SW_HIDE,$FormSelectImage)
 GUISetState(@SW_HIDE,$FormMensajesProgreso)
 GUISetState(@SW_SHOW, $Activador)
-ActualizandoStatus("Listo")
 RefrescarDiscos()
+ActualizandoStatus("Listo")
 
 While 1
 	$nMsg = GUIGetMsg(1)
