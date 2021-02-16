@@ -34,7 +34,8 @@ $InImageName = GUICtrlCreateInput("", 104, 260, 265, 21, BitOR($GUI_SS_DEFAULT_I
 $lblIndexImage = GUICtrlCreateLabel("#", 384, 264, 11, 17)
 $InIndexImage = GUICtrlCreateInput("", 408, 260, 25, 21, BitOR($GUI_SS_DEFAULT_INPUT,$ES_READONLY))
 GUICtrlCreateGroup("", -99, -99, 1, 1)
-$ctrlStatus = GUICtrlCreateLabel("Listo", 16, 384, 578, 17, -1, $WS_EX_STATICEDGE)
+$ctrlStatus = GUICtrlCreateLabel("Listo", 16, 384, 522, 17, -1, $WS_EX_STATICEDGE)
+$IconAbout = GUICtrlCreateIcon(@ScriptDir & '\oxygen-icons.org-oxygen-actions-help-about.ico', -1, 560, 376, 25, 25)
 #EndRegion ### END Koda GUI section ###
 
 ;~ GUICtrlSetStyle($idListDiscos,  BitOr($LVS_SHOWSELALWAYS, $LVS_SINGLESEL, $LVS_NOSORTHEADER))
