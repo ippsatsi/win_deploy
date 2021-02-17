@@ -94,6 +94,9 @@ While 1
 					EndIf
 				Case $btCambiarImagen
 					GUISetState(@SW_SHOW,$FormSelectImage)
+				Case $IconAbout
+					MsgBox(0,"prueba icono", "Correcto")
+
 			EndSwitch
 		Case $nMsg[1] = $FormSelectImage
 			EventosSelectImage()
