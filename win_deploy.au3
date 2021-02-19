@@ -29,7 +29,7 @@ Global $strSistemaSel = ""
 Global $pathFileWimSel = ""
 Global $strImageNameSel = ""
 Global $intIndexImageSel = 1
-Global $strVersionApp = " v1.014"
+Global $strVersionApp = " v1.015"
 
 ;Opciones GUI
 Opt("GUIResizeMode", $GUI_DOCKTOP  + $GUI_DOCKSIZE)
@@ -53,6 +53,7 @@ EndIf
 GUISetState(@SW_HIDE,$FormSelectImage)
 GUISetState(@SW_HIDE,$FormMensajesProgreso)
 GUISetState(@SW_HIDE,$FormReinstalacion)
+GUISetState(@SW_HIDE,$FormAcerca)
 GUISetState(@SW_SHOW, $Activador)
 RefrescarDiscos()
 ActualizandoStatus("Listo")
@@ -95,7 +96,7 @@ While 1
 				Case $btCambiarImagen
 					GUISetState(@SW_SHOW,$FormSelectImage)
 				Case $IconAbout
-					MsgBox(0,"prueba icono", "Correcto")
+					GUISetState(@SW_SHOW,$FormAcerca)
 
 			EndSwitch
 		Case $nMsg[1] = $FormSelectImage
@@ -104,5 +105,7 @@ While 1
 			gi_EventosSelectProgreso()
 		Case $nMsg[1] = $FormReinstalacion
 			gi_EventosReinstalacion()
+		Case $nMsg[1] = $FormAcerca
+			gi_EventosVentanaAcerca()
 	EndSelect
 WEnd

@@ -1,7 +1,9 @@
-
+$strNombrePrograma = "Instalador de Imagenes de SO"
+$strNombreAutor = "Luis Aguilar Z."
+$strEmailAutor = "laz133@gmail.com"
 
 #Region ### START Koda GUI section ### Form=d:\util\win_deploy\gui_design.kxf
-$Activador = GUICreate("Instalador de Imagenes de SO" & $strVersionApp, 615, 411, 183, 166)
+$Activador = GUICreate($strNombrePrograma & $strVersionApp, 615, 411, 183, 166)
 $GroupSelDisk = GUICtrlCreateGroup("Seleccione disco", 16, 8, 577, 185)
 $idListDiscos = GUICtrlCreateListView("#|  Modelo    |Sistema|Tamaño|Espacio Libre|Interface|Status", 40, 32, 521, 105, BitOr($LVS_SHOWSELALWAYS, $LVS_SINGLESEL, $LVS_NOSORTHEADER))
 GUICtrlSendMsg(-1, $LVM_SETCOLUMNWIDTH, 0, 30)
@@ -88,9 +90,24 @@ $lblRecoveryShrink1 = GUICtrlCreateLabel("Recovery se creara a partir de la redu
 $lblRecoveryShrink2 = GUICtrlCreateLabel("la particion de Windows", 63, 297, 223, 17, $SS_LEFTNOWORDWRAP)
 GUICtrlCreateGroup("", -99, -99, 1, 1)
 $btReinstalacion = GUICtrlCreateButton("Reinstalar", 123, 344, 81, 25)
-GUISetState(@SW_SHOW)
 #EndRegion ### END Koda GUI section ###
 GUICtrlSendMsg($ListViewParticionesDisco, $LVM_SETEXTENDEDLISTVIEWSTYLE, $LVS_EX_GRIDLINES, $LVS_EX_GRIDLINES)
+
+### --------------------------- Ventana de Acerca de ----------------------------------------------------------------------------------------------###
+
+#Region ### START Koda GUI section ### Form=d:\util\win_deploy\form_acerca.kxf
+$FormAcerca = GUICreate("Acerca", 328, 205, 198, 540)
+$lblPrograma = GUICtrlCreateLabel($strNombrePrograma, 16, 16, 267, 29)
+GUICtrlSetFont(-1, 14, 800, 0, "Segoe UI")
+$lblAutor = GUICtrlCreateLabel("Autor: " & $strNombreAutor, 16, 144, 123, 17)
+$lblCorreo = GUICtrlCreateLabel("email: " & $strEmailAutor, 16, 168, 123, 17)
+$lblVersion = GUICtrlCreateLabel($strVersionApp, 16, 48, 42, 20)
+GUICtrlSetFont(-1, 10, 400, 0, "MS Sans Serif")
+$Label1 = GUICtrlCreateLabel("El instalador de imagenes  SO  es   un  programa  realizado  en  ", 16, 72, 305, 17)
+$Label2 = GUICtrlCreateLabel("Autoit para la instalacion de imagenes de Windows, siguiendo", 16, 88, 292, 17)
+$Label3 = GUICtrlCreateLabel("los parametros de Microsoft para la instalacion de imagenes   ", 16, 104, 293, 17)
+$Label4 = GUICtrlCreateLabel("mediante la herramienta DISM.", 16, 120, 149, 17)
+#EndRegion ### END Koda GUI section ###
 
 ;Funciones GUI
 ;$lblMensajesInstalacion = GUICtrlCreateLabel("", 16, 16, 577, 353)
@@ -140,6 +157,13 @@ Func gi_EventosReinstalacion()
 	Switch $nMsg[0]
 		Case $GUI_EVENT_CLOSE
 			GUISetState(@SW_HIDE,$FormReinstalacion)
+	EndSwitch
+EndFunc
+
+Func gi_EventosVentanaAcerca()
+	Switch $nMsg[0]
+		Case $GUI_EVENT_CLOSE
+			GUISetState(@SW_HIDE,$FormAcerca)
 	EndSwitch
 EndFunc
 
