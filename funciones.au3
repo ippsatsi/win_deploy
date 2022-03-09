@@ -77,7 +77,28 @@ Func CambiarEstado()
 		GUICtrlSetState($btExtractWinRE, $GUI_ENABLE)
 		$DiscoActual = $ItemSelected
 	EndIf
-EndFunc
+ EndFunc
+;~ Funcion para buscar discos vacios y seleccionarlos automaticamente
+ Func f_AutoSelect()
+	Local $numDevices, $sistDisco, $interfaceDisco, $setSelect, $i
+	$numDevices = ControlListView($Activador, "", $idListDiscos,"GetItemCount") ;obtenemos cantidad de discos en el ListView
+	If $numDevices < 1 Then Return True
+    $i = 0
+	$setSelect = False
+    Do
+	   $sistDisco = ControlListView($Activador, "", $idListDiscos, "GetText", $i, 2) ;obtenemos el dato de la columna SISTEMA
+	   $interfaceDisco = ControlListView($Activador, "", $idListDiscos, "GetText", $i, 5) ;obtenemos el dato de la columna interface
+;~ 	   MsgBox(0, "prueba boton", "$i: " & $i & " $sistDisco: " & $sistDisco & " $interfaceDisco: " & $interfaceDisco )
+	   If $sistDisco == "vacio" And $interfaceDisco <> "USB" Then
+		   ControlListView($Activador, "", $idListDiscos,"SelectClear")
+		   ControlListView($Activador, "", $idListDiscos,"Select", $i )
+		   GUICtrlSetData($ctrlSelModoDisco, "Nuevo")
+		   GUICtrlSetState($ctrlSelModoDisco, $GUI_ENABLE)
+		   $setSelect = True
+		EndIf
+		$i += 1
+	Until ($i = $numDevices) Or ($setSelect)
+ EndFunc
 
 Func ActivarBtInstalacion()
 	Local $ValorModoDisco, $sValorIndexSeleccionado
@@ -230,8 +251,6 @@ Func f_InstalarEnDiscoNuevo()
 	FormProgreso_lblProgreso("Instalacion correcta de la imagen")
 	Return True
 EndFunc
-
-
 
 Func f_AsignarParametros()
 	$strSistemaSel = LeerSistemaSeleccionado()

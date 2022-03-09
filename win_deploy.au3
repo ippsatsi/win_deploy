@@ -29,7 +29,7 @@ Global $strSistemaSel = ""
 Global $pathFileWimSel = ""
 Global $strImageNameSel = ""
 Global $intIndexImageSel = 1
-Global $strVersionApp = " v1.015"
+Global $strVersionApp = " v1.020"
 
 ;Opciones GUI
 Opt("GUIResizeMode", $GUI_DOCKTOP  + $GUI_DOCKSIZE)
@@ -57,6 +57,8 @@ GUISetState(@SW_HIDE,$FormAcerca)
 GUISetState(@SW_SHOW, $Activador)
 RefrescarDiscos()
 ActualizandoStatus("Listo")
+f_AutoSelect()
+;~ ControlListView($Activador, "", $idListDiscos,"Select", 1 )
 
 While 1
 	$nMsg = GUIGetMsg(1)
