@@ -146,7 +146,18 @@ Func gi_EventosSelectProgreso()
 	Switch $nMsg[0]
 		Case $GUI_EVENT_CLOSE
 			GUISetState(@SW_HIDE,$FormMensajesProgreso)
-	EndSwitch
+			gi_ResetFormProgreso()
+		 Case $Cancelar
+			If GUICtrlRead($Cancelar) = "Cerrar" Then
+			   GUISetState(@SW_HIDE,$FormMensajesProgreso)
+			   gi_ResetFormProgreso()
+			EndIf
+   EndSwitch
+EndFunc
+
+Func gi_ResetFormProgreso()
+   GUICtrlSetData($Cancelar, "Cancelar")
+   WinSetTitle($FormMensajesProgreso, "", "Instalacion en curso")
 EndFunc
 
 Func gi_MostrarAvanceBarraProgresoGUI($idProgressbar, $value)

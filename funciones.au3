@@ -237,8 +237,9 @@ EndFunc
 Func f_InstalarEnDiscoNuevo()
 	LimpiarVentanaProgreso()
 	f_AsignarParametros()
+
 	GUISetState(@SW_SHOW, $FormMensajesProgreso)
-	;ConsoleWrite("Disco actual: " & $DiscoActual & @CRLF)
+   ;ConsoleWrite("Disco actual: " & $DiscoActual & @CRLF)
 	f_MensajeTitulo("Iniciando Instalacion en Disco")
 	MensajesProgreso($MensajesInstalacion, "Preparando disco " & $DiscoActual & ":")
 	FormProgreso_lblProgreso("Preparando disco... ")
@@ -249,6 +250,9 @@ Func f_InstalarEnDiscoNuevo()
 	MensajesProgreso($MensajesInstalacion, "Finalizaron todas las tareas correctamente")
 	MensajesProgreso($MensajesInstalacion, "Se instalo correctamente la imagen en el Disco")
 	FormProgreso_lblProgreso("Instalacion correcta de la imagen")
+	GUICtrlSetState($Cancelar, $GUI_ENABLE)
+	GUICtrlSetData($Cancelar, "Cerrar")
+    WinSetTitle($FormMensajesProgreso, "", "Instalacion finalizada correctamente")
 	Return True
 EndFunc
 

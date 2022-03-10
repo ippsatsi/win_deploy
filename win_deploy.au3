@@ -75,20 +75,16 @@ While 1
 				Case $GUI_EVENT_CLOSE
 					Exit
 				Case $btExtractWinRE
-;~ 					MsgBox(0,"prueba tools", @ScriptDir)
 					f_ExtractWinREImagen()
 				Case $btRefresh
 					RefrescarDiscos()
 				Case $btInstalar
-					$texto_btInstalar = GUICtrlRead($btInstalar)
-					If $texto_btInstalar = "Nuevo" Then
+					$selComboModo = GUICtrlRead($ctrlSelModoDisco)
+					If $selComboModo = "Nuevo" Then
 						If Not f_InstalarEnDiscoNuevo() Then FormProgreso_lblProgreso("Se encontraron problemas en la instalacion")
 					Else
 						GUISetState(@SW_SHOW,$FormReinstalacion)
-;~ 						MsgBox(0, "prueba boton", "Manual")
 					EndIf
-
-					FormProgreso_DisableCancelar()
 				Case $btFileSel
 					Global $sWimPathFile = FileOpenDialog("Seleccione el archivo WIM conteniendo la imagen", @WindowsDir & "\", "archivos wim (*.wim)", BitOR($FD_FILEMUSTEXIST, $FD_MULTISELECT))
 					If $sWimPathFile <> "" Then
@@ -101,12 +97,15 @@ While 1
 					GUISetState(@SW_SHOW,$FormAcerca)
 
 			EndSwitch
+;~ 		mensaje de la ventana de seleccion de imagen
 		Case $nMsg[1] = $FormSelectImage
 			EventosSelectImage()
+			;mensajes de la ventana q muestra el progreso del despliegue de la imagen
 		Case $nMsg[1] = $FormMensajesProgreso
 			gi_EventosSelectProgreso()
 		Case $nMsg[1] = $FormReinstalacion
 			gi_EventosReinstalacion()
+			;mensajes de la ventana Acerca
 		Case $nMsg[1] = $FormAcerca
 			gi_EventosVentanaAcerca()
 	EndSelect
