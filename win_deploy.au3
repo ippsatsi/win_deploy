@@ -58,7 +58,6 @@ GUISetState(@SW_SHOW, $Activador)
 RefrescarDiscos()
 ActualizandoStatus("Listo")
 f_AutoSelect()
-;~ ControlListView($Activador, "", $idListDiscos,"Select", 1 )
 
 While 1
 	$nMsg = GUIGetMsg(1)
@@ -85,10 +84,12 @@ While 1
 					Else
 						GUISetState(@SW_SHOW,$FormReinstalacion)
 					EndIf
-				Case $btFileSel
+				 Case $btFileSel
+
 					Global $sWimPathFile = FileOpenDialog("Seleccione el archivo WIM conteniendo la imagen", @WindowsDir & "\", "archivos wim (*.wim)", BitOR($FD_FILEMUSTEXIST, $FD_MULTISELECT))
 					If $sWimPathFile <> "" Then
 						GUICtrlSetData($inFileImagePath, $sWimPathFile)
+;~ 					    MsgBox($MB_SYSTEMMODAL, "error", "error")
 						CargaListaImagenes($sWimPathFile)
 					EndIf
 				Case $btCambiarImagen

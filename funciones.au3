@@ -101,19 +101,28 @@ Func CambiarEstado()
  EndFunc
 
 Func ActivarBtInstalacion()
-	Local $ValorModoDisco, $sValorIndexSeleccionado
+	Local $ValorModoDisco, $sValorIndexSeleccionado, $ItemSelected
+    $ItemSelected = ControlListView($Activador, "", $idListDiscos,"GetSelected")
 	$ValorModoDisco = GUICtrlRead($ctrlSelModoDisco)
 	$sValorIndexSeleccionado = GUICtrlRead($InIndexImage)
-	If $ValorModoDisco = "Seleccione" Or $sValorIndexSeleccionado = "" Then
+;~ 	Activamos bt Instalar solo si esta seleccionada alguna opcion NUEVO/REINSTALACION y ya imagen ya fue seleccionada
+    If $ValorModoDisco = "Seleccione" Or $sValorIndexSeleccionado = "" Then
 		GUICtrlSetData($btInstalar, "Inst. Rapida")
 		GUICtrlSetState($btInstalar, $GUI_DISABLE)
-	ElseIf $ValorModoDisco = "Nuevo" Then
+	 ElseIf $ValorModoDisco = "Nuevo" Then
 		GUICtrlSetData($btInstalar, "Inst. Rapida")
 		GUICtrlSetState($btInstalar, $GUI_ENABLE)
-	Else
+	 Else
 		GUICtrlSetData($btInstalar, "Inst. Manual")
 		GUICtrlSetState($btInstalar, $GUI_ENABLE)
-	EndIf
+	 EndIf
+	 ; solo si el disco esta vacio, adveritmos q una reinstalacion no es valida
+	 $sistDisco = ControlListView($Activador, "", $idListDiscos, "GetText", $ItemSelected, 2) ;obtenemos el dato de la columna SISTEMA
+     If $sistDisco = "vacio" And $ValorModoDisco = "Reinstalacion" Then
+		 MsgBox($MB_SYSTEMMODAL, "Disco vacio", "No es posible reinstalar en un disco sin particiones")
+		 GUICtrlSetData($ctrlSelModoDisco, "Seleccione")
+		 CambiarEstado()
+	 EndIf
 EndFunc
 
 Func PrepararDiscoNuevo()
@@ -424,3 +433,10 @@ Func f_CopiarWinreArchivo()
 	EndIf
 EndFunc
 
+Func f_reinstalacion()
+   ;leer particiones del disco
+   ;detectar particiones de sistema, windows y recovery
+   ; eliminar las particiones correctamente y vovler a crearlas
+   ;instalar imagenes
+   ;activar particiones
+EndFunc

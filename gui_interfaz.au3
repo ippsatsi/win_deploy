@@ -178,3 +178,8 @@ Func gi_EventosVentanaAcerca()
 	EndSwitch
 EndFunc
 
+Func gi_estadoActivadorSistInstalacion($estado)
+   GUICtrlSetState($ck_UEFI, $estado)
+   GUICtrlSetState($ck_Csm, $estado)
+EndFunc
+
