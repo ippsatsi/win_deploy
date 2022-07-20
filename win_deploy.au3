@@ -2,6 +2,7 @@
 #Region ;**** Directives created by AutoIt3Wrapper_GUI ****
 #AutoIt3Wrapper_Outfile_x64=win_deploy.exe
 #AutoIt3Wrapper_Run_AU3Check=n
+#AutoIt3Wrapper_Res_HiDpi=Y                      ;(Y/N) Compile for high DPI. Default=N
 #EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
 #include <ButtonConstants.au3>
 #include <ComboConstants.au3>
@@ -82,14 +83,13 @@ While 1
 					If $selComboModo = "Nuevo" Then
 						If Not f_InstalarEnDiscoNuevo() Then FormProgreso_lblProgreso("Se encontraron problemas en la instalacion")
 					Else
-						GUISetState(@SW_SHOW,$FormReinstalacion)
+;~ 						GUISetState(@SW_SHOW,$FormReinstalacion)
+                        dpf_ObtenerParticiones()
 					EndIf
 				 Case $btFileSel
-
 					Global $sWimPathFile = FileOpenDialog("Seleccione el archivo WIM conteniendo la imagen", @WindowsDir & "\", "archivos wim (*.wim)", BitOR($FD_FILEMUSTEXIST, $FD_MULTISELECT))
 					If $sWimPathFile <> "" Then
 						GUICtrlSetData($inFileImagePath, $sWimPathFile)
-;~ 					    MsgBox($MB_SYSTEMMODAL, "error", "error")
 						CargaListaImagenes($sWimPathFile)
 					EndIf
 				Case $btCambiarImagen

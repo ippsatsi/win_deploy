@@ -112,9 +112,11 @@ Func ActivarBtInstalacion()
 	 ElseIf $ValorModoDisco = "Nuevo" Then
 		GUICtrlSetData($btInstalar, "Inst. Rapida")
 		GUICtrlSetState($btInstalar, $GUI_ENABLE)
+		gi_estadoActivadorSistInstalacion($GUI_ENABLE)
 	 Else
 		GUICtrlSetData($btInstalar, "Inst. Manual")
 		GUICtrlSetState($btInstalar, $GUI_ENABLE)
+		gi_estadoActivadorSistInstalacion($GUI_DISABLE)
 	 EndIf
 	 ; solo si el disco esta vacio, adveritmos q una reinstalacion no es valida
 	 $sistDisco = ControlListView($Activador, "", $idListDiscos, "GetText", $ItemSelected, 2) ;obtenemos el dato de la columna SISTEMA

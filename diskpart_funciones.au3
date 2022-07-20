@@ -134,9 +134,10 @@ Func dpf_ExtraerListaParticiones($sSalida)
 		$arSize = StringSplit(StringStripWS($sDato,7)," ",2)
 		$arParticiones[$i][4] = _ConvertirGBbinToGBdecimal($arSize[0], $arSize[1])
 		$arParticiones[$i][5] = $arSize[1] ;Unidad
-	Next
+	 Next
+	 _ArrayDisplay($arParticiones, "Lista Filas")
 	Return True
-;~ 	_ArrayDisplay($arParticiones)
+
 EndFunc
 
 
@@ -372,3 +373,17 @@ Func dpf_BuscarParticion($Diskpart_pid, $intIndexTipoPartition)
 	EndIf
 	Return $intNumPartRecovery
 EndFunc
+
+Func dpf_ObtenerParticiones()
+   	f_KillIfProcessExists("Diskpart.exe")
+	$Diskpart_pid = Diskpart_creacion_proceso()
+	If SeleccionarDisco($Diskpart_pid, $DiscoActual) Then
+	   MsgBox($MB_SYSTEMMODAL, "Disco vacio", "zz")
+	   If Not dpf_ListarParticiones($Diskpart_pid) Then
+		  MsgBox($MB_SYSTEMMODAL, "Disco vacio", "El disco seleccionado no tiene particiones")
+		  Return False
+	   EndIf
+
+	EndIf
+	Return False
+ EndFunc
