@@ -256,7 +256,15 @@ Func f_InstalarEnDiscoNuevo()
 	FormProgreso_lblProgreso("Preparando disco... ")
 	If Not PrepararDiscoNuevo() Then Return False
 	If Not ValidarParticiones() Then Return False
-	If Not df_AplicarImagen($pathFileWimSel, $intIndexImageSel) Then Return False
+	;aplicamos imagen sistema a la particion con la letra W:
+	If Not df_AplicarImagen($pathFileWimSel, $intIndexImageSel, "W") Then Return False
+	;version q usa 2 imagenes
+	;extraemos la ruta al folder donde ubicamos el archivo WIM, y usamos la misma ruta
+	;para el archivo Recovery.wim
+	Local $intUltimoBackslash = StringInStr($pathFileWimSel, "\",0,-1)
+	Local $strLocationFolderDestino = StringMid($pathFileWimSel, 1, $intUltimoBackslash)
+	;aplicamos imagen Recovery a la particion con la letra R:
+	If Not df_AplicarImagen($strLocationFolderDestino & "Recovery.wim", 1, "R") Then Return False
 	If Not f_ActivarParticiones() Then Return False
 	MensajesProgreso($MensajesInstalacion, "Finalizaron todas las tareas correctamente")
 	MensajesProgreso($MensajesInstalacion, "Se instalo correctamente la imagen en el Disco")
@@ -281,30 +289,33 @@ Func f_ActivarParticiones()
 	If Not f_TareaCMD($arrayComandos, 0, $strSistemaSel) Then Return False
 	$intBarraProgresoGUI = 84
 	gi_MostrarAvanceBarraProgresoGUI($InstProgreso, $intBarraProgresoGUI)
-	;creamos carpeta Recovery
-	If DirCreate($rutaWinre) Then
-		MensajesProgreso($MensajesInstalacion, "    " & $arrayComandos[1][0])
-	Else
-		MensajesProgreso($MensajesInstalacion, "No se pudo crear la carpeta Recovery")
-		Return False
-	EndIf
-	$intBarraProgresoGUI = 88
-	gi_MostrarAvanceBarraProgresoGUI($InstProgreso, $intBarraProgresoGUI)
+	;--------- Bloque comentado, nueva version usara imagen Recovery
+
+;~ 	;creamos carpeta Recovery
+;~ 	If DirCreate($rutaWinre) Then
+;~ 		MensajesProgreso($MensajesInstalacion, "    " & $arrayComandos[1][0])
+;~ 	Else
+;~ 		MensajesProgreso($MensajesInstalacion, "No se pudo crear la carpeta Recovery")
+;~ 		Return False
+;~ 	EndIf
+;~ 	$intBarraProgresoGUI = 88
+;~ 	gi_MostrarAvanceBarraProgresoGUI($InstProgreso, $intBarraProgresoGUI)
 	;ubicar la ruta de WinRE
-	Local $rutaFileWinREaCopiar = f_UbicarWinreImagen()
-	If $rutaFileWinREaCopiar = '' Then
-		MensajesProgreso($MensajesInstalacion, "No se ubica el archivo WinRE, extraerlo con boton Obtener WinRE y copiarlo en la raiz del USB. No puede continuar la instalacion")
-		Return False
-	EndIf
-	MensajesProgreso($MensajesInstalacion, "    Ubicado WinRE en: " & $rutaFileWinREaCopiar)
-	$intBarraProgresoGUI = 92
-	gi_MostrarAvanceBarraProgresoGUI($InstProgreso, $intBarraProgresoGUI)
-	;copiado de imagen winre
-	If Not f_TareaCMD($arrayComandos, 2, $rutaFileWinREaCopiar) Then Return False
-	$intBarraProgresoGUI = 96
-	gi_MostrarAvanceBarraProgresoGUI($InstProgreso, $intBarraProgresoGUI)
+;~ 	Local $rutaFileWinREaCopiar = f_UbicarWinreImagen()
+;~ 	If $rutaFileWinREaCopiar = '' Then
+;~ 		MensajesProgreso($MensajesInstalacion, "No se ubica el archivo WinRE, extraerlo con boton Obtener WinRE y copiarlo en la raiz del USB. No puede continuar la instalacion")
+;~ 		Return False
+;~ 	EndIf
+;~ 	MensajesProgreso($MensajesInstalacion, "    Ubicado WinRE en: " & $rutaFileWinREaCopiar)
+;~ 	$intBarraProgresoGUI = 92
+;~ 	gi_MostrarAvanceBarraProgresoGUI($InstProgreso, $intBarraProgresoGUI)
+;~ 	;copiado de imagen winre
+;~ 	If Not f_TareaCMD($arrayComandos, 2, $rutaFileWinREaCopiar) Then Return False
+;~ 	$intBarraProgresoGUI = 96
+;~ 	gi_MostrarAvanceBarraProgresoGUI($InstProgreso, $intBarraProgresoGUI)
+	;--------- Fin de Bloque comentado, nueva version usara imagen Recovery
 	;registrando WinRE: Global $rutaWinre
-	If Not f_TareaCMD($arrayComandos, 3, $rutaWinre) Then Return False
+	If Not f_TareaCMD($arrayComandos, 4, $rutaWinre) Then Return False
 	$intBarraProgresoGUI = 100
 	gi_MostrarAvanceBarraProgresoGUI($InstProgreso, $intBarraProgresoGUI)
 	Return True

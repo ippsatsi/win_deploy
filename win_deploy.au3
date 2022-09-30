@@ -1,8 +1,10 @@
 #RequireAdmin
 #Region ;**** Directives created by AutoIt3Wrapper_GUI ****
 #AutoIt3Wrapper_Outfile_x64=win_deploy.exe
+#AutoIt3Wrapper_UseX64=y
+#AutoIt3Wrapper_Res_Fileversion=2.0.1
+#AutoIt3Wrapper_Res_HiDpi=Y
 #AutoIt3Wrapper_Run_AU3Check=n
-#AutoIt3Wrapper_Res_HiDpi=Y                      ;(Y/N) Compile for high DPI. Default=N
 #EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
 #include <ButtonConstants.au3>
 #include <ComboConstants.au3>
@@ -30,7 +32,7 @@ Global $strSistemaSel = ""
 Global $pathFileWimSel = ""
 Global $strImageNameSel = ""
 Global $intIndexImageSel = 1
-Global $strVersionApp = " v1.020"
+Global $strVersionApp = " v2.001"
 
 ;Opciones GUI
 Opt("GUIResizeMode", $GUI_DOCKTOP  + $GUI_DOCKSIZE)

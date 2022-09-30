@@ -115,11 +115,11 @@ Func UpdateCtrlInputImageNameSelect($intNumImage)
 	GUICtrlSetData($InIndexImage, $arImagenes[$intNumImage][0])
 EndFunc
 
-Func df_AplicarImagen($FilePath, $IndexImage)
+Func df_AplicarImagen($FilePath, $IndexImage, $UnidadDestino)
 	;dism /Apply-Image /ImageFile:%1 /Index:1 /ApplyDir:W:\
 	;dism /Apply-Image /ImageFile:C:\Users\Luis\Documents\ima_files\install.wim /Index:1 /ApplyDir:W:\
 	;La operación se completó correctamente.
-	Local $txtCommandLine = "dism /Apply-Image /ImageFile:" & $FilePath & " /Index:" & $IndexImage & " /ApplyDir:W:\"
+	Local $txtCommandLine = "dism /Apply-Image /ImageFile:" & $FilePath & " /Index:" & $IndexImage & " /ApplyDir:" & $UnidadDestino & ":\"
 	Local $psTarea = Run(@ComSpec & " /c " & $txtCommandLine, "", @SW_HIDE, $STDOUT_CHILD)
 	Local $value = 0
 	Local $percent = 0
@@ -127,7 +127,13 @@ Func df_AplicarImagen($FilePath, $IndexImage)
 	Local $strProgresoTexto = ""
 	Local $intPrcentajeTarea = 60
 	Local $floatRatioProgreso = $intPrcentajeTarea/100
-	f_MensajeTitulo("Aplicando imagen a Particion: " & $strImageNameSel)
+	Local $CaptionRecovery = ""
+	Local $iRatioRestante
+	If $UnidadDestino = "R" Then
+		$CaptionRecovery = " Recovery "
+	EndIf
+
+	f_MensajeTitulo("Aplicando imagen" & $CaptionRecovery & " a Particion: " & $strImageNameSel)
 	f_MensajesProgreso_MostrarProgresoTexto($MensajesInstalacion,$strProgresoTexto)
 	While ProcessExists($psTarea)
 		FormProgreso_EnableCancelar()
@@ -166,11 +172,11 @@ Func df_AplicarImagen($FilePath, $IndexImage)
 			gi_MostrarAvanceBarraProgresoGUI($InstProgreso, $intBarraProgresoGUI)
 			$strProgresoTexto = f_ProgresoTexto($value, 3)
 			f_MensajesProgreso_MostrarProgresoTexto($MensajesInstalacion, $strProgresoTexto)
-			FormProgreso_lblProgreso("Aplicando imagen, Total Est: " & f_CambiarAMinutos($ssTiempoTotal) ,"Transcurrido: " & f_CambiarAMinutos($ssTiempoTranscurrido)& "  " & $value & "%")
+			FormProgreso_lblProgreso("Aplicando imagen " & $CaptionRecovery & ", Total Est: " & f_CambiarAMinutos($ssTiempoTotal) ,"Transcurrido: " & f_CambiarAMinutos($ssTiempoTranscurrido)& "  " & $value & "%")
 			$percent = $value
 		EndIf
 
-		If $value = 100 Then ExitLoop
+		;If $value = 100 Then ExitLoop
 	WEnd
 	Local $sSalida = StdoutRead($psTarea, True)
 	$sSalida = ReemplazarCaracteresEspanol($sSalida)
@@ -182,10 +188,10 @@ Func df_AplicarImagen($FilePath, $IndexImage)
 	ConsoleWrite("intOK:" & $intOK & "---")
 	If $intOK Then
 
-		MensajesProgreso($MensajesInstalacion, "Imagen aplicada correctamente" & @CRLF & @CRLF & $txtCommandLine & @CRLF & f_UltNElemArray_to_Texto($arSalida, $intOK, 1))
+		MensajesProgreso($MensajesInstalacion, "Imagen " & $CaptionRecovery & " aplicada correctamente" & @CRLF & @CRLF & $txtCommandLine & @CRLF & f_UltNElemArray_to_Texto($arSalida, $intOK, 1))
 		Return True
 	Else
-		MensajesProgreso($MensajesInstalacion, "Error, no se pudo completar la aplicacion de la imagen" & @CRLF & $txtCommandLine & @CRLF & f_UltNElemArray_to_Texto($arSalida, $intOK,3))
+		MensajesProgreso($MensajesInstalacion, "Error, no se pudo completar la aplicacion de la imagen" & $CaptionRecovery & @CRLF & $txtCommandLine & @CRLF & f_UltNElemArray_to_Texto($arSalida, $intOK,3))
 		Return False
 	EndIf
 EndFunc
