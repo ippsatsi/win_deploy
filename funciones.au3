@@ -316,6 +316,17 @@ Func f_ActivarParticiones()
 	;--------- Fin de Bloque comentado, nueva version usara imagen Recovery
 	;registrando WinRE: Global $rutaWinre
 	If Not f_TareaCMD($arrayComandos, 4, $rutaWinre) Then Return False
+	$intBarraProgresoGUI = 88
+	gi_MostrarAvanceBarraProgresoGUI($InstProgreso, $intBarraProgresoGUI)
+	Local $OsGuid = f_FindGuidBcdedit()
+	If $OsGuid = "." Then
+		MensajesProgreso($MensajesInstalacion, "    Error al ejecutar BCDEDIT")
+		Return False
+	EndIf
+	If Not f_TareaCMD($arrayComandos, 4, $rutaWinre) Then Return False
+	$intBarraProgresoGUI = 92
+	gi_MostrarAvanceBarraProgresoGUI($InstProgreso, $intBarraProgresoGUI)
+	If Not f_TareaCMD($arrayComandos, 7, $OsGuid) Then Return False
 	$intBarraProgresoGUI = 100
 	gi_MostrarAvanceBarraProgresoGUI($InstProgreso, $intBarraProgresoGUI)
 	Return True
@@ -444,6 +455,33 @@ Func f_CopiarWinreArchivo()
 		MensajesProgreso($MensajesInstalacion, "Error al copiar WinRE a " & @ScriptDir)
 		Return False
 	EndIf
+EndFunc
+
+Func f_FindGuidBcdedit()
+	Local $Resultado = "."
+	Local $txtCommandLine1 = "W:\Windows\System32\bcdedit.exe -enum -V"
+	Local $psTarea = Run(@ComSpec & " /c " & $txtCommandLine1, "W:\Windows\System32\", @SW_HIDE, $STDOUT_CHILD)
+	ProcessWaitClose($psTarea)
+	$strSalida = StdoutRead($psTarea)
+	If StringLen($strSalida) < 600 Then Return $Resultado
+	Local $intUbicacionCargador = StringInStr($strSalida, "Cargador ",0,-1)
+	If $intUbicacionCargador = 0 Then
+		ConsoleWrite("--$intUbicacionCargador=0: " & $strSalida & @CRLF)
+		Return $Resultado
+	EndIf
+	Local $strCampoCargador = StringMid($strSalida, $intUbicacionCargador)
+;~ 	ConsoleWrite("dato:" & $strLocationFolderDestino & @CRLF)
+	Local $aArray = StringSplit(StringTrimRight(StringStripCR($strCampoCargador), StringLen(@CRLF)), @CRLF)
+	 _ArrayDisplay($aArray)
+	 For $i=1 To $aArray[0]
+		 If StringInStr($aArray[$i], "W:") Then
+			 $arLinea = StringSplit(StringStripWS($aArray[$i-1],$STR_STRIPLEADING + $STR_STRIPTRAILING + $STR_STRIPSPACES), " ", $STR_NOCOUNT )
+			 $Resultado = $arLinea[1]
+			 ConsoleWrite("--" &$arLinea[1] & @CRLF)
+			 Return $Resultado
+		 EndIf
+	 Next
+
 EndFunc
 
 Func f_reinstalacion()

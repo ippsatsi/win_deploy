@@ -8,7 +8,7 @@ $arUnidadesBasicas[2][0] = "R:"
 $arUnidadesBasicas[2][1] = "Recovery"
 
 ;Comandos
-Global $arrayComandos[6][5]
+Global $arrayComandos[8][5]
 
 $arrayComandos[0][0] = "Activando Particion De Sistema..." ; Tarea a mostrar
 $arrayComandos[0][1] = 'W:\Windows\System32\bcdboot W:\Windows /l es-mx /s S: /f ??param??' ; commando a ejecutar
@@ -45,6 +45,18 @@ $arrayComandos[5][1] = 'W:\Windows\System32\reagentc /setreimage /path ??param??
 $arrayComandos[5][2] = 'La operación se completó correctamente' ; salida a comparar si es exitoso
 $arrayComandos[5][3] = 'Registro Winre.wim' ; texto alternativo de tarea
 $arrayComandos[5][4] = 'cmd' ; texto alternativo de tarea
+
+$arrayComandos[6][0] = "Habilitando Recovery..." ; Tarea a mostrar
+$arrayComandos[6][1] = 'W:\Windows\System32\reagentc /enable' ; commando a ejecutar
+$arrayComandos[6][2] = 'n efectuada correctamente' ; salida a comparar si es exitoso
+$arrayComandos[6][3] = 'Recovery habilitado' ; texto alternativo de tarea
+$arrayComandos[6][4] = 'cmd' ; texto alternativo de tarea
+
+$arrayComandos[7][0] = "Activando Recovery..." ; Tarea a mostrar
+$arrayComandos[7][1] = 'W:\Windows\System32\reagentc /enable /osguid ??param??' ; commando a ejecutar
+$arrayComandos[7][2] = 'n efectuada correctamente' ; salida a comparar si es exitoso
+$arrayComandos[7][3] = 'Recovery activado' ; texto alternativo de tarea
+$arrayComandos[7][4] = 'cmd' ; texto alternativo de tarea
 
 Global $arPrepararUEFI[17][5]
 
