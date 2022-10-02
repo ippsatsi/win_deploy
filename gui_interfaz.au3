@@ -1,7 +1,8 @@
 $strNombrePrograma = "Instalador de Imagenes de SO"
 $strNombreAutor = "Luis Aguilar Z."
 $strEmailAutor = "laz133@gmail.com"
-
+$ModoDiscoTotal = "Todo el disco"
+$ModoDiscoParticion = "Solo en particion Windows"
 #Region ### START Koda GUI section ### Form=d:\util\win_deploy\gui_design.kxf
 $Activador = GUICreate($strNombrePrograma & $strVersionApp, 615, 411, 183, 166)
 $GroupSelDisk = GUICtrlCreateGroup("Seleccione disco", 16, 8, 577, 185)
@@ -13,11 +14,12 @@ GUICtrlSendMsg(-1, $LVM_SETCOLUMNWIDTH, 3, 70)
 GUICtrlSendMsg(-1, $LVM_SETCOLUMNWIDTH, 4, 70)
 GUICtrlSendMsg(-1, $LVM_SETCOLUMNWIDTH, 5, 70)
 GUICtrlSendMsg(-1, $LVM_SETCOLUMNWIDTH, 6, 70)
-$btExtractWinRE = GUICtrlCreateButton("Obtener WinRE", 296, 150, 125, 25)
+;se comenta, ya no sera necesario desde la version 2.0
+;$btExtractWinRE = GUICtrlCreateButton("Obtener WinRE", 296, 150, 125, 25)
 $btRefresh = GUICtrlCreateButton("Refrescar", 456, 150, 105, 25)
-$ctrlSelModoDisco = GUICtrlCreateCombo("Seleccione", 136, 152, 105, 25, BitOR($CBS_DROPDOWN,$CBS_AUTOHSCROLL))
-GUICtrlSetData(-1, "Nuevo|Reinstalacion")
-$lblModoDisco = GUICtrlCreateLabel("Instalar disco como:", 40, 154, 86, 17)
+$ctrlSelModoDisco = GUICtrlCreateCombo("Seleccione", 136, 152, 155, 25, BitOR($CBS_DROPDOWN,$CBS_AUTOHSCROLL))
+GUICtrlSetData(-1,$ModoDiscoTotal & "|" & $ModoDiscoParticion )
+$lblModoDisco = GUICtrlCreateLabel("Instalar en:", 40, 154, 86, 17)
 GUICtrlCreateGroup("", -99, -99, 1, 1)
 $GroupTipoInstalacion = GUICtrlCreateGroup("Seleccione tipo de instalacion", 16, 304, 577, 57)
 $btInstalar = GUICtrlCreateButton("Inst. Rapida", 456, 324, 105, 25)

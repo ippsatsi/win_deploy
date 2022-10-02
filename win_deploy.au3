@@ -76,18 +76,19 @@ While 1
 			Switch $nMsg[0]
 				Case $GUI_EVENT_CLOSE
 					Exit
-				Case $btExtractWinRE
-					RunBcdedit()
-					f_ExtractWinREImagen()
+				;se comenta, ya no sera necesario desde la version 2.0
+				;Case $btExtractWinRE
+				;	f_ExtractWinREImagen()
 				Case $btRefresh
 					RefrescarDiscos()
 				Case $btInstalar
 					$selComboModo = GUICtrlRead($ctrlSelModoDisco)
-					If $selComboModo = "Nuevo" Then
+					If $selComboModo = $ModoDiscoTotal Then
 						If Not f_InstalarEnDiscoNuevo() Then FormProgreso_lblProgreso("Se encontraron problemas en la instalacion")
 					Else
 ;~ 						GUISetState(@SW_SHOW,$FormReinstalacion)
-                        dpf_ObtenerParticiones()
+						If Not f_InstalarEnParticiones() Then FormProgreso_lblProgreso("Se encontraron problemas en la instalacion")
+                        ;dpf_ObtenerParticiones()
 					EndIf
 				 Case $btFileSel
 					Global $sWimPathFile = FileOpenDialog("Seleccione el archivo WIM conteniendo la imagen", @WindowsDir & "\", "archivos wim (*.wim)", BitOR($FD_FILEMUSTEXIST, $FD_MULTISELECT))

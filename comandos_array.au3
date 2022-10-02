@@ -59,12 +59,12 @@ $arrayComandos[7][3] = 'Recovery activado' ; texto alternativo de tarea
 $arrayComandos[7][4] = 'cmd' ; texto alternativo de tarea
 
 Global $arPrepararUEFI[17][5]
-
+;no aplica para reinstalacion
 $arPrepararUEFI[0][0] = "clean"
 $arPrepararUEFI[0][1] = "ha limpiado"
 $arPrepararUEFI[0][2] = "Limpiando disco"
 $arPrepararUEFI[0][3] = ""
-
+;no aplica para reinstalacion
 $arPrepararUEFI[1][0] = "convert gpt"
 $arPrepararUEFI[1][1] = "correctamente el disco"
 $arPrepararUEFI[1][2] = "Convirtiendo a gpt"
@@ -99,7 +99,7 @@ $arPrepararUEFI[7][0] = "create partition primary"
 $arPrepararUEFI[7][1] = "creado satisfactoriamente la"
 $arPrepararUEFI[7][2] = "Creando particion Windows"
 $arPrepararUEFI[7][3] = ""
-
+;solo aplica en reinstalacion si es adyacente
 $arPrepararUEFI[8][0] = "shrink minimum=650"
 $arPrepararUEFI[8][1] = "correctamente"
 $arPrepararUEFI[8][2] = "Reduciendo particion para dar espacio a Recovery"
@@ -146,7 +146,7 @@ $arPrepararUEFI[16][2] = "Ocultando a Recovery"
 $arPrepararUEFI[16][3] = ""
 
 Global $arPrepararMBR[15][5]
-
+;no aplica para reinstalacion
 $arPrepararMBR[0][0] = "clean"
 $arPrepararMBR[0][1] = "ha limpiado"
 $arPrepararMBR[0][2] = "Limpiando disco"
@@ -181,7 +181,7 @@ $arPrepararMBR[6][0] = "create partition primary"
 $arPrepararMBR[6][1] = "creado satisfactoriamente la"
 $arPrepararMBR[6][2] = "Creando particion Windows"
 $arPrepararMBR[6][3] = ""
-
+;solo aplica en reinstalacion si es adyacente
 $arPrepararMBR[7][0] = "shrink minimum=650"
 $arPrepararMBR[7][1] = "correctamente"
 $arPrepararMBR[7][2] = "Reduciendo particion para dar espacio a Recovery"

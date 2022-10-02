@@ -18,6 +18,8 @@ $arTiposPartitions[2][0] = "Recovery"
 $arTiposPartitions[2][1] = "Recuperación"
 $arTiposPartitions[2][2] = "R"
 
+Const $RECOVERY_PART_NUM = 2, $SYSTEM_PART_NUM = 0, $PRINCIPAL_PART_NUM = 1
+
 ;~ Global $bolEnProgresoEnPantalla = False
 ;~ Global $intEnProgresoIndex = 0
 ;~ Global $intNumDiskpartSleeps = 5
@@ -135,7 +137,7 @@ Func dpf_ExtraerListaParticiones($sSalida)
 		$arParticiones[$i][4] = _ConvertirGBbinToGBdecimal($arSize[0], $arSize[1])
 		$arParticiones[$i][5] = $arSize[1] ;Unidad
 	 Next
-	 _ArrayDisplay($arParticiones, "Lista Filas")
+	; _ArrayDisplay($arParticiones, "Lista Filas")
 	Return True
 
 EndFunc
@@ -354,6 +356,64 @@ Func dpf_AsignarLetraToPartition($intPartitionTypeNumber)
 	Return False
 EndFunc
 
+Func dpf_AsignarLetra($Diskpart_pid, $partNum)
+	Local $sSalida, $Letra, $intNumFilas
+	$Letra = dpf_getLetraAsignada($Diskpart_pid, $partNum)
+	;sino tiene letra la particion, le asignamos una
+	If $Letra <> "." Then
+		Return $Letra
+	Else
+		If dpf_SeleccionarParticion($Diskpart_pid, $partNum) Then
+			$sSalida = EjecutarComandoDiskpart($Diskpart_pid, "assign")
+			If StringInStr($sSalida, "correctamente") > 0 Then
+				$Letra = dpf_getLetraAsignada($Diskpart_pid, $partNum)
+			EndIf
+		EndIf
+		Return $Letra
+	EndIf
+EndFunc
+
+Func dpf_RemoverLetra($Diskpart_pid, $partNum)
+	Local $sSalida, $Letra, $intNumFilas
+	$Letra = dpf_getLetraAsignada($Diskpart_pid, $partNum)
+	;sino tiene letra la particion, salimos
+	If $Letra = "." Then
+		Return True
+	Else ; removemos la letra
+		If dpf_SeleccionarParticion($Diskpart_pid, $partNum) Then
+			$sSalida = EjecutarComandoDiskpart($Diskpart_pid, "remove")
+			If StringInStr($sSalida, "correctamente") > 0 Then
+				$Letra = dpf_getLetraAsignada($Diskpart_pid, $partNum)
+				If $Letra = "." Then
+					Return True
+				EndIf
+			EndIf
+		EndIf
+		Return False
+	EndIf
+EndFunc
+
+Func dpf_getLetraAsignada($Diskpart_pid, $partNum)
+	Local $Letra = "."
+	If dpf_SeleccionarParticion($Diskpart_pid, $partNum) Then
+		$sSalida = EjecutarComandoDiskpart($Diskpart_pid, "detail part")
+		$sSalida = StringSplit($sSalida, @LF, $STR_NOCOUNT)
+		$intNumFilas = UBound($sSalida)
+		; verificamos q la salida da un resultado valido
+		If $intNumFilas > 5 And StringInStr($sSalida[1], "Parti") > 0 Then
+			$Letra = StringStripWS(StringMid($sSalida[$intNumFilas-1],16,2), $STR_STRIPALL) ; Extraemos de la ultima fila el dato sobre la letra asignada
+			; si tiene letra asignada, la devolvemos; sino le asignamos letra
+			If StringLen($Letra) = 1 Then
+				ConsoleWrite("Letra:--" & $Letra & "--" & @CRLF)
+				Return $Letra
+			Else
+				$Letra = "."
+				Return $Letra
+			EndIf
+		EndIf
+	EndIf
+EndFunc
+
 Func dpf_BuscarParticion($Diskpart_pid, $intIndexTipoPartition)
 	;Buscamos y obtenemos el numero de la particion segun su tipo
 	Local $intNumPartRecovery = "N"
@@ -386,4 +446,30 @@ Func dpf_ObtenerParticiones()
 
 	EndIf
 	Return False
- EndFunc
+EndFunc
+
+Func IsPartitionType($intNumPartition, $intTypePartition)
+	If $arParticiones[$intNumPartition][1] <> $arTiposPartitions[$intTypePartition][0] And $arParticiones[$intNumPartition][1] <> $arTiposPartitions[$intTypePartition][1] Then
+		Return False
+	Else
+		Return True
+	EndIf
+EndFunc
+
+Func dpf_EliminarParticion($Diskpart_pid, $partNum)
+	If dpf_SeleccionarParticion($Diskpart_pid, $partNum) Then
+		$sSalida = EjecutarComandoDiskpart($Diskpart_pid, "del part override")
+		If StringInStr($sSalida, "correctamente") > 0 Then
+			MensajesProgreso($MensajesInstalacion, "Se eliminó correctamente la partición " & $partNum)
+			Return True
+		EndIf
+	EndIf
+	MensajesProgreso($MensajesInstalacion, "Error al eliminar la partición " & $partNum & @CRLF &"La tarea produjo esta salida: " & @CRLF & $sSalida)
+	Return False
+EndFunc
+
+Func dpf_EliminarParticionArranqueUEFI($Diskpart_pid, $partNum)
+	dpf_EliminarParticion($Diskpart_pid, $partNum)
+	$partNum += 1
+	dpf_EliminarParticion($Diskpart_pid, $partNum)
+EndFunc

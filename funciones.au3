@@ -1,6 +1,7 @@
 #include <GuiEdit.au3>
 #include <ScrollBarsConstants.au3>
 
+Global $arParticionesSistema[3][2], $estadoCancelar = False
 Global $rutaWinre = "R:\Recovery\WindowsRE"
 ;20 puntos para preparacion de disco
 ;60 puntos para aplicacion de imagenes
@@ -61,7 +62,8 @@ Func RefrescarDiscos()
 	ActualizandoStatus("Listo")
 	$Diskpart_pid = 0
 	GUICtrlSetState($ctrlSelModoDisco, $GUI_DISABLE)
-	GUICtrlSetState($btExtractWinRE, $GUI_DISABLE)
+	;se comenta, ya no sera necesario desde la version 2.0
+	;GUICtrlSetState($btExtractWinRE, $GUI_DISABLE)
 EndFunc
 
 Func CambiarEstado()
@@ -70,11 +72,13 @@ Func CambiarEstado()
 	If $ItemSelected = "" Then
 		GUICtrlSetData($ctrlSelModoDisco, "Seleccione")
 		GUICtrlSetState($ctrlSelModoDisco, $GUI_DISABLE)
-		GUICtrlSetState($btExtractWinRE, $GUI_DISABLE)
+		;se comenta, ya no sera necesario desde la version 2.0
+		;GUICtrlSetState($btExtractWinRE, $GUI_DISABLE)
 		$DiscoActual = "N"
 	Else
 		GUICtrlSetState($ctrlSelModoDisco, $GUI_ENABLE)
-		GUICtrlSetState($btExtractWinRE, $GUI_ENABLE)
+		;se comenta, ya no sera necesario desde la version 2.0
+		;GUICtrlSetState($btExtractWinRE, $GUI_ENABLE)
 		$DiscoActual = $ItemSelected
 	EndIf
  EndFunc
@@ -92,7 +96,7 @@ Func CambiarEstado()
 	   If $sistDisco == "vacio" And $interfaceDisco <> "USB" Then
 		   ControlListView($Activador, "", $idListDiscos,"SelectClear")
 		   ControlListView($Activador, "", $idListDiscos,"Select", $i )
-		   GUICtrlSetData($ctrlSelModoDisco, "Nuevo")
+		   GUICtrlSetData($ctrlSelModoDisco, $ModoDiscoTotal)
 		   GUICtrlSetState($ctrlSelModoDisco, $GUI_ENABLE)
 		   $setSelect = True
 		EndIf
@@ -107,16 +111,16 @@ Func ActivarBtInstalacion()
 	$sValorIndexSeleccionado = GUICtrlRead($InIndexImage)
 ;~ 	Activamos bt Instalar solo si esta seleccionada alguna opcion NUEVO/REINSTALACION y ya imagen ya fue seleccionada
     If $ValorModoDisco = "Seleccione" Or $sValorIndexSeleccionado = "" Then
-		GUICtrlSetData($btInstalar, "Inst. Rapida")
+		GUICtrlSetData($btInstalar, "Instalar")
 		GUICtrlSetState($btInstalar, $GUI_DISABLE)
-	 ElseIf $ValorModoDisco = "Nuevo" Then
-		GUICtrlSetData($btInstalar, "Inst. Rapida")
+;~ 	 ElseIf $ValorModoDisco = "Nuevo" Then
+;~ 		GUICtrlSetData($btInstalar, "Inst. Rapida")
+;~ 		GUICtrlSetState($btInstalar, $GUI_ENABLE)
+;~ 		gi_estadoActivadorSistInstalacion($GUI_ENABLE)
+	 Else
+		GUICtrlSetData($btInstalar, "Instalar")
 		GUICtrlSetState($btInstalar, $GUI_ENABLE)
 		gi_estadoActivadorSistInstalacion($GUI_ENABLE)
-	 Else
-		GUICtrlSetData($btInstalar, "Inst. Manual")
-		GUICtrlSetState($btInstalar, $GUI_ENABLE)
-		gi_estadoActivadorSistInstalacion($GUI_DISABLE)
 	 EndIf
 	 ; solo si el disco esta vacio, adveritmos q una reinstalacion no es valida
 	 $sistDisco = ControlListView($Activador, "", $idListDiscos, "GetText", $ItemSelected, 2) ;obtenemos el dato de la columna SISTEMA
@@ -127,6 +131,20 @@ Func ActivarBtInstalacion()
 	 EndIf
 EndFunc
 
+Func DetectarDiscoUSB()
+	$sTipoDisco = $arDisks[$DiscoActual][10]
+	If $sTipoDisco = "USB" Then
+		Local $intRespuesta = MsgBox(4,"Tipo de Disco Extraible", "El tipo de disco seleccionado es USB. ¿Esta seguro de instalar en este tipo de disco?")
+		If $intRespuesta = 7 Then
+			$MensajeStatusError = "No Se formateara el USB"
+			ActualizandoStatus()
+			Return True
+		EndIf
+	EndIf
+	Return False
+EndFunc
+
+
 Func PrepararDiscoNuevo()
 	Local $sTipoDisco, $intRespuesta, $Resultado
 	GUICtrlSetState($btInstalar, $GUI_DISABLE)
@@ -135,15 +153,16 @@ Func PrepararDiscoNuevo()
 		ActualizandoStatus()
 		Return False
 	EndIf
-	$sTipoDisco = $arDisks[$DiscoActual][10]
-	If $sTipoDisco = "USB" Then
-		$intRespuesta = MsgBox(4,"Tipo de Disco Extraible", "El tipo de disco seleccionado es USB. ¿Esta seguro de instalar en este tipo de disco?")
-		If $intRespuesta = 7 Then
-			$MensajeStatusError = "No Se formateara el USB"
-			ActualizandoStatus()
-			Return False
-		EndIf
-	EndIf
+	If DetectarDiscoUSB() Then Return False
+;~ 	$sTipoDisco = $arDisks[$DiscoActual][10]
+;~ 	If $sTipoDisco = "USB" Then
+;~ 		$intRespuesta = MsgBox(4,"Tipo de Disco Extraible", "El tipo de disco seleccionado es USB. ¿Esta seguro de instalar en este tipo de disco?")
+;~ 		If $intRespuesta = 7 Then
+;~ 			$MensajeStatusError = "No Se formateara el USB"
+;~ 			ActualizandoStatus()
+;~ 			Return False
+;~ 		EndIf
+;~ 	EndIf
 	If $strSistemaSel = "BIOS" Then
 		$Resultado = TareaComandosDiskpart($arPrepararMBR)
 	Else
@@ -251,7 +270,7 @@ Func f_InstalarEnDiscoNuevo()
 
 	GUISetState(@SW_SHOW, $FormMensajesProgreso)
    ;ConsoleWrite("Disco actual: " & $DiscoActual & @CRLF)
-	f_MensajeTitulo("Iniciando Instalacion en Disco")
+	f_MensajeTitulo("Iniciando Instalación en Disco")
 	MensajesProgreso($MensajesInstalacion, "Preparando disco " & $DiscoActual & ":")
 	FormProgreso_lblProgreso("Preparando disco... ")
 	If Not PrepararDiscoNuevo() Then Return False
@@ -267,13 +286,179 @@ Func f_InstalarEnDiscoNuevo()
 	If Not df_AplicarImagen($strLocationFolderDestino & "Recovery.wim", 1, "R") Then Return False
 	If Not f_ActivarParticiones() Then Return False
 	MensajesProgreso($MensajesInstalacion, "Finalizaron todas las tareas correctamente")
-	MensajesProgreso($MensajesInstalacion, "Se instalo correctamente la imagen en el Disco")
-	FormProgreso_lblProgreso("Instalacion correcta de la imagen")
+	MensajesProgreso($MensajesInstalacion, "Se instaló correctamente la imagen en el Disco")
+	FormProgreso_lblProgreso("Instalación correcta de la imagen")
 	GUICtrlSetState($Cancelar, $GUI_ENABLE)
 	GUICtrlSetData($Cancelar, "Cerrar")
     WinSetTitle($FormMensajesProgreso, "", "Instalacion finalizada correctamente")
 	Return True
 EndFunc
+
+Func f_InstalarEnParticiones()
+	If DetectarDiscoUSB() Then Return False
+	;verificar q tiene 4 particiones como minimo
+	;seleccionar disco
+	$Diskpart_pid = Diskpart_creacion_proceso()
+	If SeleccionarDisco($Diskpart_pid, $DiscoActual) Then
+	;verificamos q tenga particiones
+		If Not dpf_ListarParticiones($Diskpart_pid) Then
+			MsgBox($MB_SYSTEMMODAL, "Disco vacio", "El disco seleccionado no posee ninguna partición")
+			Return False
+		EndIf
+	;_ArrayDisplay($arParticiones, "lista")
+	EndIf
+	;verificamos q existan las particiones necesarias q usa el Windows
+	If $arDisks[$DiscoActual][7] = "UEFI" Then
+		$minParticiones = 5
+	Else
+		$minParticiones = 4
+	EndIf
+	ConsoleWrite("particiones necesarias: " & UBound($arParticiones) & @CRLF)
+	If UBound($arParticiones) < $minParticiones Then
+		MsgBox(0, "Particiones", "El disco solo tiene " & UBound($arParticiones) & " particion(es), aplique la función 'Nuevo'"  )
+		Return False
+	EndIf
+		GUISetState(@SW_SHOW, $FormMensajesProgreso)
+	f_MensajeTitulo("Iniciando Instalacion en Disco")
+	MensajesProgreso($MensajesInstalacion, "Se encontraron " & UBound($arParticiones) & " particion(es) en el disco")
+	MensajesProgreso($MensajesInstalacion, "Preparando disco " & $DiscoActual & ":")
+	FormProgreso_lblProgreso("Preparando disco... ")
+	$intPartActual = 0
+	;detectar particion sistema
+	;Encontrar particion sistema
+	If $arDisks[$DiscoActual][7] = "UEFI" Then
+		;si es UEFI, puede q sea la 2 particion la q sea de sistema
+		If Not IsPartitionType($intPartActual, $SYSTEM_PART_NUM) Then
+			$intPartActual += 1
+			If Not IsPartitionType($intPartActual, $SYSTEM_PART_NUM) Then
+				ConsoleWrite("El disco no posee partición de sistema")
+				MensajesProgreso($MensajesInstalacion, "El disco no posee partición de sistema")
+				Return False
+			EndIf
+		EndIf
+	EndIf
+	$arParticionesSistema[0][0] = $arParticiones[$intPartActual][0]
+	MensajesProgreso($MensajesInstalacion, "Se detecto la partición " & $arParticionesSistema[0][0] & " como partición de arranque")
+	ConsoleWrite("arParSis: " & $arParticionesSistema[0][0] & @CRLF)
+	$arSize = StringSplit($arParticiones[$intPartActual][2], " ", $STR_NOCOUNT)
+	;Confirmamos q tenga particion de sistema
+	If ($arSize[0] > 300 And $arSize[1] = "MB") Or $arSize[1] = "GB" Then
+		ConsoleWrite("No tiene particion de sistema" & @CRLF)
+		MensajesProgreso($MensajesInstalacion, "El disco no posee partición de sistema")
+		Return False
+	EndIf
+	$intBarraProgresoGUI = 5
+	gi_MostrarAvanceBarraProgresoGUI($InstProgreso, $intBarraProgresoGUI)
+
+	;detectar particion principal
+	$intPartActual += 1
+	If $arDisks[$DiscoActual][7] = "UEFI" Then
+		$intPartActual += 1
+	EndIf
+	$arParticionesSistema[1][0] = $arParticiones[$intPartActual][0]
+	If Not IsPartitionType($intPartActual, $PRINCIPAL_PART_NUM) Then
+		MsgBox($MB_SYSTEMMODAL, "Partición Windows", "El disco no tiene partición con Windows")
+		MensajesProgreso($MensajesInstalacion, "El disco no posee partición de sistema")
+		Return False
+	EndIf
+	ConsoleWrite("arParPrincipal: " & $arParticionesSistema[1][0] & @CRLF)
+	MensajesProgreso($MensajesInstalacion, "Se detecto la partición " & $arParticionesSistema[1][0] & " como partición Windows")
+	$intBarraProgresoGUI = 8
+	gi_MostrarAvanceBarraProgresoGUI($InstProgreso, $intBarraProgresoGUI)
+
+	;detectar particion recovery, si esta contigua, habilitar flag RecoveryAdyacente
+	$arParticionesSistema[2][0] = 99 ; 99 es la bandera cuando no encontramos Recovery
+	$intPartActual += 1
+	If IsPartitionType($intPartActual, $RECOVERY_PART_NUM) Then
+		$arParticionesSistema[2][0] = $arParticiones[$intPartActual][0]
+		$flagRecoveryAdyacente = True
+		$msjRecovery = " "
+	Else
+		For $i = 0 to UBound($arParticiones)- 1
+		If IsPartitionType($i, $RECOVERY_PART_NUM) Then
+			$arParticionesSistema[2][0] = $arParticiones[$i][0]
+		EndIf
+		$flagRecoveryAdyacente = False
+		$msjRecovery = "no "
+	Next
+	EndIf
+
+;~ 	For $i = 0 to UBound($arParticiones)- 1
+;~ 		If IsPartitionType($i, $RECOVERY_PART_NUM) Then
+;~ 			$arParticionesSistema[2][0] = $arParticiones[$i][0]
+;~ 		EndIf
+;~ 	Next
+;~ 	If $arParticionesSistema[2][0] = ($arParticionesSistema[1][0] + 1) Then
+;~ 		$flagRecoveryAdyacente = True
+;~ 		$msjRecovery = " "
+;~ 	Else
+;~ 		$flagRecoveryAdyacente = False
+;~ 		$msjRecovery = "no "
+;~ 	EndIf
+
+	ConsoleWrite("Partición Recovery: " & $arParticionesSistema[2][0] & @CRLF)
+	If $arParticionesSistema[2][0] = 99 Then
+		MsgBox($MB_SYSTEMMODAL, "Partición Recovery", "El disco no tiene partición Recovery")
+		MensajesProgreso($MensajesInstalacion, "El disco no posee partición Recovery")
+		Return False
+	EndIf
+	MensajesProgreso($MensajesInstalacion, "Se detecto la partición " & $arParticionesSistema[2][0] & " como partición Recovery y " & $msjRecovery & "es adyacente" )
+	$intBarraProgresoGUI = 11
+	gi_MostrarAvanceBarraProgresoGUI($InstProgreso, $intBarraProgresoGUI)
+
+	;verificar partiones principales y recovery
+	; asignar letras a las 2 particiones
+	$Letra = dpf_AsignarLetra($Diskpart_pid, $arParticionesSistema[1][0])
+	If $Letra = "." Then
+		MsgBox($MB_SYSTEMMODAL, "Asignacion de Letras", "No se pudo asignar una letra a la particon principal")
+		Return False
+	EndIf
+	$arParticionesSistema[1][1] = $Letra
+	$Letra = dpf_AsignarLetra($Diskpart_pid, $arParticionesSistema[2][0])
+	If $Letra = "." Then
+		MsgBox($MB_SYSTEMMODAL, "Asignacion de Letras", "No se pudo asignar una letra a la particon Recovery")
+		Return False
+	EndIf
+	$arParticionesSistema[2][1] = $Letra
+	If FileExists($arParticionesSistema[1][1] & ":\Windows") Then
+		ConsoleWrite("Carpeta Windows Existe" & @CRLF)
+	Else
+		MsgBox($MB_SYSTEMMODAL, "Carpetas Sistema", "No se encontró la carpeta " & $arParticionesSistema[1][1] & ":\Windows")
+		MensajesProgreso($MensajesInstalacion, "No se encontró la carpeta " & $arParticionesSistema[1][1] & ":\Windows")
+		Return False
+	EndIf
+	MensajesProgreso($MensajesInstalacion, "Se encontró la carpeta " & $arParticionesSistema[1][1] & ":\Windows")
+	If FileExists($arParticionesSistema[2][1] & ":\Recovery") Then
+		ConsoleWrite("Carpeta Recovery Existe" & @CRLF)
+	Else
+		MsgBox($MB_SYSTEMMODAL, "Carpetas Sistema", "No se encontró la carpeta " & $arParticionesSistema[2][1] & ":\Recovery")
+		MensajesProgreso($MensajesInstalacion, "No se encontró la carpeta " & $arParticionesSistema[2][1] & ":\Recovery")
+		Return False
+	EndIf
+	MensajesProgreso($MensajesInstalacion, "Se encontró la carpeta " & $arParticionesSistema[2][1] & ":\Recovery")
+	$intBarraProgresoGUI = 14
+	gi_MostrarAvanceBarraProgresoGUI($InstProgreso, $intBarraProgresoGUI)
+	Return False
+	; eliminar particiones sistema, principal y recovery
+	If $arDisks[$DiscoActual][7] = "UEFI" Then
+		dpf_EliminarParticionArranqueUEFI($Diskpart_pid, $arParticionesSistema[0][0])
+	Else
+		dpf_EliminarParticion($Diskpart_pid, $arParticionesSistema[0][0])
+	EndIf
+	$intBarraProgresoGUI = 16
+	gi_MostrarAvanceBarraProgresoGUI($InstProgreso, $intBarraProgresoGUI)
+	dpf_EliminarParticion($Diskpart_pid, $arParticionesSistema[1][0])
+	$intBarraProgresoGUI = 18
+	gi_MostrarAvanceBarraProgresoGUI($InstProgreso, $intBarraProgresoGUI)
+	dpf_EliminarParticion($Diskpart_pid, $arParticionesSistema[2][0])
+	$intBarraProgresoGUI = 20
+	gi_MostrarAvanceBarraProgresoGUI($InstProgreso, $intBarraProgresoGUI)
+	;crear particiones
+	; aplicar procedimientos ya establecidos
+	ConsoleWrite("Todo OK")
+	Return True
+EndFunc
+
 
 Func f_AsignarParametros()
 	$strSistemaSel = LeerSistemaSeleccionado()
@@ -463,24 +648,30 @@ Func f_FindGuidBcdedit()
 	Local $psTarea = Run(@ComSpec & " /c " & $txtCommandLine1, "W:\Windows\System32\", @SW_HIDE, $STDOUT_CHILD)
 	ProcessWaitClose($psTarea)
 	$strSalida = StdoutRead($psTarea)
+	;verificamos q no haya un error en la salida, verificando q la salida tenga por lo menos 600 caracteres
 	If StringLen($strSalida) < 600 Then Return $Resultado
+	; Buscamos la seccion cargador de arranque de Windows
 	Local $intUbicacionCargador = StringInStr($strSalida, "Cargador ",0,-1)
+	;sino existiera cargador, salimos con error
 	If $intUbicacionCargador = 0 Then
 		ConsoleWrite("--$intUbicacionCargador=0: " & $strSalida & @CRLF)
 		Return $Resultado
 	EndIf
+	;seleccionamos todo el texto a partir de cargador
 	Local $strCampoCargador = StringMid($strSalida, $intUbicacionCargador)
 ;~ 	ConsoleWrite("dato:" & $strLocationFolderDestino & @CRLF)
+	;convertimos a array de lineas
 	Local $aArray = StringSplit(StringTrimRight(StringStripCR($strCampoCargador), StringLen(@CRLF)), @CRLF)
-	 _ArrayDisplay($aArray)
-	 For $i=1 To $aArray[0]
-		 If StringInStr($aArray[$i], "W:") Then
-			 $arLinea = StringSplit(StringStripWS($aArray[$i-1],$STR_STRIPLEADING + $STR_STRIPTRAILING + $STR_STRIPSPACES), " ", $STR_NOCOUNT )
-			 $Resultado = $arLinea[1]
-			 ConsoleWrite("--" &$arLinea[1] & @CRLF)
-			 Return $Resultado
-		 EndIf
-	 Next
+	;_ArrayDisplay($aArray)
+	;buscamos la primera linea q muestre W:, la linea anterior a esa, tendrá el guid
+	For $i=1 To $aArray[0]
+		If StringInStr($aArray[$i], "W:") Then
+			$arLinea = StringSplit(StringStripWS($aArray[$i-1],$STR_STRIPLEADING + $STR_STRIPTRAILING + $STR_STRIPSPACES), " ", $STR_NOCOUNT )
+			$Resultado = $arLinea[1]
+			ConsoleWrite("--" &$arLinea[1] & @CRLF)
+			Return $Resultado
+		EndIf
+	Next
 
 EndFunc
 
