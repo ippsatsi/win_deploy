@@ -2,7 +2,8 @@
 #Region ;**** Directives created by AutoIt3Wrapper_GUI ****
 #AutoIt3Wrapper_Outfile_x64=win_deploy.exe
 #AutoIt3Wrapper_UseX64=y
-#AutoIt3Wrapper_Res_Fileversion=2.0.2.0
+#AutoIt3Wrapper_Res_Fileversion=2.0.2.7
+#AutoIt3Wrapper_Res_Fileversion_AutoIncrement=y
 #AutoIt3Wrapper_Res_HiDpi=Y
 #AutoIt3Wrapper_Run_AU3Check=n
 #EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
@@ -83,6 +84,9 @@ While 1
 					RefrescarDiscos()
 				Case $btInstalar
 					$selComboModo = GUICtrlRead($ctrlSelModoDisco)
+					If DetectarDiscoUSB() Then ContinueLoop
+				 	LimpiarVentanaProgreso()
+				 	f_AsignarParametros()
 					If $selComboModo = $ModoDiscoTotal Then
 						If Not f_InstalarEnDiscoNuevo() Then FormProgreso_lblProgreso("Se encontraron problemas en la instalacion")
 					Else

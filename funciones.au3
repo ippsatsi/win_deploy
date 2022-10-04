@@ -1,7 +1,7 @@
 #include <GuiEdit.au3>
 #include <ScrollBarsConstants.au3>
 
-Global $arParticionesSistema[3][2], $estadoCancelar = False
+Global $arParticionesSistema[3][2], $estadoCancelar = False, $flagRecoveryAdyacente = False
 Global $rutaWinre = "R:\Recovery\WindowsRE"
 ;20 puntos para preparacion de disco
 ;60 puntos para aplicacion de imagenes
@@ -21,6 +21,15 @@ Func _CirculoResultado ($x, $y, $color)
 	GuiCtrlSetState($a, $GUI_SHOW)
 	Return $a
 EndFunc
+
+Func ExtraerRutaPadre($Ruta)
+	;extraemos la ruta al folder donde ubicamos el archivo WIM, y usamos la misma ruta
+	;para el archivo Recovery.wim
+	Local $intUltimoBackslash = StringInStr($Ruta, "\",0,-1)
+	Local $strLocationFolderDestino = StringMid($Ruta, 1, $intUltimoBackslash)
+	Return $strLocationFolderDestino
+EndFunc
+
 
 Func LeerSistemaSeleccionado()
 	If	GUICtrlRead($ck_UEFI) = $GUI_CHECKED Then
@@ -144,8 +153,7 @@ Func DetectarDiscoUSB()
 	Return False
 EndFunc
 
-
-Func PrepararDiscoNuevo()
+Func PrepararDisco($flgDiscoEntero)
 	Local $sTipoDisco, $intRespuesta, $Resultado
 	GUICtrlSetState($btInstalar, $GUI_DISABLE)
 	If $DiscoActual = "N" Then
@@ -153,7 +161,7 @@ Func PrepararDiscoNuevo()
 		ActualizandoStatus()
 		Return False
 	EndIf
-	If DetectarDiscoUSB() Then Return False
+;~ 	If DetectarDiscoUSB() Then Return False
 ;~ 	$sTipoDisco = $arDisks[$DiscoActual][10]
 ;~ 	If $sTipoDisco = "USB" Then
 ;~ 		$intRespuesta = MsgBox(4,"Tipo de Disco Extraible", "El tipo de disco seleccionado es USB. ¿Esta seguro de instalar en este tipo de disco?")
@@ -163,11 +171,25 @@ Func PrepararDiscoNuevo()
 ;~ 			Return False
 ;~ 		EndIf
 ;~ 	EndIf
+
 	If $strSistemaSel = "BIOS" Then
-		$Resultado = TareaComandosDiskpart($arPrepararMBR)
+		$arrayCmdDisco = $arPrepararMBR
+;~ 		$Resultado = TareaComandosDiskpart($arPrepararMBR)
 	Else
-		$Resultado = TareaComandosDiskpart($arPrepararUEFI)
+		$arrayCmdDisco = $arPrepararUEFI
+;~ 		$Resultado = TareaComandosDiskpart($arPrepararUEFI)
 	EndIf
+	;si es instalacion a particion, borramos las tareas no necesarias
+	If Not $flgDiscoEntero Then
+		;si no es adayecente eliminamo la tarea "shrink"
+		If Not $flagRecoveryAdyacente Then
+			_ArrayDelete($arrayCmdDisco, 8) ; tarea shrink
+			If $strSistemaSel <> "BIOS" Then _ArrayDelete($arrayCmdDisco, 6) ; tarea active, para discos UEFI no se usa
+			_ArrayDelete($arrayCmdDisco, "0;1") ; tarea borrado disco
+		EndIf
+	EndIf
+
+	$Resultado = TareaComandosDiskpart($arrayCmdDisco)
 	If $Resultado Then
 		Local $sError = $Resultado & " Fallo: La tarea no se pudo completar"
 		RefrescarDiscos()
@@ -265,29 +287,17 @@ Func f_KillIfProcessExists($process_name)
 EndFunc
 
 Func f_InstalarEnDiscoNuevo()
-	LimpiarVentanaProgreso()
-	f_AsignarParametros()
+;~ 	LimpiarVentanaProgreso()
+;~ 	f_AsignarParametros()
 
 	GUISetState(@SW_SHOW, $FormMensajesProgreso)
    ;ConsoleWrite("Disco actual: " & $DiscoActual & @CRLF)
 	f_MensajeTitulo("Iniciando Instalación en Disco")
 	MensajesProgreso($MensajesInstalacion, "Preparando disco " & $DiscoActual & ":")
 	FormProgreso_lblProgreso("Preparando disco... ")
-	If Not PrepararDiscoNuevo() Then Return False
+	If Not PrepararDisco(True) Then Return False
 	If Not ValidarParticiones() Then Return False
-	;aplicamos imagen sistema a la particion con la letra W:
-	If Not df_AplicarImagen($pathFileWimSel, $intIndexImageSel, "W") Then Return False
-	;version q usa 2 imagenes
-	;extraemos la ruta al folder donde ubicamos el archivo WIM, y usamos la misma ruta
-	;para el archivo Recovery.wim
-	Local $intUltimoBackslash = StringInStr($pathFileWimSel, "\",0,-1)
-	Local $strLocationFolderDestino = StringMid($pathFileWimSel, 1, $intUltimoBackslash)
-	;aplicamos imagen Recovery a la particion con la letra R:
-	If Not df_AplicarImagen($strLocationFolderDestino & "Recovery.wim", 1, "R") Then Return False
-	If Not f_ActivarParticiones() Then Return False
-	MensajesProgreso($MensajesInstalacion, "Finalizaron todas las tareas correctamente")
-	MensajesProgreso($MensajesInstalacion, "Se instaló correctamente la imagen en el Disco")
-	FormProgreso_lblProgreso("Instalación correcta de la imagen")
+	If Not f_AplicarImagenes() Then Return False
 	GUICtrlSetState($Cancelar, $GUI_ENABLE)
 	GUICtrlSetData($Cancelar, "Cerrar")
     WinSetTitle($FormMensajesProgreso, "", "Instalacion finalizada correctamente")
@@ -295,7 +305,7 @@ Func f_InstalarEnDiscoNuevo()
 EndFunc
 
 Func f_InstalarEnParticiones()
-	If DetectarDiscoUSB() Then Return False
+;~ 	If DetectarDiscoUSB() Then Return False
 	;verificar q tiene 4 particiones como minimo
 	;seleccionar disco
 	$Diskpart_pid = Diskpart_creacion_proceso()
@@ -315,7 +325,7 @@ Func f_InstalarEnParticiones()
 	EndIf
 	ConsoleWrite("particiones necesarias: " & UBound($arParticiones) & @CRLF)
 	If UBound($arParticiones) < $minParticiones Then
-		MsgBox(0, "Particiones", "El disco solo tiene " & UBound($arParticiones) & " particion(es), aplique la función 'Nuevo'"  )
+		MsgBox(0, "Particiones", "El disco solo tiene " & UBound($arParticiones) & " particion(es), no parece tener particion de solo datos"  )
 		Return False
 	EndIf
 		GUISetState(@SW_SHOW, $FormMensajesProgreso)
@@ -327,6 +337,7 @@ Func f_InstalarEnParticiones()
 	;detectar particion sistema
 	;Encontrar particion sistema
 	If $arDisks[$DiscoActual][7] = "UEFI" Then
+		$strSistemaSel = "UEFI"
 		;si es UEFI, puede q sea la 2 particion la q sea de sistema
 		If Not IsPartitionType($intPartActual, $SYSTEM_PART_NUM) Then
 			$intPartActual += 1
@@ -336,6 +347,8 @@ Func f_InstalarEnParticiones()
 				Return False
 			EndIf
 		EndIf
+	Else
+		$strSistemaSel = "BIOS"
 	EndIf
 	$arParticionesSistema[0][0] = $arParticiones[$intPartActual][0]
 	MensajesProgreso($MensajesInstalacion, "Se detecto la partición " & $arParticionesSistema[0][0] & " como partición de arranque")
@@ -438,7 +451,7 @@ Func f_InstalarEnParticiones()
 	MensajesProgreso($MensajesInstalacion, "Se encontró la carpeta " & $arParticionesSistema[2][1] & ":\Recovery")
 	$intBarraProgresoGUI = 14
 	gi_MostrarAvanceBarraProgresoGUI($InstProgreso, $intBarraProgresoGUI)
-	Return False
+	;Return False
 	; eliminar particiones sistema, principal y recovery
 	If $arDisks[$DiscoActual][7] = "UEFI" Then
 		dpf_EliminarParticionArranqueUEFI($Diskpart_pid, $arParticionesSistema[0][0])
@@ -454,11 +467,32 @@ Func f_InstalarEnParticiones()
 	$intBarraProgresoGUI = 20
 	gi_MostrarAvanceBarraProgresoGUI($InstProgreso, $intBarraProgresoGUI)
 	;crear particiones
-	; aplicar procedimientos ya establecidos
-	ConsoleWrite("Todo OK")
+	If Not PrepararDisco(False) Then Return False ; cuando es a particiones es False
+	If Not ValidarParticiones() Then Return False
+	If Not f_AplicarImagenes() Then Return False
+	GUICtrlSetState($Cancelar, $GUI_ENABLE)
+	GUICtrlSetData($Cancelar, "Cerrar")
+    WinSetTitle($FormMensajesProgreso, "", "Instalacion finalizada correctamente")
 	Return True
 EndFunc
 
+Func f_AplicarImagenes()
+	;aplicamos imagen sistema a la particion con la letra W:
+	If Not df_AplicarImagen($pathFileWimSel, $intIndexImageSel, "W") Then Return False
+	;version q usa 2 imagenes
+;~ 	;extraemos la ruta al folder donde ubicamos el archivo WIM, y usamos la misma ruta
+;~ 	;para el archivo Recovery.wim
+;~ 	Local $intUltimoBackslash = StringInStr($pathFileWimSel, "\",0,-1)
+;~ 	Local $strLocationFolderDestino = StringMid($pathFileWimSel, 1, $intUltimoBackslash)
+	Local $strLocationFolderDestino = ExtraerRutaPadre($pathFileWimSel)
+	;aplicamos imagen Recovery a la particion con la letra R:
+	If Not df_AplicarImagen($strLocationFolderDestino & "Recovery.wim", 1, "R") Then Return False
+	If Not f_ActivarParticiones() Then Return False
+	MensajesProgreso($MensajesInstalacion, "Finalizaron todas las tareas correctamente")
+	MensajesProgreso($MensajesInstalacion, "Se instaló correctamente la imagen en el Disco")
+	FormProgreso_lblProgreso("Instalación correcta de la imagen")
+	Return True
+EndFunc
 
 Func f_AsignarParametros()
 	$strSistemaSel = LeerSistemaSeleccionado()
@@ -505,13 +539,17 @@ Func f_ActivarParticiones()
 	gi_MostrarAvanceBarraProgresoGUI($InstProgreso, $intBarraProgresoGUI)
 	Local $OsGuid = f_FindGuidBcdedit()
 	If $OsGuid = "." Then
-		MensajesProgreso($MensajesInstalacion, "    Error al ejecutar BCDEDIT")
-		Return False
+		MensajesProgreso($MensajesInstalacion, "    Se recomienda ejecutar 'reagentc /enable' para finalizar la activacion")
+		;Return False
+		Local $strLocationFolderDestino = ExtraerRutaPadre($pathFileWimSel)
+		If Not f_TareaCMD($arrayComandos, 8, $strLocationFolderDestino) Then MensajesProgreso($MensajesInstalacion, "    Error copiando recovery_enable.cmd")
 	EndIf
 	If Not f_TareaCMD($arrayComandos, 4, $rutaWinre) Then Return False
 	$intBarraProgresoGUI = 92
 	gi_MostrarAvanceBarraProgresoGUI($InstProgreso, $intBarraProgresoGUI)
-	If Not f_TareaCMD($arrayComandos, 7, $OsGuid) Then Return False
+	If $OsGuid <> "." Then
+		If Not f_TareaCMD($arrayComandos, 7, $OsGuid) Then Return False
+	EndIf
 	$intBarraProgresoGUI = 100
 	gi_MostrarAvanceBarraProgresoGUI($InstProgreso, $intBarraProgresoGUI)
 	Return True

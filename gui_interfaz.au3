@@ -4,7 +4,7 @@ $strEmailAutor = "laz133@gmail.com"
 $ModoDiscoTotal = "Todo el disco"
 $ModoDiscoParticion = "Solo en particion Windows"
 #Region ### START Koda GUI section ### Form=d:\util\win_deploy\gui_design.kxf
-$Activador = GUICreate($strNombrePrograma & $strVersionApp, 615, 411, 183, 166)
+$Activador = GUICreate($strNombrePrograma  & _GetVersion(), 615, 411, 183, 166)
 $GroupSelDisk = GUICtrlCreateGroup("Seleccione disco", 16, 8, 577, 185)
 $idListDiscos = GUICtrlCreateListView("#|  Modelo    |Sistema|Tamaño|Espacio Libre|Interface|Status", 40, 32, 521, 105, BitOr($LVS_SHOWSELALWAYS, $LVS_SINGLESEL, $LVS_NOSORTHEADER))
 GUICtrlSendMsg(-1, $LVM_SETCOLUMNWIDTH, 0, 30)
@@ -114,6 +114,16 @@ $Label4 = GUICtrlCreateLabel("mediante la herramienta DISM.", 16, 120, 149, 17)
 ;Funciones GUI
 ;$lblMensajesInstalacion = GUICtrlCreateLabel("", 16, 16, 577, 353)
 ;GUICtrlSetState($lblMensajesInstalacion,$GUI_ONTOP+$GUI_FOCUS)
+
+Func _GetVersion()
+    If @Compiled Then
+        Return FileGetVersion(@AutoItExe)
+Return "1.1.1.1"
+    Else
+        Return IniRead(@ScriptFullPath, "FileVersion", "#AutoIt3Wrapper_Res_Fileversion", "0.0.0.0")
+;~ Return "x.x.x.x"
+    EndIf
+EndFunc
 
 Global $gi_boolPuedoCerrarProgreso = True
 Global $gi_AlmacenTextoMensajes = ""
