@@ -137,7 +137,7 @@ Func dpf_ExtraerListaParticiones($sSalida)
 		$arParticiones[$i][4] = _ConvertirGBbinToGBdecimal($arSize[0], $arSize[1])
 		$arParticiones[$i][5] = $arSize[1] ;Unidad
 	 Next
-	; _ArrayDisplay($arParticiones, "Lista Filas")
+	;_ArrayDisplay($arParticiones, "Lista Filas")
 	Return True
 
 EndFunc

@@ -181,12 +181,12 @@ Func PrepararDisco($flgDiscoEntero)
 	EndIf
 	;si es instalacion a particion, borramos las tareas no necesarias
 	If Not $flgDiscoEntero Then
-		;si no es adayecente eliminamo la tarea "shrink"
+		;si no es adyacente eliminamos la tarea "shrink"
 		If Not $flagRecoveryAdyacente Then
 			_ArrayDelete($arrayCmdDisco, 8) ; tarea shrink
-			If $strSistemaSel <> "BIOS" Then _ArrayDelete($arrayCmdDisco, 6) ; tarea active, para discos UEFI no se usa
-			_ArrayDelete($arrayCmdDisco, "0;1") ; tarea borrado disco
 		EndIf
+		If $strSistemaSel <> "BIOS" Then _ArrayDelete($arrayCmdDisco, 6) ; tarea active, para discos UEFI no se usa
+		_ArrayDelete($arrayCmdDisco, "0;1") ; tarea borrado disco
 	EndIf
 
 	$Resultado = TareaComandosDiskpart($arrayCmdDisco)
@@ -305,8 +305,6 @@ Func f_InstalarEnDiscoNuevo()
 EndFunc
 
 Func f_InstalarEnParticiones()
-;~ 	If DetectarDiscoUSB() Then Return False
-	;verificar q tiene 4 particiones como minimo
 	;seleccionar disco
 	$Diskpart_pid = Diskpart_creacion_proceso()
 	If SeleccionarDisco($Diskpart_pid, $DiscoActual) Then
@@ -328,14 +326,14 @@ Func f_InstalarEnParticiones()
 		MsgBox(0, "Particiones", "El disco solo tiene " & UBound($arParticiones) & " particion(es), no parece tener particion de solo datos"  )
 		Return False
 	EndIf
-		GUISetState(@SW_SHOW, $FormMensajesProgreso)
+	GUISetState(@SW_SHOW, $FormMensajesProgreso)
 	f_MensajeTitulo("Iniciando Instalacion en Disco")
 	MensajesProgreso($MensajesInstalacion, "Se encontraron " & UBound($arParticiones) & " particion(es) en el disco")
 	MensajesProgreso($MensajesInstalacion, "Preparando disco " & $DiscoActual & ":")
 	FormProgreso_lblProgreso("Preparando disco... ")
 	$intPartActual = 0
+
 	;detectar particion sistema
-	;Encontrar particion sistema
 	If $arDisks[$DiscoActual][7] = "UEFI" Then
 		$strSistemaSel = "UEFI"
 		;si es UEFI, puede q sea la 2 particion la q sea de sistema
@@ -396,19 +394,6 @@ Func f_InstalarEnParticiones()
 	Next
 	EndIf
 
-;~ 	For $i = 0 to UBound($arParticiones)- 1
-;~ 		If IsPartitionType($i, $RECOVERY_PART_NUM) Then
-;~ 			$arParticionesSistema[2][0] = $arParticiones[$i][0]
-;~ 		EndIf
-;~ 	Next
-;~ 	If $arParticionesSistema[2][0] = ($arParticionesSistema[1][0] + 1) Then
-;~ 		$flagRecoveryAdyacente = True
-;~ 		$msjRecovery = " "
-;~ 	Else
-;~ 		$flagRecoveryAdyacente = False
-;~ 		$msjRecovery = "no "
-;~ 	EndIf
-
 	ConsoleWrite("Partición Recovery: " & $arParticionesSistema[2][0] & @CRLF)
 	If $arParticionesSistema[2][0] = 99 Then
 		MsgBox($MB_SYSTEMMODAL, "Partición Recovery", "El disco no tiene partición Recovery")
@@ -451,7 +436,8 @@ Func f_InstalarEnParticiones()
 	MensajesProgreso($MensajesInstalacion, "Se encontró la carpeta " & $arParticionesSistema[2][1] & ":\Recovery")
 	$intBarraProgresoGUI = 14
 	gi_MostrarAvanceBarraProgresoGUI($InstProgreso, $intBarraProgresoGUI)
-	;Return False
+
+;~ 	_ArrayDisplay($arParticionesSistema, "lista2")
 	; eliminar particiones sistema, principal y recovery
 	If $arDisks[$DiscoActual][7] = "UEFI" Then
 		dpf_EliminarParticionArranqueUEFI($Diskpart_pid, $arParticionesSistema[0][0])
@@ -466,8 +452,11 @@ Func f_InstalarEnParticiones()
 	dpf_EliminarParticion($Diskpart_pid, $arParticionesSistema[2][0])
 	$intBarraProgresoGUI = 20
 	gi_MostrarAvanceBarraProgresoGUI($InstProgreso, $intBarraProgresoGUI)
+	;Return False
 	;crear particiones
+;~ 	_ArrayDisplay($arParticionesSistema, "lista3")
 	If Not PrepararDisco(False) Then Return False ; cuando es a particiones es False
+;~ 	_ArrayDisplay($arParticionesSistema, "lista4")
 	If Not ValidarParticiones() Then Return False
 	If Not f_AplicarImagenes() Then Return False
 	GUICtrlSetState($Cancelar, $GUI_ENABLE)
@@ -543,11 +532,10 @@ Func f_ActivarParticiones()
 		;Return False
 		Local $strLocationFolderDestino = ExtraerRutaPadre($pathFileWimSel)
 		If Not f_TareaCMD($arrayComandos, 8, $strLocationFolderDestino) Then MensajesProgreso($MensajesInstalacion, "    Error copiando recovery_enable.cmd")
-	EndIf
-	If Not f_TareaCMD($arrayComandos, 4, $rutaWinre) Then Return False
-	$intBarraProgresoGUI = 92
-	gi_MostrarAvanceBarraProgresoGUI($InstProgreso, $intBarraProgresoGUI)
-	If $OsGuid <> "." Then
+	Else
+		If Not f_TareaCMD($arrayComandos, 4, $rutaWinre) Then Return False
+		$intBarraProgresoGUI = 92
+		gi_MostrarAvanceBarraProgresoGUI($InstProgreso, $intBarraProgresoGUI)
 		If Not f_TareaCMD($arrayComandos, 7, $OsGuid) Then Return False
 	EndIf
 	$intBarraProgresoGUI = 100
