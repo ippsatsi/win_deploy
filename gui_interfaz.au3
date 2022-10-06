@@ -1,4 +1,4 @@
-$strNombrePrograma = "Instalador de Imagenes de SO"
+$strNombrePrograma = "Instalador de Imagenes de SO "
 $strNombreAutor = "Luis Aguilar Z."
 $strEmailAutor = "laz133@gmail.com"
 $ModoDiscoTotal = "Todo el disco"
@@ -22,7 +22,7 @@ GUICtrlSetData(-1,$ModoDiscoTotal & "|" & $ModoDiscoParticion )
 $lblModoDisco = GUICtrlCreateLabel("Instalar en:", 40, 154, 86, 17)
 GUICtrlCreateGroup("", -99, -99, 1, 1)
 $GroupTipoInstalacion = GUICtrlCreateGroup("Seleccione tipo de instalacion", 16, 304, 577, 57)
-$btInstalar = GUICtrlCreateButton("Inst. Rapida", 456, 324, 105, 25)
+$btInstalar = GUICtrlCreateButton("Instalar", 456, 324, 105, 25)
 $ck_UEFI = GUICtrlCreateRadio("", 32, 328, 17, 17)
 $ck_Csm = GUICtrlCreateRadio("", 112, 328, 17, 17)
 $lblUEFI = GUICtrlCreateLabel("UEFI", 56, 330, 28, 17)
