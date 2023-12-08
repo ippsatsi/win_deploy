@@ -185,7 +185,7 @@ Func PrepararDisco($flgDiscoEntero)
 		If Not $flagRecoveryAdyacente Then
 			_ArrayDelete($arrayCmdDisco, 8) ; tarea shrink
 		EndIf
-		If $strSistemaSel <> "BIOS" Then _ArrayDelete($arrayCmdDisco, 6) ; tarea active, para discos UEFI no se usa
+	
 		_ArrayDelete($arrayCmdDisco, "0;1") ; tarea borrado disco
 	EndIf
 
