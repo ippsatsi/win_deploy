@@ -185,7 +185,7 @@ Func PrepararDisco($flgDiscoEntero)
 		If Not $flagRecoveryAdyacente Then
 			_ArrayDelete($arrayCmdDisco, 8) ; tarea shrink
 		EndIf
-	
+
 		_ArrayDelete($arrayCmdDisco, "0;1") ; tarea borrado disco
 	EndIf
 
@@ -233,6 +233,8 @@ Func ActualizandoStatus($status = $MensajeStatusError)
 EndFunc
 
 Func MensajesProgreso($xBoxProgreso, $mensaje, $xlblEstado = 0)
+	;$xBoxProgreso, es el id del control
+	; $gi_AlmacenTextoMensajes es donde se acumula la salida de los comandos
 	$gi_AlmacenTextoMensajes &= " " & $mensaje & @CRLF
 	GUICtrlSetData($xBoxProgreso,$gi_AlmacenTextoMensajes)
 	_GUICtrlEdit_Scroll($xBoxProgreso, $SB_SCROLLCARET)
@@ -240,12 +242,18 @@ Func MensajesProgreso($xBoxProgreso, $mensaje, $xlblEstado = 0)
 EndFunc
 
 Func MensajesProgresoSinCRLF($xBoxProgreso, $mensaje, $xlblEstado = 0)
+	;$xBoxProgreso, es el id del control
+	; $gi_AlmacenTextoMensajes es donde se acumula la salida de los comandos
 	$gi_AlmacenTextoMensajes &= $mensaje
 	GUICtrlSetData($xBoxProgreso, $gi_AlmacenTextoMensajes)
 	Return $mensaje
 EndFunc
 
 Func f_MensajesProgreso_MostrarProgresoTexto($xBoxProgreso, $mensaje)
+	;$xBoxProgreso, es el id del control
+	; $gi_AlmacenTextoMensajes es donde se acumula la salida de los comandos
+	; Aca a diferencia de las funciones anteriores, mantenemos sin actualizar el $gi_AlmacenTextoMensajes, y solo actualizamos el
+	; el $mensaje con la nueva data
 	GUICtrlSetData($xBoxProgreso, $gi_AlmacenTextoMensajes & $mensaje)
 	Return $mensaje
 EndFunc
