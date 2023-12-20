@@ -291,7 +291,9 @@ Func TareaComandosDiskpart($arrayComando)
 	EndIf
 	f_KillIfProcessExists("Diskpart.exe")
 	$Diskpart_pid = Diskpart_creacion_proceso()
+	ConsoleWrite('data1')
 	If SeleccionarDisco($Diskpart_pid, $DiscoActual) Then
+		ConsoleWrite('data2')
 		FormProgreso_EnableCancelar()
 		Local $floatRatioProgreso = $intPrcentajeTarea/UBound($arrayComando)
 		For $i = 0 To UBound($arrayComando) - 1
